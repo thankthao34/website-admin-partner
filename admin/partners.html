@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Admin - Quản lý Partner</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+      .drawer-transition {
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex">
+
+    <!-- TOAST CONSOLE -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🎮</span>
+          <span class="font-extrabold text-lg text-transparent bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text">GameHub Admin</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Hệ Thống Admin</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="partners.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-violet-600/30 to-violet-900/10 text-violet-400 border border-violet-500/20 shadow-md">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Quản lý Partner</span>
+          </a>
+          <a href="apis.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="code" class="w-4 h-4"></i>
+            <span>Quản lý API</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="package-search" class="w-4 h-4"></i>
+            <span>Service & Package</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Transaction Log</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="file-bar-chart" class="w-4 h-4"></i>
+            <span>Báo cáo đối soát</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="user-cog" class="w-4 h-4"></i>
+            <span>Người dùng & Phân quyền</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center font-bold text-xs text-white">AD</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Admin System</p>
+            <p class="text-gray-500 font-mono">v2.1.0</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-500 hover:text-red-400 transition-colors" title="Đăng xuất">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Hệ Thống</span>
+          <span class="text-gray-600 font-medium">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-violet-400">Quản lý Partner</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="bg-violet-950 text-violet-300 border border-violet-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Admin Portal</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-violet-400 shadow">A</div>
+            <span>Admin System ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-7xl mx-auto">
+        
+        <!-- VIEW 1: PARTNER LIST -->
+        <div id="view-list" class="space-y-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <h1 class="text-2xl font-black text-gray-100 tracking-tight">Danh sách Partner</h1>
+              <p class="text-xs text-gray-500">Quản lý danh sách các đối tác Game và cấu hình API tích hợp</p>
+            </div>
+            <button onclick="toggleDrawer(true)" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg cursor-pointer shadow flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i> Thêm Partner
+            </button>
+          </div>
+
+          <!-- Filters -->
+          <div class="bg-card border border-gray-800 p-4 rounded-xl flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3 flex-1 max-w-lg">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="search-input" placeholder="Tìm kiếm theo Tên Partner hoặc SP Code..." onkeyup="filterPartners()" class="w-full bg-black/30 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-xs text-gray-200 focus:border-accent outline-none">
+              </div>
+              <select id="status-filter" onchange="filterPartners()" class="bg-black/30 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 outline-none focus:border-accent">
+                <option value="all">Trạng thái (Tất cả)</option>
+                <option value="Active">Active</option>
+                <option value="Locked">Locked</option>
+              </select>
+            </div>
+            <button onclick="resetFilters()" class="border border-gray-700 hover:border-gray-500 bg-gray-905 p-2 rounded-lg text-gray-400 hover:text-gray-100 transition-colors text-xs flex items-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Làm mới
+            </button>
+          </div>
+
+          <!-- Partner Table Wrapper -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                    <th class="px-6 py-4">STT</th>
+                    <th class="px-6 py-4">Tên Partner</th>
+                    <th class="px-6 py-4">SP Code</th>
+                    <th class="px-6 py-4">Trạng thái</th>
+                    <th class="px-6 py-4">API Key</th>
+                    <th class="px-6 py-4">Ngày tạo</th>
+                    <th class="px-6 py-4 text-right">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="partners-table-body" class="divide-y divide-gray-850/30 text-xs">
+                  <!-- Dynamic rows rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="px-6 py-4 border-t border-gray-800 flex items-center justify-between text-gray-400 text-xs">
+              <span>Hiển thị 1 - 6 trên tổng số <span id="total-count">6</span></span>
+              <div class="flex items-center gap-1.5 font-mono">
+                <button class="border border-gray-800 px-2.5 py-1 rounded hover:bg-gray-800 transition-colors">&lt;</button>
+                <button class="bg-accent/20 border border-accent/40 text-violet-400 px-2.5 py-1 rounded">1</button>
+                <button class="border border-gray-800 px-2.5 py-1 rounded hover:bg-gray-800 transition-colors">2</button>
+                <button class="border border-gray-800 px-2.5 py-1 rounded hover:bg-gray-800 transition-colors">3</button>
+                <button class="border border-gray-800 px-2.5 py-1 rounded hover:bg-gray-800 transition-colors">&gt;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 2: PARTNER DETAIL (HIDDEN BY DEFAULT) -->
+        <div id="view-detail" class="hidden space-y-8">
+          <div class="flex items-center justify-between">
+            <button onclick="switchView('list')" class="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider cursor-pointer">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại danh sách
+            </button>
+            <span id="detail-badge" class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Active</span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEFT CARD: Partner basics -->
+            <div class="bg-card border border-gray-800 p-6 rounded-xl shadow lg:col-span-7 space-y-6">
+              <div class="flex items-center gap-4">
+                <div id="detail-avatar" class="w-16 h-16 rounded-full bg-violet-600 flex items-center justify-center text-xl font-black text-white shadow-md">GV</div>
+                <div>
+                  <h2 id="detail-title" class="text-xl font-extrabold text-white">Garena Vietnam</h2>
+                  <p id="detail-spcode" class="text-xs text-gray-400 font-mono uppercase tracking-wider mt-1">VN_VTL_001</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4 text-xs">
+                <div class="bg-black/20 p-3.5 rounded-lg border border-gray-800/40">
+                  <span class="text-gray-500 block mb-1">Ngày tạo</span>
+                  <p id="detail-created" class="font-medium text-gray-200">15/01/2024</p>
+                </div>
+                <div class="bg-black/20 p-3.5 rounded-lg border border-gray-800/40">
+                  <span class="text-gray-500 block mb-1">Cấu hình API Key</span>
+                  <div class="flex items-center justify-between gap-2 mt-1">
+                    <p id="detail-apikey" class="font-mono text-gray-200">gar***nm1234</p>
+                    <div class="flex items-center gap-1">
+                      <button onclick="toggleMaskKey()" class="text-gray-400 hover:text-white" title="Hiện"><i data-lucide="eye" class="w-3.5 h-3.5" id="detail-eye-icon"></i></button>
+                      <button onclick="copyToClipboard('gar_live_vn_vtl_sec_1234_key')" class="text-gray-400 hover:text-white" title="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-xs">
+                <span class="text-gray-500 block mb-1.5">Mô tả</span>
+                <p id="detail-desc" class="text-gray-300 leading-relaxed bg-[#0D1117] p-3 rounded-xl border border-gray-850">Nhà phát hành game hàng đầu Đông Nam Á, tích hợp các game thể thao điện tử Esports.</p>
+              </div>
+            </div>
+
+            <!-- RIGHT CARD: Dynamic action tools -->
+            <div class="bg-card border border-gray-800 p-6 rounded-xl shadow lg:col-span-5 flex flex-col justify-between">
+              <div>
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Menu Thao Tác Nhanh</h3>
+                <p class="text-xs text-gray-500 mb-6 font-medium">Thay đổi trạng thái tài khoản hoặc thay thế các cấu hình nhạy cảm bảo mật cao.</p>
+              </div>
+
+              <div class="space-y-3">
+                <button onclick="showToast('info', '✏️ Tính năng chỉnh sửa sẽ được cập nhật.')" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all">
+                  <i data-lucide="edit" class="w-4 h-4"></i> Chỉnh sửa thông tin
+                </button>
+                <button onclick="confirmAction('regenerate')" class="w-full border border-violet-850 hover:border-violet-500 hover:bg-violet-950/20 text-violet-300 text-xs font-bold uppercase tracking-wider py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all">
+                  <i data-lucide="key" class="w-4 h-4"></i> Cấp lại API Key (Regenerate)
+                </button>
+                <div class="grid grid-cols-2 gap-3">
+                  <button onclick="confirmAction('revoke')" class="border border-red-950/40 hover:border-red-500/20 hover:bg-red-950/20 text-red-400 text-xs font-bold uppercase tracking-wider py-3.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> Revoke Key
+                  </button>
+                  <button onclick="confirmAction('lock')" id="detail-lock-btn" class="border border-yellow-950/40 hover:border-yellow-500/20 hover:bg-yellow-950/20 text-yellow-400 text-xs font-bold uppercase tracking-wider py-3.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all">
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i> Khóa Partner
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Tabs Panel -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            
+            <!-- Tab Headers -->
+            <div class="flex border-b border-gray-800 bg-black/10">
+              <button onclick="switchTab('info')" id="tab-btn-info" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300">Thông tin chung</button>
+              <button onclick="switchTab('endpoints')" id="tab-btn-endpoints" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">API Endpoints</button>
+              <button onclick="switchTab('requests')" id="tab-btn-requests" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">Yêu cầu chờ duyệt</button>
+              <button onclick="switchTab('history')" id="tab-btn-history" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">Lịch sử hoạt động</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="p-6">
+              
+              <!-- Tab Info -->
+              <div id="tab-content-info" class="space-y-4">
+                <h4 class="text-sm font-bold text-gray-200">Tổng quan cấu hình chung</h4>
+                <p class="text-xs text-gray-400">Chọn tab API Endpoints để xem cấu hình giới hạn, hoặc xem danh sách Yêu cầu chờ duyệt kế bên.</p>
+              </div>
+
+              <!-- Tab Endpoints -->
+              <div id="tab-content-endpoints" class="hidden">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left">
+                    <thead>
+                      <tr class="text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800 pb-3">
+                        <th class="py-2.5">Endpoint Path</th>
+                        <th class="py-2.5">Req/s Limit (TPS)</th>
+                        <th class="py-2.5">Window Size (giây)</th>
+                        <th class="py-2.5">Burst Limit</th>
+                        <th class="py-2.5 text-right">Trạng thái</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-850/30 text-xs font-mono">
+                      <tr>
+                        <td class="py-3 text-cyan-400">/v1/check-status</td>
+                        <td class="py-3 text-gray-300">100</td>
+                        <td class="py-3 text-gray-300">1s</td>
+                        <td class="py-3 text-gray-300">150</td>
+                        <td class="py-3 text-right text-green-400 font-sans font-bold">ACTIVE</td>
+                      </tr>
+                      <tr>
+                        <td class="py-3 text-cyan-400">/v1/register</td>
+                        <td class="py-3 text-gray-300">50</td>
+                        <td class="py-3 text-gray-300">1s</td>
+                        <td class="py-3 text-gray-300">75</td>
+                        <td class="py-3 text-right text-green-400 font-sans font-bold">ACTIVE</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Tab Requests -->
+              <div id="tab-content-requests" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                  
+                  <!-- Left Request List (5 cols) -->
+                  <div class="md:col-span-5 border-r border-gray-800 pr-6 space-y-3" id="partner-req-list">
+                    <!-- Dynamic Item -->
+                    <div onclick="selectRequest(0)" id="req-item-0" class="p-3 bg-gray-900 rounded-lg border border-accent/20 cursor-pointer hover:bg-gray-800/50">
+                      <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold text-gray-200" id="req-title-partner">Garena Vietnam</span>
+                        <span class="bg-yellow-500/10 text-yellow-400 text-[10px] px-2 py-0.5 rounded font-mono font-bold">Pending</span>
+                      </div>
+                      <p class="text-[11px] text-gray-400 mt-1">Đổi Rate Limit /vcheck-status</p>
+                      <span class="text-[10px] text-gray-500 font-mono italic block mt-2">21/06/2026 10:30</span>
+                    </div>
+
+                    <div onclick="selectRequest(1)" id="req-item-1" class="p-3 bg-card rounded-lg border border-gray-800/70 cursor-pointer hover:bg-gray-800/30">
+                      <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold text-gray-200">VNG Corp</span>
+                        <span class="bg-yellow-500/10 text-yellow-400 text-[10px] px-2 py-0.5 rounded font-mono font-bold">Pending</span>
+                      </div>
+                      <p class="text-[11px] text-gray-400 mt-1">Gán API /v1/balance</p>
+                      <span class="text-[10px] text-gray-500 font-mono italic block mt-2">20/06/2026 15:45</span>
+                    </div>
+                  </div>
+
+                  <!-- Right Request Detail (7 cols) -->
+                  <div class="md:col-span-7 space-y-4 text-xs" id="partner-req-details">
+                    <div class="bg-black/20 p-4 border border-gray-800 rounded-xl space-y-3">
+                      <div class="flex justify-between items-center pb-2 border-b border-gray-850">
+                        <div>
+                          <p class="text-xs text-gray-500">Người gửi yêu cầu</p>
+                          <span class="font-bold text-gray-200 tracking-wide text-sm" id="req-detail-sender">Garena Vietnam (VN_VTL_001)</span>
+                        </div>
+                        <span class="text-xs font-mono text-gray-400">21/06/2026 10:30:25</span>
+                      </div>
+
+                      <div class="space-y-1">
+                        <p class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Cập nhật cấu hình</p>
+                        <p class="text-gray-200 leading-relaxed bg-[#0D1117] p-2 rounded text-xs font-mono">Đề nghị nâng Rate Limit từ 100 req/s lên 300 req/s để chạy sự kiện giải đấu mới của game Free Fire.</p>
+                      </div>
+
+                      <div class="space-y-1.5">
+                        <label class="block text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Trạng thái xử lý</label>
+                        <select id="req-status-dropdown" class="bg-black/60 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 w-full outline-none focus:border-accent">
+                          <option value="Approved">Duyệt (Approve)</option>
+                          <option value="Rejected">Từ chối (Reject)</option>
+                        </select>
+                      </div>
+
+                      <div class="space-y-1.5">
+                        <label class="block text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Phản hồi / Ghi chú</label>
+                        <textarea id="req-notes" placeholder="Để lại lý do hoặc lời nhắn ví dụ: 'Đã xét duyệt dựa trên lưu lượng...'" class="w-full bg-black/60 border border-gray-700 focus:border-accent outline-none text-xs text-gray-200 rounded-lg p-2.5 h-16"></textarea>
+                      </div>
+
+                      <div class="flex justify-end gap-3 pt-2">
+                        <button onclick="handleRequestApproval('Approved')" class="bg-green-600 hover:bg-green-500 text-white font-bold text-xs px-4 py-2 rounded-lg cursor-pointer">✅ Approve</button>
+                        <button onclick="handleRequestApproval('Rejected')" class="bg-red-900 hover:bg-red-800 text-white font-bold text-xs px-4 py-2 rounded-lg cursor-pointer">❌ Reject</button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Tab History -->
+              <div id="tab-content-history" class="hidden text-xs">
+                <div class="relative pl-6 border-l border-gray-800 space-y-6">
+                  
+                  <div class="relative">
+                    <span class="absolute -left-[30px] top-1.5 w-4.5 h-4.5 rounded-full bg-green-950 border border-green-500 flex items-center justify-center text-[9px] text-green-400">✔</span>
+                    <span class="text-gray-500 text-[10px] font-mono">20/06/2026 09:30</span>
+                    <p class="font-semibold text-gray-200 mt-0.5">Hệ thống kích hoạt đối tác</p>
+                    <p class="text-[11px] text-gray-500">Mã định danh VN_VTL_001 được cấp trạng thái Active.</p>
+                  </div>
+
+                  <div class="relative">
+                    <span class="absolute -left-[30px] top-1.5 w-4.5 h-4.5 rounded-full bg-violet-950 border border-violet-500 flex items-center justify-center text-[9px] text-violet-400">🔑</span>
+                    <span class="text-gray-500 text-[10px] font-mono">15/06/2026 14:12</span>
+                    <p class="font-semibold text-gray-200 mt-0.5">Khởi tạo và gán API Key</p>
+                    <p class="text-[11px] text-gray-500">Cấp mã API Key ban đầu với masking gar***nm1234.</p>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- DRAWER: THÊM PARTNER (Slide-out from Right, width 560px) -->
+    <div id="drawer-container" class="fixed inset-0 z-50 overflow-hidden hidden">
+      <!-- Backdrop -->
+      <div onclick="toggleDrawer(false)" class="absolute inset-0 bg-black/65 backdrop-blur-xs transition-opacity"></div>
+      
+      <div class="absolute inset-y-0 right-0 max-w-full flex">
+        <div id="drawer-panel" class="w-screen max-w-[560px] bg-card border-l border-gray-800 flex flex-col justify-between shadow-2xl transform translate-x-full drawer-transition">
+          
+          <!-- Drawer Header -->
+          <div class="px-6 py-5 border-b border-gray-800 bg-[#0D1117] flex justify-between items-center">
+            <div>
+              <h3 class="text-base font-bold text-gray-100 uppercase tracking-wider">Thêm Đối Tác (Partner) Mới</h3>
+              <p class="text-xs text-gray-500">Khai báo cấu hình, ID viễn thông và API giới hạn</p>
+            </div>
+            <button onclick="toggleDrawer(false)" class="text-gray-400 hover:text-white p-2 text-xl font-bold">&times;</button>
+          </div>
+
+          <!-- Drawer Body (Scrollable) -->
+          <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            
+            <!-- SECTION 1: THÔNG TIN CƠ BẢN -->
+            <div class="space-y-4 border-b border-gray-800/40 pb-5">
+              <h4 class="text-xs font-bold text-violet-400 uppercase tracking-widest">Section 1: Thông tin cơ bản</h4>
+              
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-semibold text-gray-400 uppercase">Tên Partner *</label>
+                  <input type="text" id="form-name" placeholder="Ví dụ: Garena Vietnam" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-100 placeholder-gray-500 outline-none focus:border-accent">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-semibold text-gray-400 uppercase">SP Code *</label>
+                  <input type="text" id="form-spcode" placeholder="Ví dụ: VN_VTL_001" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-100 placeholder-gray-500 outline-none focus:border-accent">
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-gray-400 uppercase">Trạng thái khởi tạo</label>
+                <div class="flex items-center gap-6 mt-1.5">
+                  <label class="flex items-center gap-2 cursor-pointer text-xs">
+                    <input type="radio" name="form-status" value="Active" checked class="accent-accent"> Active
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer text-xs">
+                    <input type="radio" name="form-status" value="Locked" class="accent-accent"> Locked
+                  </label>
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-gray-400 uppercase">Mô tả ngắn</label>
+                <textarea id="form-desc" placeholder="Nhập tóm tắt mô tả đối tác..." class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-100 placeholder-gray-500 outline-none focus:border-accent h-16"></textarea>
+              </div>
+            </div>
+
+            <!-- SECTION 2: MÃ ĐỊNH DANH (COMBINED CODE) -->
+            <div class="space-y-4 border-b border-gray-800/40 pb-5">
+              <h4 class="text-xs font-bold text-violet-400 uppercase tracking-widest">Section 2: Mã định danh Cổng cổng kết nối</h4>
+              
+              <div class="grid grid-cols-3 gap-3">
+                <div class="space-y-1">
+                  <label class="block text-[10px] font-bold text-gray-500 uppercase">Mã Quốc Gia *</label>
+                  <select id="form-country" onchange="updateBrandPreview()" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2 text-xs text-gray-300 outline-none focus:border-accent">
+                    <option value="VN">VN</option>
+                    <option value="TH">TH</option>
+                    <option value="SG">SG</option>
+                  </select>
+                </div>
+                
+                <div class="space-y-1">
+                  <label class="block text-[10px] font-bold text-gray-500 uppercase">Mã Nhà Mạng *</label>
+                  <select id="form-operator" onchange="updateBrandPreview()" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2 text-xs text-gray-300 outline-none focus:border-accent">
+                    <option value="VTL">Viettel (VTL)</option>
+                    <option value="MBF">Mobifone (MBF)</option>
+                    <option value="VNP">Vinaphone (VNP)</option>
+                    <option value="GTL">GTM (GTL)</option>
+                  </select>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="block text-[10px] font-bold text-gray-500 uppercase">Mã Dịch Vụ *</label>
+                  <input type="text" id="form-servicecode" value="GAME01" placeholder="GAME01" onkeyup="updateBrandPreview()" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2 text-xs text-gray-100 outline-none focus:border-accent font-mono uppercase">
+                </div>
+              </div>
+
+              <div class="p-3 bg-black/30 border border-gray-800 rounded-xl">
+                <span class="text-[10px] text-gray-500 uppercase font-semibold">Mã Cổng viễn thông liên kết (Preview ID):</span>
+                <p id="form-preview-id" class="text-sm font-mono font-bold text-cyan-400 mt-1">VN_VTL_GAME01</p>
+              </div>
+            </div>
+
+            <!-- SECTION 3: API ENDPOINTS -->
+            <div class="space-y-4">
+              <div class="flex justify-between items-center">
+                <h4 class="text-xs font-bold text-violet-400 uppercase tracking-widest">Section 3: API Endpoints cấp quyền</h4>
+                <div class="flex gap-2">
+                  <button type="button" onclick="loadDefaultEndpoints()" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white border border-gray-700 font-bold uppercase rounded px-2.5 py-1">Áp dụng mặc định</button>
+                  <button type="button" onclick="addNewEndpointRow()" class="text-[10px] bg-accent/25 hover:bg-accent/40 text-violet-400 border border-accent/30 font-bold uppercase rounded px-2.5 py-1">+ Thêm Endpoint</button>
+                </div>
+              </div>
+
+              <!-- Mini table -->
+              <div class="border border-gray-800 bg-black/20 rounded-xl overflow-hidden">
+                <table class="w-full text-left text-xs">
+                  <tr class="bg-black/40 text-[10px] font-bold text-gray-500 uppercase tracking-wider border-b border-gray-800">
+                    <th class="px-4 py-2">Endpoint Path</th>
+                    <th class="px-4 py-2">Req/s</th>
+                    <th class="px-4 py-2">Window</th>
+                    <th class="px-4 py-2">Burst</th>
+                    <th class="px-4 py-2 text-right">Xóa</th>
+                  </tr>
+                  <tbody id="drawer-endpoints-list" class="divide-y divide-gray-850/30 font-mono">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Drawer Footer -->
+          <div class="px-6 py-4 border-t border-gray-800 bg-[#0D1117] flex justify-end gap-3.5">
+            <button onclick="toggleDrawer(false)" class="border border-gray-700 hover:border-gray-500 hover:bg-gray-800 text-gray-300 font-semibold text-xs uppercase tracking-wide px-5 py-3 rounded-xl cursor-pointer">Hủy</button>
+            <button onclick="saveNewPartner()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl cursor-pointer">Lưu Partner</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- DANGEROUS ACTION MODAL (Revoke/Lock) -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="toggleModal(false)" class="absolute inset-0 bg-black/75 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 p-6 rounded-2xl w-full max-w-md shadow-2xl space-y-5">
+        <div class="flex items-center gap-3 text-yellow-400">
+          <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+          <div>
+            <h3 class="text-base font-bold text-gray-100">Báo Động Action Nguy Hiểm!</h3>
+            <p class="text-xs text-gray-500 font-medium">Hành động này tác động trực tiếp đến kết nối của khách hàng.</p>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-300 leading-relaxed bg-[#0D1117] p-3 rounded-lg border border-gray-800" id="confirm-text">Bạn có chắc chắn muốn thực hiện hành động này không?</p>
+
+        <div class="flex justify-end gap-3 font-semibold text-xs uppercase tracking-wider">
+          <button onclick="toggleModal(false)" class="border border-gray-700 text-gray-400 hover:text-white px-4 py-2.5 rounded-lg cursor-pointer">Hủy</button>
+          <button id="modal-submit-btn" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2.5 rounded-lg cursor-pointer">Xác Nhận</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global list of Partners (realistic mock data representing the table)
+      let partnersArray = [
+        { id: 1, name: "Garena Vietnam", spcode: "VN_VTL_001", status: "Active", apikey: "gar***nm1234", created: "15/01/2024", desc: "Nhà phát hành game hàng đầu Đông Nam Á, tích hợp các game thể thao điện tử Esports." },
+        { id: 2, name: "VNG Corporation", spcode: "VN_MBF_002", status: "Active", apikey: "vng***rp5678", created: "20/01/2024", desc: "Đơn vị cung cấp nội dung số tích hợp thanh toán tiện lợi tại Việt Nam." },
+        { id: 3, name: "Krafton Vietnam", spcode: "VN_VNP_003", status: "Active", apikey: "kra***vn9012", created: "25/01/2024", desc: "Đơn vị vận hành game bắn súng sinh tồn PUBG Mobile." },
+        { id: 4, name: "Sea Limited", spcode: "VN_GTL_004", status: "Locked", apikey: "sea***td3456", created: "01/02/2024", desc: "Đại lý liên kết game quốc tế." },
+        { id: 5, name: "Moonton VN", spcode: "VN_VTL_005", status: "Active", apikey: "moo***vn7890", created: "10/02/2024", desc: "Tối ưu hóa kết nối cho Mobile Legends Việt Nam." },
+        { id: 6, name: "Riot Games VN", spcode: "VN_MBF_006", status: "Active", apikey: "rio***vn2345", created: "15/02/2024", desc: "Tích hợp dịch vụ Valorant và League of Legends." }
+      ];
+
+      let selectedPartnerId = null;
+      let isKeyMasked = true;
+      let modalActionType = '';
+
+      // Initialize Page
+      function init() {
+        renderTable();
+        lucide.createIcons();
+        checkUrlParams();
+      }
+
+      // Check URL parameters for direct details link
+      function checkUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const partnerId = urlParams.get('id');
+        const tab = urlParams.get('tab');
+        if (partnerId) {
+          viewDetails(parseInt(partnerId));
+        }
+        if (tab === 'requests') {
+          switchTab('requests');
+        }
+      }
+
+      // Render Table rows dynamically
+      function renderTable() {
+        const searchVal = document.getElementById('search-input').value.toLowerCase();
+        const statusFilter = document.getElementById('status-filter').value;
+        const tbody = document.getElementById('partners-table-body');
+        tbody.innerHTML = '';
+
+        let filtered = partnersArray.filter(p => {
+          const matchSearch = p.name.toLowerCase().includes(searchVal) || p.spcode.toLowerCase().includes(searchVal);
+          const matchStatus = statusFilter === 'all' || p.status === statusFilter;
+          return matchSearch && matchStatus;
+        });
+
+        document.getElementById('total-count').textContent = filtered.length;
+
+        filtered.forEach((p, index) => {
+          let badgeColor = p.status === 'Active' 
+            ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
+            : 'bg-red-500/10 text-red-400 border border-red-500/20';
+          
+          let dotColor = p.status === 'Active' ? 'bg-green-500' : 'bg-red-500';
+
+          const rowHtml = `
+            <tr class="hover:bg-gray-800/20 transition-colors">
+              <td class="px-6 py-4 font-mono font-medium text-gray-500">${index + 1}</td>
+              <td class="px-6 py-4 font-bold text-gray-200">${p.name}</td>
+              <td class="px-6 py-4 font-mono text-[11px] uppercase tracking-wide text-gray-400">${p.spcode}</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${badgeColor}">
+                  <span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span> ${p.status}
+                </span>
+              </td>
+              <td class="px-6 py-4 font-mono text-[11px] text-gray-500">${p.apikey}</td>
+              <td class="px-6 py-4 text-gray-400 font-mono">${p.created}</td>
+              <td class="px-6 py-4 text-right">
+                <button onclick="viewDetails(${p.id})" class="border border-gray-800 hover:border-gray-500 hover:bg-gray-800 bg-[#0D1117] text-gray-300 font-bold uppercase tracking-wide text-[10px] py-1.5 px-3 rounded-lg transition-all cursor-pointer">Xem</button>
+              </td>
+            </tr>
+          `;
+          tbody.insertAdjacentHTML('beforeend', rowHtml);
+        });
+
+        lucide.createIcons();
+      }
+
+      // Filter trigger
+      function filterPartners() {
+        renderTable();
+      }
+
+      // Reset filter options
+      function resetFilters() {
+        document.getElementById('search-input').value = '';
+        document.getElementById('status-filter').value = 'all';
+        renderTable();
+        showToast('info', '🔄 Bộ lọc của bạn đã được làm mới.');
+      }
+
+      // Switch View Details or List
+      function switchView(view) {
+        if (view === 'list') {
+          document.getElementById('view-list').classList.remove('hidden');
+          document.getElementById('view-detail').classList.add('hidden');
+        } else {
+          document.getElementById('view-list').classList.add('hidden');
+          document.getElementById('view-detail').classList.remove('hidden');
+        }
+      }
+
+      // Populate details view
+      function viewDetails(partnerId) {
+        selectedPartnerId = partnerId;
+        const partner = partnersArray.find(p => p.id === partnerId);
+        if (!partner) return;
+
+        // Apply fields to detail page
+        document.getElementById('detail-title').textContent = partner.name;
+        document.getElementById('detail-spcode').textContent = partner.spcode;
+        document.getElementById('detail-created').textContent = partner.created;
+        document.getElementById('detail-desc').textContent = partner.desc;
+        document.getElementById('detail-avatar').textContent = partner.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+        
+        // Trạng thái badge
+        const badge = document.getElementById('detail-badge');
+        badge.textContent = partner.status;
+        if (partner.status === 'Active') {
+          badge.className = "bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow";
+          document.getElementById('detail-lock-btn').innerHTML = '<i class="w-4 h-4" data-lucide="shield-alert"></i> Khóa Partner';
+          document.getElementById('detail-lock-btn').className = "border border-yellow-950/40 hover:border-yellow-500/20 hover:bg-yellow-950/20 text-yellow-400 text-xs font-bold uppercase tracking-wider py-3.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all";
+        } else {
+          badge.className = "bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow";
+          document.getElementById('detail-lock-btn').innerHTML = '<i class="w-4 h-4" data-lucide="shield-check"></i> Mở khóa';
+          document.getElementById('detail-lock-btn').className = "border border-green-950/40 hover:border-green-500/20 hover:bg-green-950/20 text-green-400 text-xs font-bold uppercase tracking-wider py-3.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all";
+        }
+
+        isKeyMasked = true;
+        document.getElementById('detail-apikey').textContent = partner.apikey;
+        document.getElementById('detail-eye-icon').setAttribute('data-lucide', 'eye');
+
+        switchView('detail');
+        switchTab('info');
+        lucide.createIcons();
+      }
+
+      // Handle custom password masking
+      function toggleMaskKey() {
+        const partner = partnersArray.find(p => p.id === selectedPartnerId);
+        if (!partner) return;
+        
+        isKeyMasked = !isKeyMasked;
+        const keyDisplay = document.getElementById('detail-apikey');
+        const eyeIcon = document.getElementById('detail-eye-icon');
+
+        if (isKeyMasked) {
+          keyDisplay.textContent = partner.apikey;
+          eyeIcon.setAttribute('data-lucide', 'eye');
+        } else {
+          keyDisplay.textContent = `gar_live_vn_vtl_sec_${partner.spcode.toLowerCase()}_9031_key`;
+          eyeIcon.setAttribute('data-lucide', 'eye-off');
+        }
+        lucide.createIcons();
+      }
+
+      // Tab switcher inside Partner detail
+      function switchTab(tabId) {
+        const tabs = ['info', 'endpoints', 'requests', 'history'];
+        tabs.forEach(t => {
+          document.getElementById(`tab-content-${t}`).classList.add('hidden');
+          const btn = document.getElementById(`tab-btn-${t}`);
+          btn.className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent";
+        });
+
+        document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+        document.getElementById(`tab-btn-${tabId}`).className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300";
+      }
+
+      // Select specific pending requests in detail requests tab
+      function selectRequest(reqIdx) {
+        const items = [0, 1];
+        items.forEach(idx => {
+          const el = document.getElementById(`req-item-${idx}`);
+          if (idx === reqIdx) {
+            el.className = "p-3 bg-gray-900 rounded-lg border border-accent/20 cursor-pointer hover:bg-gray-800/50";
+          } else {
+            el.className = "p-3 bg-card rounded-lg border border-gray-800/70 cursor-pointer hover:bg-gray-800/30";
+          }
+        });
+
+        if (reqIdx === 0) {
+          document.getElementById('req-detail-sender').textContent = "Garena Vietnam (VN_VTL_001)";
+          document.querySelector('#partner-req-details p.text-mono').textContent = "Đề nghị nâng Rate Limit từ 100 req/s lên 300 req/s để chạy sự kiện giải đấu mới của game Free Fire.";
+        } else {
+          document.getElementById('req-detail-sender').textContent = "VNG Corporation (VN_MBF_002)";
+          document.querySelector('#partner-req-details p.text-mono').textContent = "Cấp quyền sử dụng thêm API Get Balance (/v1/balance) nhằm đồng bộ hóa nạp gói VIP 30 ngày.";
+        }
+      }
+
+      function handleRequestApproval(status) {
+        showToast('success', `✅ Yêu cầu đã được cập nhật thành: ${status === 'Approved' ? 'Phê duyệt' : 'Từ chối'}`);
+      }
+
+      // DRAWER INTERACTION
+      function toggleDrawer(open) {
+        const container = document.getElementById('drawer-container');
+        const panel = document.getElementById('drawer-panel');
+
+        if (open) {
+          container.classList.remove('hidden');
+          setTimeout(() => {
+            panel.classList.remove('translate-x-full');
+          }, 10);
+          resetEndpointsForm();
+        } else {
+          panel.classList.add('translate-x-full');
+          setTimeout(() => {
+            container.classList.add('hidden');
+          }, 300);
+        }
+      }
+
+      // Update mã dự báo (preview combine code)
+      function updateBrandPreview() {
+        const country = document.getElementById('form-country').value;
+        const operator = document.getElementById('form-operator').value;
+        const scode = document.getElementById('form-servicecode').value.toUpperCase().replace(/\s/g, '');
+        
+        document.getElementById('form-preview-id').textContent = `${country}_${operator}_${scode || "GAME01"}`;
+      }
+
+      // Core Drawer Endpoint Mini Form Lists
+      let dynamicEndpoints = [];
+
+      function resetEndpointsForm() {
+        dynamicEndpoints = [];
+        renderDynamicEndpoints();
+      }
+
+      function loadDefaultEndpoints() {
+        dynamicEndpoints = [
+          { path: "/v1/check-status", req: 100, window: 1, burst: 150 },
+          { path: "/v1/register", req: 50, window: 1, burst: 75 }
+        ];
+        renderDynamicEndpoints();
+        showToast('info', 'Áp dụng cấu hình endpoints mặc định hệ thống!');
+      }
+
+      function addNewEndpointRow() {
+        dynamicEndpoints.push({ path: "/v1/custom", req: 10, window: 1, burst: 15 });
+        renderDynamicEndpoints();
+      }
+
+      function renderDynamicEndpoints() {
+        const tbody = document.getElementById('drawer-endpoints-list');
+        tbody.innerHTML = '';
+
+        if (dynamicEndpoints.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-gray-500 font-sans italic">Chưa cấu hình Endpoint nào. Nhấp "Áp dụng mặc định" để tạo nhanh.</td></tr>';
+          return;
+        }
+
+        dynamicEndpoints.forEach((ep, idx) => {
+          const tr = `
+            <tr>
+              <td class="px-2 py-2">
+                <input type="text" value="${ep.path}" onchange="updateEpItem(${idx}, 'path', this.value)" class="bg-black/40 border border-gray-800 rounded px-2 py-1 text-xs text-gray-200 focus:border-cyan w-full font-mono outline-none">
+              </td>
+              <td class="px-2 py-2">
+                <input type="number" value="${ep.req}" onchange="updateEpItem(${idx}, 'req', this.value)" class="bg-black/40 border border-gray-800 rounded px-2 py-1 text-xs text-cyan-400 focus:border-cyan w-16 outline-none">
+              </td>
+              <td class="px-2 py-2">
+                <input type="number" value="${ep.window}" onchange="updateEpItem(${idx}, 'window', this.value)" class="bg-black/40 border border-gray-800 rounded px-2 py-1 text-xs text-gray-300 focus:border-cyan w-12 outline-none">
+              </td>
+              <td class="px-2 py-2">
+                <input type="number" value="${ep.burst}" onchange="updateEpItem(${idx}, 'burst', this.value)" class="bg-black/40 border border-gray-800 rounded px-2 py-1 text-xs text-gray-300 focus:border-cyan w-16 outline-none">
+              </td>
+              <td class="px-2 py-2 text-right">
+                <button type="button" onclick="deleteEpRow(${idx})" class="text-red-500 hover:text-red-400 p-1 font-sans font-bold">🗑</button>
+              </td>
+            </tr>
+          `;
+          tbody.insertAdjacentHTML('beforeend', tr);
+        });
+      }
+
+      function updateEpItem(idx, prop, val) {
+        if (prop === 'path') {
+          dynamicEndpoints[idx].path = val;
+        } else {
+          dynamicEndpoints[idx][prop] = parseInt(val) || 0;
+        }
+      }
+
+      function deleteEpRow(idx) {
+        dynamicEndpoints.splice(idx, 1);
+        renderDynamicEndpoints();
+      }
+
+      // Save Newly Created Partner via Drawer Form
+      function saveNewPartner() {
+        const name = document.getElementById('form-name').value.trim();
+        const spcode = document.getElementById('form-spcode').value.trim();
+        const desc = document.getElementById('form-desc').value.trim();
+        const status = document.querySelector('input[name="form-status"]:checked').value;
+
+        if (!name || !spcode) {
+          showToast('error', 'Vui lòng nhập đầy đủ các thông tin bắt buộc (*)');
+          return;
+        }
+
+        const newId = partnersArray.length + 1;
+        const newPart = {
+          id: newId,
+          name: name,
+          spcode: spcode,
+          status: status,
+          apikey: `${name.substring(0,3).toLowerCase()}***key${Math.floor(Math.random()*9000)+1000}`,
+          created: new Date().toLocaleDateString('vi-VN'),
+          desc: desc || "Không có mô tả chi tiết."
+        };
+
+        partnersArray.unshift(newPart); // Add at top
+        renderTable();
+        toggleDrawer(false);
+
+        // Reset inputs
+        document.getElementById('form-name').value = '';
+        document.getElementById('form-spcode').value = '';
+        document.getElementById('form-desc').value = '';
+
+        showToast('success', '🏆 Lưu thành công! Đối tác đã được thêm vào hệ thống.');
+      }
+
+      // CONFIRM MODALS FOR DANGEROUS ACTIONS
+      function toggleModal(open, text = '', onSubmit = null) {
+        const modal = document.getElementById('confirm-modal');
+        const confirmText = document.getElementById('confirm-text');
+        const submitBtn = document.getElementById('modal-submit-btn');
+
+        if (open) {
+          modal.classList.remove('hidden');
+          confirmText.textContent = text;
+          submitBtn.onclick = () => {
+            if (onSubmit) onSubmit();
+            toggleModal(false);
+          };
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
+
+      function confirmAction(type) {
+        const partner = partnersArray.find(p => p.id === selectedPartnerId);
+        if (!partner) return;
+
+        modalActionType = type;
+
+        if (type === 'regenerate') {
+          toggleModal(
+            true, 
+            `⚠️ Cảnh báo: Regenerate Key sẽ ngay lập tức vô hiệu hóa API Key dạng "${partner.apikey}" của Partner "${partner.name}". Tiếp tục?`,
+            () => {
+              partner.apikey = `${partner.name.substring(0,3).toLowerCase()}***rg${Math.floor(Math.random()*9000)+1000}`;
+              document.getElementById('detail-apikey').textContent = partner.apikey;
+              renderTable();
+              showToast('success', '🔑 Cấp lại API Key mới thành công!');
+            }
+          );
+        } else if (type === 'revoke') {
+          toggleModal(
+            true, 
+            `⚠️ Cảnh báo nguy hiểm: Khóa hoàn toàn API Key của "${partner.name}". Partner sẽ không thể gọi cuộc gọi nào. Tiếp tục?`,
+            () => {
+              partner.apikey = "Revoked (Đã thu hồi)";
+              document.getElementById('detail-apikey').textContent = "Revoked";
+              renderTable();
+              showToast('success', '❌ Đã thu hồi API Key thành công!');
+            }
+          );
+        } else if (type === 'lock') {
+          const currentStatus = partner.status;
+          const nextStatus = currentStatus === 'Active' ? 'Locked' : 'Active';
+          const actionWord = currentStatus === 'Active' ? 'Khóa' : 'Mở khóa';
+
+          toggleModal(
+            true, 
+            `Quy trình quản trị: Xác nhận ${actionWord} hoạt động của Partner "${partner.name}".`,
+            () => {
+              partner.status = nextStatus;
+              viewDetails(partner.id);
+              renderTable();
+              showToast('success', `✅ Đã thay đổi trạng thái sang: ${nextStatus}`);
+            }
+          );
+        }
+      }
+
+      // TOAST NOTIFICATIONS HELPER
+      function showToast(type, text) {
+        const container = document.getElementById('toast-container');
+        const id = 'toast-' + Math.random().toString(36).substr(2, 9);
+
+        let iconColor = type === 'success' ? 'text-green-400' : 'text-cyan-400';
+        let iconName = type === 'success' ? 'check-circle' : 'info';
+        if (type === 'error') {
+          iconColor = 'text-red-400';
+          iconName = 'x-circle';
+        }
+
+        const toastHtml = `
+          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
+            <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
+            <span class="text-gray-200 font-medium">${text}</span>
+          </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        lucide.createIcons();
+
+        // Animate in
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.remove('translate-y-2', 'opacity-0');
+          }
+        }, 10);
+
+        // Remove out
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0', 'translate-y-[-4px]');
+            setTimeout(() => el.remove(), 300);
+          }
+        }, 3000);
+      }
+
+      // Double-checking on copy to clipboard
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+        showToast('success', '📋 Đã sao chép API Key vào Bộ nhớ tạm!');
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

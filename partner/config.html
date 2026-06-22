@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Partner - API & IP Whitelist</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex p-0">
+
+    <!-- TOASTS -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🤝</span>
+          <span class="font-extrabold text-md text-transparent bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text">GameHub Partner</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Đối tác Liên Kết</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="info.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="building" class="w-4 h-4"></i>
+            <span>Hồ sơ Doanh nghiệp</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+            <span>Cấu hình Dịch vụ & Gói cước</span>
+          </a>
+          <a href="config.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-cyan-600/30 to-cyan-900/10 text-cyan-400 border border-cyan-500/20 shadow-md">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>Thông số API & IP Whitelist</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Lịch sử Giao dịch</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Nhân viên nội bộ</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Đối soát Doanh thu</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center font-bold text-xs text-white">GA</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Garena VN</p>
+            <p class="text-gray-500 font-mono">ID: PTN_001</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-550 hover:text-red-400 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Không gian làm việc</span>
+          <span class="text-gray-600 font-medium">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-cyan-400">Kênh API & IP</span>
+        </div>
+         <div class="flex items-center gap-4">
+          <span class="bg-cyan-950 text-cyan-300 border border-cyan-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Garena Vietnam</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-cyan-400 shadow">G</div>
+            <span>Garena Admin ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-4xl mx-auto space-y-8">
+        <div>
+          <h1 class="text-2xl font-black text-gray-100 tracking-tight">Cấu hình Tích hợp API (Gateway Integration)</h1>
+          <p class="text-xs text-gray-500 mt-1">Quản lý mã định danh liên kết B2B, mật key mã hóa xác thực tài khoản, và IP whitelists bảo mật máy chủ.</p>
+        </div>
+
+        <!-- API Secrets card -->
+        <div class="bg-card border border-gray-800 p-6 rounded-2xl space-y-5 shadow">
+          <div class="border-b border-gray-850 pb-3.5 flex justify-between items-center">
+            <h3 class="text-xs uppercase tracking-wider font-extrabold text-gray-400 font-sans">API Client Credentials</h3>
+            <span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded text-[10px] font-bold">PRODUCTION</span>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Client ID -->
+            <div class="grid grid-cols-3 items-center gap-4 text-xs font-medium">
+              <span class="text-gray-400 font-bold uppercase">Client ID:</span>
+              <div class="col-span-2 flex items-center gap-2">
+                <input type="text" readonly value="cli_gar_vn_99182a" class="flex-1 bg-black/40 border border-gray-800 font-mono text-[11px] p-2.5 rounded text-gray-300 select-all outline-none">
+                <button onclick="copyToClipboard('cli_gar_vn_99182a')" class="border border-gray-800 hover:border-gray-500 p-2 text-gray-400 hover:text-white rounded cursor-pointer" title="Sao chép"><i data-lucide="copy" class="w-4 h-4"></i></button>
+              </div>
+            </div>
+
+            <!-- Client Secret -->
+            <div class="grid grid-cols-3 items-center gap-4 text-xs font-medium">
+              <span class="text-gray-400 font-bold uppercase">Client Secret:</span>
+              <div class="col-span-2 flex items-center gap-2">
+                <input type="password" id="secret-field" readonly value="sk_production_gar_vn_12456_axm9910z" class="flex-1 bg-black/40 border border-gray-800 font-mono text-[11px] p-2.5 rounded text-gray-300 outline-none">
+                <button onclick="toggleSecret()" class="border border-gray-800 hover:border-gray-500 p-2 text-gray-400 hover:text-white rounded cursor-pointer" title="Hiển thị mật key"><i data-lucide="eye" id="eye-icon" class="w-4 h-4"></i></button>
+                <button onclick="showRotateModal(true)" class="border border-yellow-950/40 hover:border-yellow-500/40 text-yellow-500 p-2 text-xs font-bold uppercase rounded cursor-pointer" title="Tái cấp key">Xoay Secret</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IP Whitelist dynamic section -->
+        <div class="bg-card border border-gray-800 p-6 rounded-2xl space-y-5 shadow">
+          <div class="flex justify-between items-center bg-black/30 border border-dashed border-gray-800 p-4 rounded-xl text-xs gap-4">
+            <div class="space-y-1">
+              <span class="text-xs font-bold text-gray-200">Đăng tuyển IP/CIDR máy chủ giao dịch của bạn</span>
+              <p class="text-[11px] text-gray-500">Gateway GameHub sẽ kiểm chứng IP liên thông và từ chối nếu không thuộc Whitelist.</p>
+            </div>
+            <div class="flex gap-2 max-w-xs shrink-0">
+              <input type="text" id="new-ip" placeholder="Ví dụ: 103.45.18.91" class="bg-black/40 border border-gray-700 rounded px-3 py-2 text-xs text-gray-200 outline-none font-mono">
+              <button onclick="addIpAddress()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold uppercase px-4 py-2 rounded">Thêm IP</button>
+            </div>
+          </div>
+
+          <!-- Table lists IPs -->
+          <div class="border border-gray-800 rounded-xl overflow-hidden bg-black/10">
+            <table class="w-full text-left text-xs font-mono">
+              <thead>
+                <tr class="bg-black/30 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-3">STT</th>
+                  <th class="px-6 py-3">Địa chỉ IP (CIDR)</th>
+                  <th class="px-6 py-3 font-sans">Thời điểm thêm</th>
+                  <th class="px-6 py-3 text-right">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="ip-tbody" class="divide-y divide-gray-850/30">
+                <!-- IP list managed by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- MODAL: WARNING ROTATE KEY -->
+    <div id="rotate-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="showRotateModal(false)" class="absolute inset-0 bg-black/75 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl space-y-4">
+        
+        <div class="flex items-center gap-3 text-yellow-500">
+          <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+          <div>
+            <h3 class="text-base font-bold text-gray-100">Xoay và tái cấp Secret Key B2B</h3>
+            <p class="text-[11px] text-gray-400">Hành động này sẽ làm ngắt quãng liên kết hiện tại.</p>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-300 leading-relaxed bg-black/20 border border-gray-800 p-3 rounded-xl">
+          Mật key Client Secret cũ của bạn sẽ bị vô hiệu hóa ngay lập tức. Bạn cần cập nhật lại giá trị mới ở Header cấu hình code server API. Bạn vẫn muốn tiếp tục?
+        </p>
+
+        <div class="flex justify-end gap-3 font-semibold text-xs uppercase tracking-wider pt-2">
+          <button onclick="showRotateModal(false)" class="border border-gray-700 text-gray-400 hover:text-white px-4 py-2.5 rounded-lg">Hủy</button>
+          <button onclick="confirmRotateSecret()" class="bg-yellow-600 hover:bg-yellow-500 text-black px-5 py-2.5 rounded-lg">Xoay Key Ngay</button>
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+      let partnerIps = ["192.168.1.24/32", "10.0.0.12/24", "172.16.5.4/24"];
+
+      function init() {
+        renderIpsTable();
+        lucide.createIcons();
+      }
+
+      function renderIpsTable() {
+        const tbody = document.getElementById('ip-tbody');
+        tbody.innerHTML = '';
+
+        if (partnerIps.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-6 text-center text-gray-505 font-sans italic">Bạn chưa đăng ký IP Whitelist nào. Cuộc gọi API sẽ bị Gateway chặn.</td></tr>';
+          return;
+        }
+
+        partnerIps.forEach((ip, idx) => {
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/10">
+              <td class="px-6 py-2.5 text-gray-500 font-bold">${idx + 1}</td>
+              <td class="px-6 py-2.5 font-bold text-cyan-400">${ip}</td>
+              <td class="px-6 py-2.5 font-sans text-gray-400">10/01/2026</td>
+              <td class="px-6 py-2.5 text-right font-sans">
+                <button onclick="deleteIpAddress(${idx})" class="text-red-500 hover:text-red-400 p-1 cursor-pointer">Xóa</button>
+              </td>
+            </tr>
+          `);
+        });
+      }
+
+      function addIpAddress() {
+        const input = document.getElementById('new-ip');
+        const val = input.value.trim();
+        if (!val) return;
+
+        partnerIps.push(val);
+        input.value = '';
+        renderIpsTable();
+        showToast('success', `✅ Thêm IP Whitelisted định tuyến: ${val}`);
+      }
+
+      function deleteIpAddress(idx) {
+        const removed = partnerIps.splice(idx, 1)[0];
+        renderIpsTable();
+        showToast('info', `🗑 Đã xóa địa chỉ IP gỡ quyền: ${removed}`);
+      }
+
+      // Copy to clipboard helper
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+        showToast('success', '📋 Sao chép Client ID thành công!');
+      }
+
+      // Show hide API secret
+      let secretVisible = false;
+      function toggleSecret() {
+        const input = document.getElementById('secret-field');
+        const icon = document.getElementById('eye-icon');
+        
+        if (secretVisible) {
+          input.type = "password";
+          icon.setAttribute('data-lucide', 'eye');
+          secretVisible = false;
+        } else {
+          input.type = "text";
+          icon.setAttribute('data-lucide', 'eye-off');
+          secretVisible = true;
+        }
+        lucide.createIcons();
+      }
+
+      // Rotate API Secret Key modal Handlers
+      function showRotateModal(open) {
+        const modal = document.getElementById('rotate-modal');
+        if (open) modal.classList.remove('hidden');
+        else modal.classList.add('hidden');
+      }
+
+      function confirmRotateSecret() {
+        const input = document.getElementById('secret-field');
+        input.value = "sk_prod_gar_rotated_" + Math.random().toString(36).substr(2, 8) + "_x10";
+        showRotateModal(false);
+        showToast('success', '✅ Khóa Client Secret đã xoay xong! Vui lòng tải trang hoặc sao chép key mới!');
+      }
+
+      // TOASTS HELPER
+      function showToast(type, text) {
+        const container = document.getElementById('toast-container');
+        const id = 'toast-' + Math.random().toString(36).substr(2, 9);
+
+        let iconColor = type === 'success' ? 'text-green-400' : 'text-cyan-400';
+        let iconName = type === 'success' ? 'check-circle' : 'info';
+
+        const toastHtml = `
+          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
+            <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
+            <span class="text-gray-200 font-medium">${text}</span>
+          </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        lucide.createIcons();
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('translate-y-2', 'opacity-0');
+        }, 10);
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0', 'translate-y-[-4px]');
+            setTimeout(() => el.remove(), 300);
+          }
+        }, 3000);
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

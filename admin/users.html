@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Admin - Quản lý Thành Viên & Vai trò</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+      .drawer-transition {
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex p-0">
+
+    <!-- TOASTS -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🎮</span>
+          <span class="font-extrabold text-lg text-transparent bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text">GameHub Admin</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Hệ Thống Admin</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="partners.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Quản lý Partner</span>
+          </a>
+          <a href="apis.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="code" class="w-4 h-4"></i>
+            <span>Quản lý API</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="package-search" class="w-4 h-4"></i>
+            <span>Service & Package</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Transaction Log</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="file-bar-chart" class="w-4 h-4"></i>
+            <span>Báo cáo đối soát</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-violet-600/30 to-violet-900/10 text-violet-400 border border-violet-500/20 shadow-md">
+            <i data-lucide="user-cog" class="w-4 h-4"></i>
+            <span>Người dùng & Phân quyền</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center font-bold text-xs text-white">AD</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Admin System</p>
+            <p class="text-gray-500 font-mono">v2.1.0</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-500 hover:text-red-400 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Hệ Thống</span>
+          <span class="text-gray-600 font-medium">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-violet-400">Thành Viên</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="bg-violet-950 text-violet-300 border border-violet-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Admin Portal</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-violet-400 shadow">A</div>
+            <span>Admin System ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-7xl mx-auto space-y-6">
+        
+        <div class="flex justify-between items-center flex-wrap gap-4">
+          <div>
+            <h1 class="text-2xl font-black text-gray-100 tracking-tight">Kênh Quản trị Nhân Viên & Phân vai chính</h1>
+            <p class="text-xs text-gray-500 mt-0.5">Mời thành viên nội bộ, quản trị cơ chế vai trò bảo mật chi tiết, kiểm soát quyền truy vấn.</p>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <button onclick="toggleDrawer(true)" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg shadow flex items-center gap-2 cursor-pointer">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> Thêm thành viên
+            </button>
+          </div>
+        </div>
+
+        <!-- Master Tabs -->
+        <div class="flex border-b border-gray-800">
+          <button onclick="switchTab('users')" id="tab-btn-users" class="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300 cursor-pointer">Thành viên nội bộ</button>
+          <button onclick="switchTab('roles')" id="tab-btn-roles" class="px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-200 border-b-2 border-transparent cursor-pointer">Cơ cấu Vai trò & Quyền lực (Roles)</button>
+        </div>
+
+        <!-- TAB CONTENT 1: USER LIST -->
+        <div id="tab-content-users" class="space-y-6">
+          
+          <!-- Filters -->
+          <div class="bg-card border border-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
+            <div class="flex-1 max-w-lg flex items-center gap-3">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="user-search" placeholder="Tìm kiếm theo Tên hoặc Email..." onkeyup="filterUsers()" class="w-full bg-black/30 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-xs text-gray-200 focus:border-accent outline-none">
+              </div>
+              <select id="user-role-filter" onchange="filterUsers()" class="bg-black/30 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 outline-none focus:border-accent">
+                <option value="all">Mọi vai trò</option>
+                <option value="Super Admin">Super Admin</option>
+                <option value="Admin">Admin</option>
+                <option value="Auditor">Auditor</option>
+                <option value="Operator">Operator</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Users Table -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-4">Họ và Tên</th>
+                  <th class="px-6 py-4">Tài khoản Email</th>
+                  <th class="px-6 py-4">Vai trò phân cấp</th>
+                  <th class="px-6 py-4">Trạng thái</th>
+                  <th class="px-6 py-4">Ngày tham gia</th>
+                  <th class="px-6 py-4 text-right">Lựa chọn</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody" class="divide-y divide-gray-850/30 text-xs">
+                <!-- User rows loaded by JS -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- TAB CONTENT 2: ROLES & PERMISSIONS -->
+        <div id="tab-content-roles" class="hidden space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left roles table list -->
+            <div class="lg:col-span-1 bg-card border border-gray-800 rounded-xl p-5 space-y-4">
+              <h3 class="text-xs uppercase tracking-wider font-extrabold text-gray-400">Chọn vai trò hệ thống</h3>
+              <div class="space-y-2.5" id="roles-list-group">
+                <!-- Roles list items -->
+              </div>
+            </div>
+
+            <!-- Right configuration panel -->
+            <div class="lg:col-span-2 bg-card border border-gray-800 rounded-xl p-6 flex flex-col justify-between">
+              <div class="space-y-6">
+                <div class="border-b border-gray-800 pb-4">
+                  <span id="role-det-badge" class="bg-violet-500/10 text-violet-400 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-violet-500/20">Super Admin</span>
+                  <h3 id="role-det-name" class="text-lg font-extrabold text-white mt-2">Tổng quản quyền hệ thống</h3>
+                  <p id="role-det-desc" class="text-xs text-gray-400 mt-1">Sở hữu toàn bộ tác vụ, phê chuẩn kết toán, quản trị phân quyền cho mọi cấp dưới.</p>
+                </div>
+
+                <div class="space-y-4">
+                  <span class="text-xs font-bold text-gray-300">Tùy chỉnh danh mục Quyền hạn cụ thể (Scope matrix)</span>
+                  
+                  <div class="space-y-3 pb-2" id="role-permissions-checkboxes">
+                    <!-- Permission Checkboxes -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-t border-gray-805 pt-5 flex justify-end">
+                <button onclick="saveRoleConfig()" class="bg-accent hover:bg-accent/90 text-white font-bold text-[11px] uppercase tracking-wider px-5 py-2.5 rounded-lg transition-colors cursor-pointer">Lưu cấu hình</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+    <!-- DRAWER: THÊM THÀNH VIÊN -->
+    <div id="drawer-container" class="fixed inset-0 z-50 overflow-hidden hidden">
+      <div onclick="toggleDrawer(false)" class="absolute inset-0 bg-black/65 backdrop-blur-xs"></div>
+      <div class="absolute inset-y-0 right-0 max-w-full flex">
+        <div id="drawer-panel" class="w-screen max-w-[1100px] bg-card border-l border-gray-800 flex flex-col justify-between shadow-2xl transform translate-x-full drawer-transition">
+          
+          <div class="px-6 py-4 border-b border-gray-800 bg-[#0D1117] flex justify-between items-center shrink-0">
+            <div>
+              <h3 class="text-xs font-bold text-gray-100 uppercase tracking-wider">Mời thành viên mới</h3>
+              <p class="text-[11px] text-gray-500 mt-0.5">Nhập email thành viên toàn hệ thống và phân phối quyền sử dụng.</p>
+            </div>
+            <button onclick="toggleDrawer(false)" class="text-gray-400 hover:text-white p-2 text-xl font-bold">&times;</button>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 text-xs">
+            <!-- Left Column (lg:col-span-5) -->
+            <div class="lg:col-span-5 space-y-5 lg:border-r lg:border-gray-800 lg:pr-6">
+              
+              <!-- SECTION 1: THÔNG TIN NGƯỜI DÙNG -->
+              <div class="space-y-3">
+                <div class="space-y-2">
+                  <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">Email thành viên</label>
+                  <div class="flex gap-2">
+                    <input type="email" id="f-email" placeholder="dinh.hv@gamehub.vn" class="flex-1 bg-black/40 border border-gray-700 focus:border-accent rounded-lg px-3 py-2 text-gray-100 outline-none text-[11px]">
+                    <button type="button" onclick="searchSystemUser()" class="bg-cyan-950/40 text-cyan-400 hover:bg-cyan-900/40 border border-cyan-800/50 px-4 py-2 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer">
+                      Tìm kiếm
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Search Result Box -->
+                <div id="search-result-box" class="bg-emerald-950/20 border border-emerald-500/15 px-3 py-2.5 rounded-lg hidden flex justify-between items-center text-[11px]">
+                  <span class="text-gray-400 font-medium">Người dùng:</span>
+                  <span id="search-found-name" class="font-bold text-emerald-400">...</span>
+                </div>
+              </div>
+
+              <!-- SECTION 2: PHÂN QUYỀN VAI TRÒ -->
+              <div class="space-y-3 pt-1">
+                <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cấu hình vai trò</label>
+
+                <div class="grid grid-cols-2 gap-1 bg-[#0d1117] p-1 rounded-lg border border-gray-800">
+                  <button type="button" id="role-mode-predefined" onclick="setRoleMode('predefined')" class="py-1.5 px-2 text-[10px] font-bold rounded-md transition-all text-center text-white bg-violet-600/20 border border-violet-500/20 cursor-pointer">
+                    Mẫu vai trò có sẵn
+                  </button>
+                  <button type="button" id="role-mode-manual" onclick="setRoleMode('manual')" class="py-1.5 px-2 text-[10px] font-bold rounded-md transition-all text-center text-gray-400 hover:text-gray-200 cursor-pointer border border-transparent">
+                    Tự phân cấp thủ công
+                  </button>
+                </div>
+
+                <!-- Predefined Sub-Panel -->
+                <div id="panel-role-predefined" class="space-y-3">
+                  <div class="space-y-1.5">
+                    <select id="f-role" onchange="autoConfigureCheckboxesByPredefined(this.value)" class="w-full bg-black/40 border border-gray-700 rounded-lg p-2.5 text-gray-100 outline-none focus:border-accent text-[11px] font-medium cursor-pointer">
+                      <option value="Super Admin">Super Admin</option>
+                      <option value="Admin">Admin</option>
+                      <option value="Auditor">Auditor</option>
+                      <option value="Operator">Operator</option>
+                    </select>
+                  </div>
+                  <!-- Role Info help card -->
+                  <div id="selected-role-info-card" class="bg-violet-950/10 border border-violet-500/10 p-3 rounded-lg text-[10px] text-violet-350 leading-relaxed">
+                    <p class="font-bold text-gray-200 text-[11px] mb-1" id="role-info-title">Super Admin</p>
+                    <p id="role-info-desc" class="text-gray-400 text-[10px]"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 3: THỜI HẠN VÀ GHI CHÚ -->
+              <div class="space-y-4 pt-1">
+                <div class="space-y-2">
+                  <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">Thời hạn hiệu lực</label>
+                  <div class="flex gap-4">
+                    <label class="flex items-center gap-1.5 cursor-pointer text-gray-300 text-[11px] select-none">
+                      <input type="radio" value="unlimited" name="expiry-mode" id="expiry-unlimited" checked onchange="toggleDateInputs(false)" class="w-3.5 h-3.5 text-accent focus:ring-0 cursor-pointer">
+                      <span>Vô thời hạn</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer text-gray-300 text-[11px] select-none">
+                      <input type="radio" value="limited" name="expiry-mode" id="expiry-limited" onchange="toggleDateInputs(true)" class="w-3.5 h-3.5 text-accent focus:ring-0 cursor-pointer">
+                      <span>Chọn khoảng ngày</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Date Inputs Box -->
+                <div id="expiry-dates-box" class="grid grid-cols-2 gap-2 opacity-40 transition-all pointer-events-none">
+                  <div>
+                    <span class="block text-[10px] text-gray-500 mb-1">Từ ngày</span>
+                    <input type="date" id="expiry-start" class="w-full bg-black/40 border border-gray-750 rounded-lg px-2.5 py-1.5 text-gray-300 outline-none text-[11px]">
+                  </div>
+                  <div>
+                    <span class="block text-[10px] text-gray-500 mb-1">Đến ngày</span>
+                    <input type="date" id="expiry-end" class="w-full bg-black/40 border border-gray-750 rounded-lg px-2.5 py-1.5 text-gray-300 outline-none text-[11px]">
+                  </div>
+                </div>
+
+                <div class="space-y-1.5">
+                  <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ghi chú</label>
+                  <textarea id="f-notes" rows="2" placeholder="Ghi chú nội dung cấp quyền..." class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-gray-200 outline-none text-[11px] resize-none focus:border-accent"></textarea>
+                </div>
+
+                <div class="space-y-1.5">
+                  <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider">Trạng thái ban đầu</label>
+                  <select id="f-status" class="w-full bg-black/40 border border-gray-700 rounded-lg px-2.5 py-2 text-gray-300 outline-none focus:border-accent text-[11px] font-medium cursor-pointer">
+                    <option value="Active">Kích hoạt (Active)</option>
+                    <option value="Inactive">Tạm khóa (Inactive)</option>
+                  </select>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Column (lg:col-span-7) -->
+            <div class="lg:col-span-7 flex flex-col justify-between">
+              <div>
+                <div class="border-b border-gray-800 pb-2 flex justify-between items-center">
+                  <h4 class="text-xs font-bold text-gray-200 uppercase tracking-wider">Chi tiết cấu hình phân quyền</h4>
+                  <span class="text-[10px] text-gray-500">Bật/tắt thủ công hoặc gán theo vai trò</span>
+                </div>
+
+                <!-- Checkbox Table exactly as in Image 2 -->
+                <div class="mt-3 border border-gray-800 rounded-xl overflow-hidden bg-black/10">
+                  <table class="w-full text-left text-[11px] border-collapse">
+                    <thead>
+                      <tr class="bg-[#0D1117] border-b border-gray-800 text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                        <th class="py-2.5 px-4">Phạm vi chức năng</th>
+                        <th class="py-2.5 px-4 text-center w-16">Cho phép</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800/40" id="matrix-tbody">
+                      
+                      <!-- Quản lý Đối tác -->
+                      <tr class="bg-gray-905/30 font-semibold text-gray-400 text-[10px]">
+                        <td colspan="2" class="py-2 px-4 text-violet-400 uppercase tracking-wider">Quản lý đối tác</td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Xem và xem chi tiết đối tác</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-p-view" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Đăng ký mới đối tác</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-p-create" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Sửa thông tin Partner</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-p-edit" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Xử lý các yêu cầu của Partner</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-p-process" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Xem lịch sử thay đổi cấu hình Partner</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-p-history" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+
+                      <!-- Quản lý API & Routing Gateway -->
+                      <tr class="bg-gray-905/30 font-semibold text-gray-400 text-[10px]">
+                        <td colspan="2" class="py-2 px-4 text-blue-400 uppercase tracking-wider">Quản lý API & Gateway</td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Xem các API hiện tại</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-api-view" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Gán đối tác sử dụng API</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-api-assign" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Thu hồi quyền sử dụng API</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-api-revoke" class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+
+                      <!-- Quản lý Dịch vụ, Trò chơi, Gói cước & IP Whitelist -->
+                      <tr class="bg-gray-905/30 font-semibold text-gray-400 text-[10px]">
+                        <td colspan="2" class="py-2 px-4 text-amber-400 uppercase tracking-wider">Quản lý dịch vụ & IP Whitelist</td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Xem chi tiết dịch vụ & gói cước</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-srv-view" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Thêm Service liên kết mới</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-srv-add" class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Thêm Package gói cước</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-srv-add-pkg" class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Sửa đổi Service hiện tại</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-srv-edit" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Sửa đổi Package cước phí</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-srv-edit-pkg" class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+
+                      <!-- Quản lý Nhật ký Giao dịch Logs -->
+                      <tr class="bg-gray-905/30 font-semibold text-gray-400 text-[10px]">
+                        <td colspan="2" class="py-2 px-4 text-emerald-400 uppercase tracking-wider">Nhật ký giao dịch (Logs)</td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Xem chi tiết trace log</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-log-view" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+
+                      <!-- Báo cáo Đối soát Doanh thu -->
+                      <tr class="bg-gray-905/30 font-semibold text-gray-400 text-[10px]">
+                        <td colspan="2" class="py-2 px-4 text-teal-400 uppercase tracking-wider">Đối soát & Doanh thu</td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Xem báo cáo đối soát doanh thu</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-fin-view" class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+
+                      <!-- Quản lý người dùng và Phân quyền -->
+                      <tr class="bg-gray-905/30 font-semibold text-gray-400 text-[10px]">
+                        <td colspan="2" class="py-2 px-4 text-orange-400 uppercase tracking-wider">Thành viên & Quyền hạn</td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Mời thành viên mới vào hệ thống</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-usr-invite" class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Quản lý chi tiết phân quyền</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-usr-perm" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+
+                      <!-- Quản lý vai trò (Role Management) -->
+                      <tr class="bg-gray-905/30 font-semibold text-gray-400 text-[10px]">
+                        <td colspan="2" class="py-2 px-4 text-rose-400 uppercase tracking-wider">Quản lý cấu hình vai trò</td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Xem danh sách vai trò</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-role-view" checked class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Tạo vai trò hệ thống mới</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-role-create" class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+                      <tr class="hover:bg-white/5 transition-colors">
+                        <td class="py-2 px-4 text-gray-300">Hiệu chỉnh vai trò hệ thống</td>
+                        <td class="py-2 px-4 text-center">
+                          <input type="checkbox" id="c-role-update" class="matrix-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                        </td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="px-6 py-4 border-t border-gray-800 bg-[#0D1117] flex justify-end gap-3 shrink-0">
+            <button onclick="toggleDrawer(false)" class="border border-gray-700 hover:border-gray-550 text-gray-300 font-semibold text-xs px-4 py-2 rounded-lg cursor-pointer transition-colors">Hủy</button>
+            <button onclick="submitNewMember()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs px-5 py-2 rounded-lg cursor-pointer transition-all shadow-md shadow-accent/10">Thêm thành viên</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: DELETE CONFIRMATION -->
+    <div id="delete-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="showDeleteModal(false)" class="absolute inset-0 bg-black/75 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl space-y-4">
+        
+        <div class="flex items-center gap-3 text-red-500">
+          <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+          <div>
+            <h3 class="text-base font-bold text-gray-100">Xóa tài khoản thành viên</h3>
+            <p class="text-[11px] text-gray-400">Hành động này không thể hoàn tác phục hồi.</p>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-300 leading-relaxed bg-black/20 border border-gray-800 p-3 rounded-xl" id="delete-modal-text">
+          Bạn có chắc chắn muốn xóa vĩnh viễn quyền truy cập...?
+        </p>
+
+        <div class="flex justify-end gap-3 font-semibold text-xs uppercase tracking-wider pt-2">
+          <button onclick="showDeleteModal(false)" class="border border-gray-700 text-gray-400 hover:text-white px-4 py-2.5 rounded-lg">Hủy</button>
+          <button id="delete-confirm-submit" class="bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-lg">Kiên quyết xóa</button>
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+      // Users collection
+      let internalUsers = [
+        { id: 1, name: "Trần Minh Hoàng", email: "hoang.tm@gamehub.vn", role: "Super Admin", status: "Active", joined: "01/01/2026" },
+        { id: 2, name: "Nguyễn Thị Lan Chi", email: "chi.ntl@gamehub.vn", role: "Auditor", status: "Active", joined: "10/01/2026" },
+        { id: 3, name: "Lê Huy Khánh", email: "khanh.lh@gamehub.vn", role: "Admin", status: "Active", joined: "15/01/2026" },
+        { id: 4, name: "Phạm Tiến Dũng", email: "dung.pt@gamehub.vn", role: "Operator", status: "Inactive", joined: "20/01/2026" },
+        { id: 5, name: "Hoàng Anh Tuấn", email: "tuan.ha@gamehub.vn", role: "Operator", status: "Active", joined: "25/01/2026" }
+      ];
+
+      // Roles configurations
+      const systemRoles = [
+        {
+          key: "Super Admin",
+          name: "Super Admin (Tổng Quản)",
+          desc: "Sở hữu đặc quyền tối thượng của nhà phát triển, phê chuẩn kết toán, bổ nhiệm admin phụ.",
+          permissions: ["Full Access / Quản trị hệ thống", "Cấu hình Service & Gói cước", "Đăng ký dải IP Whitelist", "Đối soát & Xuất báo cáo tài chính", "Mời và phân quyền thành viên"]
+        },
+        {
+          key: "Admin",
+          name: "Admin Điều Phối",
+          desc: "Phối hợp với Partner, đăng ký dịch vụ game mới, cập nhật bảng giá cước định dạng.",
+          permissions: ["Cấu hình Service & Gói cước", "Đăng ký dải IP Whitelist", "Đối soát & Xuất báo cáo tài chính"]
+        },
+        {
+          key: "Auditor",
+          name: "Auditor Kiểm Toán",
+          desc: "Theo dõi dòng tiền cước nạp viễn thông, kiểm chứng dữ liệu, xem toàn quyền nhưng không được sửa cấu hình.",
+          permissions: ["Đối soát & Xuất báo cáo tài chính"]
+        },
+        {
+          key: "Operator",
+          name: "Operator Vận Hành",
+          desc: "Đăng ký thông số IPs Whitelists, giám sát tình trạng lỗi HTTP kết nối.",
+          permissions: ["Đăng ký dải IP Whitelist"]
+        }
+      ];
+
+      let inspectedRoleKey = "Super Admin";
+      let deletingUserId = null;
+
+      const permLabels = [
+        "Full Access / Quản trị hệ thống",
+        "Cấu hình Service & Gói cước",
+        "Đăng ký dải IP Whitelist",
+        "Đối soát & Xuất báo cáo tài chính",
+        "Mời và phân quyền thành viên"
+      ];
+
+      function init() {
+        renderUsersTable();
+        renderRolesGroup();
+        renderRolePermissions();
+        lucide.createIcons();
+      }
+
+      function renderUsersTable() {
+        const tbody = document.getElementById('users-tbody');
+        tbody.innerHTML = '';
+
+        const search = document.getElementById('user-search').value.toLowerCase();
+        const roleSel = document.getElementById('user-role-filter').value;
+
+        let filtered = internalUsers.filter(u => {
+          const mSearch = u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search);
+          const mRole = roleSel === 'all' || u.role === roleSel;
+          return mSearch && mRole;
+        });
+
+        filtered.forEach(u => {
+          let badgeColor = "bg-gray-500/10 text-gray-400 border border-gray-500/20";
+          let dot = "bg-gray-500";
+
+          if (u.status === 'Active') {
+            badgeColor = "bg-green-500/10 text-green-400 border border-green-500/20";
+            dot = "bg-green-500";
+          }
+
+          let roleBadge = "text-gray-400 bg-gray-900 border border-gray-700";
+          if (u.role === 'Super Admin') roleBadge = "text-violet-400 bg-violet-950/40 border border-violet-800/40";
+          else if (u.role === 'Admin') roleBadge = "text-purple-400 bg-purple-950/40 border border-purple-800/40";
+          else if (u.role === 'Auditor') roleBadge = "text-cyan-400 bg-cyan-950/40 border border-cyan-800/40";
+          else if (u.role === 'Operator') roleBadge = "text-blue-400 bg-blue-950/40 border border-blue-800/40";
+
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/20 transition-colors">
+              <td class="px-6 py-4.5 font-bold text-gray-200">${u.name}</td>
+              <td class="px-6 py-4.5 font-mono text-gray-400">${u.email}</td>
+              <td class="px-6 py-4.5">
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider ${roleBadge}">${u.role}</span>
+              </td>
+              <td class="px-6 py-4.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${badgeColor}">
+                  <span class="w-1.5 h-1.5 rounded-full ${dot}"></span> ${u.status}
+                </span>
+              </td>
+              <td class="px-6 py-4.5 font-mono text-gray-500">${u.joined}</td>
+              <td class="px-6 py-4.5 text-right">
+                <button onclick="showDeleteModal(true, ${u.id})" class="text-red-500 hover:text-red-400 font-bold uppercase tracking-wider text-[10px] px-2 py-1 select-none cursor-pointer">Xóa</button>
+              </td>
+            </tr>
+          `);
+        });
+
+        lucide.createIcons();
+      }
+
+      function filterUsers() {
+        renderUsersTable();
+      }
+
+      function switchTab(tabId) {
+        document.getElementById('tab-content-users').classList.add('hidden');
+        document.getElementById('tab-content-roles').classList.add('hidden');
+        
+        document.getElementById('tab-btn-users').className = "px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-200 border-b-2 border-transparent cursor-pointer";
+        document.getElementById('tab-btn-roles').className = "px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-200 border-b-2 border-transparent cursor-pointer";
+
+        if (tabId === 'users') {
+          document.getElementById('tab-content-users').classList.remove('hidden');
+          document.getElementById('tab-btn-users').className = "px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300 cursor-pointer";
+        } else {
+          document.getElementById('tab-content-roles').classList.remove('hidden');
+          document.getElementById('tab-btn-roles').className = "px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300 cursor-pointer";
+        }
+      }
+
+      // DRAWER INTERACTION & ROLE DESIGN CONFIGURATION
+      let currentRoleMode = 'predefined'; // 'predefined' or 'manual'
+
+      function toggleDateInputs(enable) {
+        const datesBox = document.getElementById('expiry-dates-box');
+        if (enable) {
+          datesBox.classList.remove('opacity-40', 'pointer-events-none');
+        } else {
+          datesBox.classList.add('opacity-40', 'pointer-events-none');
+          document.getElementById('expiry-start').value = '';
+          document.getElementById('expiry-end').value = '';
+        }
+      }
+
+      function setRoleMode(mode) {
+        currentRoleMode = mode;
+        const btnPre = document.getElementById('role-mode-predefined');
+        const btnMan = document.getElementById('role-mode-manual');
+        const panelPre = document.getElementById('panel-role-predefined');
+        const panelMan = document.getElementById('panel-role-manual');
+
+        if (mode === 'predefined') {
+          btnPre.className = "py-1.5 px-2.5 text-[10px] font-bold rounded-md transition-all text-center text-white bg-violet-600/25 border border-violet-500/30 cursor-pointer";
+          btnMan.className = "py-1.5 px-2.5 text-[10px] font-bold rounded-md transition-all text-center text-gray-400 hover:text-gray-200 cursor-pointer border border-transparent";
+          panelPre.classList.remove('hidden');
+          panelMan.classList.add('hidden');
+          
+          // Re-update checkboxes based on current dropdown selection value
+          const predefinedRole = document.getElementById('f-role').value;
+          autoConfigureCheckboxesByPredefined(predefinedRole);
+        } else {
+          btnMan.className = "py-1.5 px-2.5 text-[10px] font-bold rounded-md transition-all text-center text-white bg-violet-600/25 border border-violet-500/30 cursor-pointer";
+          btnPre.className = "py-1.5 px-2.5 text-[10px] font-bold rounded-md transition-all text-center text-gray-400 hover:text-gray-200 cursor-pointer border border-transparent";
+          panelMan.classList.remove('hidden');
+          panelPre.classList.add('hidden');
+        }
+      }
+
+      const roleDefinitionsInfo = {
+        "Super Admin": {
+          title: "🛡️ Super Admin (Tổng quản hệ thống)",
+          desc: "Sở hữu toàn bộ tác vụ tối thượng, phê chuẩn kết toán hoàn toàn, quản trị phân quyền cho tất cả thành viên.",
+          checks: [
+            "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
+            "c-api-view", "c-api-assign", "c-api-revoke",
+            "c-srv-view", "c-srv-add", "c-srv-add-pkg", "c-srv-edit", "c-srv-edit-pkg",
+            "c-log-view", "c-fin-view", "c-usr-invite", "c-usr-perm", "c-role-view", "c-role-create", "c-role-update"
+          ]
+        },
+        "Admin": {
+          title: "⚡ Admin (Phó quản trị điều phối)",
+          desc: "Điều lệ nghiệp vụ thông suốt. Đăng ký trò chơi mới, xử lý phản hồi, cấu hình IP dải mạng.",
+          checks: [
+            "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
+            "c-api-view", "c-api-assign",
+            "c-srv-view", "c-srv-edit",
+            "c-log-view", "c-usr-perm", "c-role-view"
+          ]
+        },
+        "Auditor": {
+          title: "📊 Auditor (Kế toán kiểm toán tài vụ)",
+          desc: "Xem báo cáo doanh số, theo dõi lịch sử thay đổi thông tin đối tác và trace log, không sửa hạt nhân.",
+          checks: [
+            "c-p-view", "c-p-history",
+            "c-api-view", "c-srv-view",
+            "c-log-view", "c-fin-view", "c-role-view"
+          ]
+        },
+        "Operator": {
+          title: "⚙️ Operator (Kỹ sư vận mạng mạng lưới IP)",
+          desc: "Quản trị kết nối mạng gateway, kiểm tra lỗi HTTP, giám sát trace log và API whitelist.",
+          checks: [
+            "c-api-view", "c-api-assign",
+            "c-srv-view", "c-log-view"
+          ]
+        }
+      };
+
+      function autoConfigureCheckboxesByPredefined(roleValue) {
+        const def = roleDefinitionsInfo[roleValue];
+        if (!def) return;
+
+        // Update layout card
+        document.getElementById('role-info-title').textContent = def.title;
+        document.getElementById('role-info-desc').textContent = def.desc;
+
+        // Update all checkboxes
+        const checkboxes = document.querySelectorAll('.matrix-chk');
+        checkboxes.forEach(box => {
+          if (def.checks.includes(box.id)) {
+            box.checked = true;
+          } else {
+            box.checked = false;
+          }
+        });
+      }
+
+      // Add dynamic listener: If user clicks ANY matrix checkbox, automatically switch role selection mode to "manual"
+      function setupMatrixCheckboxListeners() {
+        const checkboxes = document.querySelectorAll('.matrix-chk');
+        checkboxes.forEach(box => {
+          box.addEventListener('change', () => {
+            if (currentRoleMode === 'predefined') {
+              setRoleMode('manual');
+              if (window.showToast) {
+                showToast('Chế độ phân vai đã chuyển sang "Quyền tùy chỉnh" tự động', 'info');
+              }
+            }
+          });
+        });
+      }
+
+      function searchSystemUser() {
+        const email = document.getElementById('f-email').value.trim();
+        if (!email) {
+          if (window.showToast) {
+            showToast('Vui lòng nhập hòm thư trước khi tra cứu', 'error');
+          } else {
+            alert('Vui lòng nhập hòm thư trước khi tra cứu');
+          }
+          return;
+        }
+
+        // Mock lookups
+        const directory = {
+          "khai.vv@gamehub.vn": "Vũ Văn Khải",
+          "hai.nd@gamehub.vn": "Nguyễn Đăng Hải",
+          "linh.pt@gamehub.vn": "Phạm Thúy Linh",
+          "dung.pt@gamehub.vn": "Phạm Tiến Dũng",
+          "dinh.hv@gamehub.vn": "Hoàng Văn Định",
+          "garena@gamehub.vn": "Trần Hồng Nam",
+          "vng@gamehub.vn": "Lê Hồng Minh",
+          "vtc@gamehub.vn": "Nguyễn Xuân Cường",
+          "krafton@gamehub.vn": "Changhan Kim"
+        };
+
+        let foundName = directory[email.toLowerCase()];
+        if (!foundName) {
+          const prefix = email.split('@')[0];
+          const parts = prefix.split('.');
+          foundName = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+          if (foundName.length < 3) foundName = "Cán bộ " + email.split('@')[0].toUpperCase();
+        }
+
+        document.getElementById('search-found-name').textContent = foundName;
+        document.getElementById('search-result-box').classList.remove('hidden');
+
+        if (window.showToast) {
+          showToast(`Tìm thấy hồ sơ: ${foundName}`, 'success');
+        }
+      }
+
+      function toggleDrawer(open) {
+        const container = document.getElementById('drawer-container');
+        const panel = document.getElementById('drawer-panel');
+
+        if (open) {
+          container.classList.remove('hidden');
+          setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+          
+          // Apply initial configs
+          setRoleMode('predefined');
+          setupMatrixCheckboxListeners();
+        } else {
+          panel.classList.add('translate-x-full');
+          setTimeout(() => container.classList.add('hidden'), 350);
+          
+          // Clear form elements when closing drawer
+          document.getElementById('f-email').value = '';
+          document.getElementById('search-found-name').textContent = '...';
+          document.getElementById('search-result-box').classList.add('hidden');
+          document.getElementById('f-notes').value = '';
+          toggleDateInputs(false);
+          document.getElementById('expiry-unlimited').checked = true;
+          setRoleMode('predefined');
+        }
+      }
+
+      function submitNewMember() {
+        const email = document.getElementById('f-email').value.trim();
+        if (!email || !email.includes('@')) {
+          if (window.showToast) {
+            showToast('Vui lòng cung cấp hòm thư người dùng hợp lệ', 'error');
+          } else {
+            alert('Vui lòng cung cấp hòm thư người dùng hợp lệ');
+          }
+          return;
+        }
+
+        // Determine candidate name
+        let name = document.getElementById('search-found-name').textContent;
+        if (!name || name === '...') {
+          const prefix = email.split('@')[0];
+          const parts = prefix.split('.');
+          name = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+          if (name.length < 3) name = "Cán bộ " + prefix.toUpperCase();
+        }
+
+        // Figure out final role label or custom capabilities count
+        let finalRole = "Operator";
+        if (currentRoleMode === 'predefined') {
+          finalRole = document.getElementById('f-role').value;
+        } else {
+          // Check how many checked custom scopes
+          const checkedBoxes = document.querySelectorAll('.matrix-chk:checked');
+          const count = checkedBoxes.length;
+          if (count === 20) {
+            finalRole = "Super Admin (Custom)";
+          } else if (count >= 12) {
+            finalRole = "Admin Cao cấp (Tùy chọn)";
+          } else if (count > 0) {
+            finalRole = `Custom (${count} scopes)`;
+          } else {
+            finalRole = "Thành viên chưa cấp quyền";
+          }
+        }
+
+        const status = document.getElementById('f-status').value;
+
+        const newMem = {
+          id: internalUsers.length + 1,
+          name: name,
+          email: email,
+          role: finalRole,
+          status: status,
+          joined: new Date().toLocaleDateString('vi-VN')
+        };
+
+        internalUsers.unshift(newMem);
+        renderUsersTable();
+        toggleDrawer(false);
+
+        if (window.showToast) {
+          showToast(`✅ Đã thêm tài khoản: ${name} / ${email} thành công.`, 'success');
+        } else {
+          alert(`Đã thêm tài khoản: ${name} thành công.`);
+        }
+      }
+
+      // ROLES SIDE-PANEL ASSIGNMENTS
+      function renderRolesGroup() {
+        const container = document.getElementById('roles-list-group');
+        container.innerHTML = '';
+
+        systemRoles.forEach(role => {
+          const isActive = role.key === inspectedRoleKey;
+          const rootClass = isActive 
+            ? "border border-violet-500/50 bg-violet-600/10 text-white" 
+            : "border border-gray-800 bg-black/10 hover:border-gray-700 text-gray-400 hover:text-gray-200";
+
+          container.insertAdjacentHTML('beforeend', `
+            <div onclick="inspectRole('${role.key}')" class="p-3.5 rounded-xl cursor-pointer transition-all ${rootClass}">
+              <p class="font-bold text-xs uppercase tracking-wider">${role.key}</p>
+              <p class="text-[11px] text-gray-400 mt-1 leading-relaxed">${role.desc}</p>
+            </div>
+          `);
+        });
+      }
+
+      function inspectRole(roleKey) {
+        inspectedRoleKey = roleKey;
+        const r = systemRoles.find(role => role.key === roleKey);
+        if (!r) return;
+
+        document.getElementById('role-det-badge').textContent = r.key;
+        document.getElementById('role-det-name').textContent = r.name;
+        document.getElementById('role-det-desc').textContent = r.desc;
+
+        renderRolesGroup();
+        renderRolePermissions();
+      }
+
+      function renderRolePermissions() {
+        const r = systemRoles.find(role => role.key === inspectedRoleKey);
+        if (!r) return;
+
+        const container = document.getElementById('role-permissions-checkboxes');
+        container.innerHTML = '';
+
+        permLabels.forEach((label, idx) => {
+          const isChecked = r.permissions.includes(label);
+          container.insertAdjacentHTML('beforeend', `
+            <label class="flex items-center gap-3 p-3 rounded-lg bg-[#0D1117] border border-gray-805 hover:border-gray-700 cursor-pointer select-none">
+              <input type="checkbox" name="role-p-checkbox" value="${label}" ${isChecked ? 'checked' : ''} class="accent-violet-500 w-4 h-4 cursor-pointer">
+              <div class="text-xs">
+                <p class="font-bold text-gray-200">${label}</p>
+              </div>
+            </label>
+          `);
+        });
+      }
+
+      function saveRoleConfig() {
+        const r = systemRoles.find(role => role.key === inspectedRoleKey);
+        if (!r) return;
+
+        const checkboxes = document.getElementsByName('role-p-checkbox');
+        const nextPermissions = [];
+        checkboxes.forEach(box => {
+          if (box.checked) {
+            nextPermissions.push(box.value);
+          }
+        });
+
+        r.permissions = nextPermissions;
+        showToast('success', `✅ Đã lưu cấu hình ma trận phân quyền cho vai trò "${r.key}"!`);
+      }
+
+      // DELETE CONFIRMATION MODAL ACTIONS
+      function showDeleteModal(open, userId = null) {
+        const modal = document.getElementById('delete-confirm-modal');
+        if (open) {
+          deletingUserId = userId;
+          const u = internalUsers.find(user => user.id === userId);
+          if (!u) return;
+
+          document.getElementById('delete-modal-text').innerHTML = `Bạn có chắc chắn muốn tước bỏ quyền hoạt động và xóa tài khoản của thành viên <span class="font-bold text-white">${u.name} (${u.email})</span>?`;
+          modal.classList.remove('hidden');
+
+          document.getElementById('delete-confirm-submit').onclick = () => {
+            internalUsers = internalUsers.filter(user => user.id !== deletingUserId);
+            renderUsersTable();
+            showDeleteModal(false);
+            showToast('success', `🗑 Đã gỡ bỏ tài khoản thành công!`);
+          };
+
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
+
+      // TOASTS HELPER
+      function showToast(type, text) {
+        const container = document.getElementById('toast-container');
+        const id = 'toast-' + Math.random().toString(36).substr(2, 9);
+
+        let iconColor = type === 'success' ? 'text-green-400' : 'text-cyan-400';
+        let iconName = type === 'success' ? 'check-circle' : 'info';
+
+        const toastHtml = `
+          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
+            <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
+            <span class="text-gray-200 font-medium">${text}</span>
+          </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        lucide.createIcons();
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('translate-y-2', 'opacity-0');
+        }, 10);
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0', 'translate-y-[-4px]');
+            setTimeout(() => el.remove(), 300);
+          }
+        }, 3000);
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

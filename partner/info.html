@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Partner - Hồ sơ doanh nghiệp</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex p-0">
+
+    <!-- TOASTS -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🤝</span>
+          <span class="font-extrabold text-md text-transparent bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text">GameHub Partner</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Đối tác Liên Kết</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="info.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-cyan-600/30 to-cyan-900/10 text-cyan-400 border border-cyan-500/20 shadow-md">
+            <i data-lucide="building" class="w-4 h-4"></i>
+            <span>Hồ sơ Doanh nghiệp</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+            <span>Cấu hình Dịch vụ & Gói cước</span>
+          </a>
+          <a href="config.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>Thông số API & IP Whitelist</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Lịch sử Giao dịch</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Nhân viên nội bộ</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Đối soát Doanh thu</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center font-bold text-xs text-white">GA</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Garena VN</p>
+            <p class="text-gray-500 font-mono">ID: PTN_001</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-500 hover:text-red-400 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Không gian làm việc</span>
+          <span class="text-gray-600 font-medium">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-cyan-400">Doanh Nghiệp</span>
+        </div>
+         <div class="flex items-center gap-4">
+          <span class="bg-cyan-950 text-cyan-300 border border-cyan-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Garena Vietnam</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-cyan-400 shadow">G</div>
+            <span>Garena Admin ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-7xl mx-auto space-y-8">
+        <div>
+          <h1 class="text-2xl font-black text-gray-100 tracking-tight">Hồ Sơ Doanh Nghiệp (Enterprise Profile)</h1>
+          <p class="text-xs text-gray-500 mt-1">Quản lý và cập nhật thông số pháp nhân, địa chỉ hóa đơn VAT, đầu mối liên hệ kỹ thuật đối soát.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <!-- Company profile summary (Left column) -->
+          <div class="lg:col-span-2 space-y-6">
+            <div class="bg-card border border-gray-800 rounded-2xl p-6 space-y-5 shadow">
+              
+              <div class="flex items-center gap-4 border-b border-gray-850 pb-5">
+                <div class="w-14 h-14 rounded-2xl bg-cyan-600/10 border border-cyan-500/20 flex items-center justify-center font-bold text-lg text-cyan-400">GR</div>
+                <div>
+                  <h3 class="text-lg font-extrabold text-white">Công ty cổ phần Giải trí và Thể thao Điện tử Việt Nam</h3>
+                  <div class="flex gap-2 text-xs font-mono text-cyan-400 mt-1">
+                    <span>Mã số thuế: 0105301423</span>
+                    <span>|</span>
+                    <span class="text-gray-500">Mã đối tác: PTN_001</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs leading-relaxed">
+                <div>
+                  <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block mb-1">Người đại diện pháp luật</span>
+                  <p class="font-bold text-gray-200">Trần Hồng Nam (Giám đốc)</p>
+                </div>
+                <div>
+                  <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block mb-1">Dịch vụ cung cấp</span>
+                  <p class="font-bold text-gray-200">Game trực tuyến và giải đấu Esport</p>
+                </div>
+                <div class="sm:col-span-2">
+                  <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block mb-1">Trụ sở đăng ký</span>
+                  <p class="text-gray-350">Tầng 29, Tòa nhà Lotte Center Hà Nội, 54 Liễu Giai, Phường Cống Vị, Quận Ba Đình, Thành phố Hà Nội, Việt Nam.</p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Contacts Info Cards -->
+            <div class="bg-card border border-gray-800 rounded-2xl p-6 space-y-4 shadow">
+              <h3 class="text-xs uppercase tracking-wider font-extrabold text-gray-400">Đầu mối vận hành & Kỹ thuật</h3>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium">
+                <div class="p-4 bg-black/25 rounded-xl border border-gray-850">
+                  <span class="text-cyan-400 font-bold tracking-tight text-[11px] uppercase">Kênh Đối soát Doanh Thu</span>
+                  <p class="mt-2 text-gray-200 font-bold">Lê Thu Trang</p>
+                  <p class="text-gray-500 mt-1">Email: tracking-billing@garena.vn</p>
+                  <p class="text-gray-550 font-mono">+84 912 345 678</p>
+                </div>
+
+                <div class="p-4 bg-black/25 rounded-xl border border-gray-850">
+                  <span class="text-cyan-400 font-bold tracking-tight text-[11px] uppercase">Kết nối kỹ thuật API</span>
+                  <p class="mt-2 text-gray-200 font-bold">Đặng Thế Anh (Lead Dev)</p>
+                  <p class="text-gray-500 mt-1">Email: tech-integration@garena.vn</p>
+                  <p class="text-gray-550 font-mono">+84 988 999 123</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Quick Request modification (Right column) -->
+          <div class="lg:col-span-1 bg-card border border-gray-800 rounded-2xl p-6 flex flex-col justify-between shadow">
+            <div class="space-y-4">
+              <div class="pb-2 border-b border-gray-850">
+                <h3 class="text-xs font-bold text-gray-200 uppercase tracking-widest">Yêu Cầu Thay Đổi</h3>
+                <p class="text-[11px] text-gray-500 mt-1">Tạo phiếu đề nghị Admin cập nhật thông tin pháp lý doanh nghiệp.</p>
+              </div>
+
+              <div class="space-y-3.5 text-xs">
+                <div class="space-y-1">
+                  <label class="text-gray-400 uppercase font-black tracking-widest text-[9px]">Danh mục cần chỉnh sửa</label>
+                  <select class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-300 outline-none">
+                    <option value="legal">Người đại diện pháp luật / Giám đốc</option>
+                    <option value="address">Địa chỉ xuất hóa đơn đỏ (VAT)</option>
+                    <option value="contact">Hòm thư đầu mối hóa đơn</option>
+                  </select>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="text-gray-400 uppercase font-black tracking-widest text-[9px]">Giá trị thay đổi mới</label>
+                  <textarea id="req-content" placeholder="Vui lòng mô tả đầy đủ thông tin hoặc tham chiếu quyết định cần bổ sung..." class="w-full bg-black/30 border border-gray-700 focus:border-cyan rounded-lg p-2.5 text-xs text-gray-100 outline-none h-24"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="submitChangeRequest()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs uppercase tracking-wider text-center py-3 rounded-xl transition-all cursor-pointer shadow mt-4">Gửi Yêu Cầu</button>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+
+    <script>
+      function init() {
+        lucide.createIcons();
+      }
+
+      function submitChangeRequest() {
+        const text = document.getElementById('req-content').value.trim();
+        if (!text) {
+          showToast('error', 'Vui lòng bổ sung nội dung yêu cầu cụ thể.');
+          return;
+        }
+
+        document.getElementById('req-content').value = '';
+        showToast('success', '✅ Đã khởi tạo ticket yêu cầu thay đổi thông tin. Admin GameHub đang tiến hành soát xét!');
+      }
+
+      // TOASTS HELPER
+      function showToast(type, text) {
+        const container = document.getElementById('toast-container');
+        const id = 'toast-' + Math.random().toString(36).substr(2, 9);
+
+        let iconColor = type === 'success' ? 'text-green-400' : 'text-cyan-400';
+        let iconName = type === 'success' ? 'check-circle' : 'info';
+        if (type === 'error') {
+          iconColor = 'text-red-400';
+          iconName = 'x-circle';
+        }
+
+        const toastHtml = `
+          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
+            <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
+            <span class="text-gray-200 font-medium">${text}</span>
+          </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        lucide.createIcons();
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('translate-y-2', 'opacity-0');
+        }, 10);
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0', 'translate-y-[-4px]');
+            setTimeout(() => el.remove(), 300);
+          }
+        }, 3000);
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

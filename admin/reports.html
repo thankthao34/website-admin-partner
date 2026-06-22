@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Admin - Báo cáo đối soát</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex p-0">
+
+    <!-- TOASTS -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🎮</span>
+          <span class="font-extrabold text-lg text-transparent bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text">GameHub Admin</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Hệ Thống Admin</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="partners.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Quản lý Partner</span>
+          </a>
+          <a href="apis.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="code" class="w-4 h-4"></i>
+            <span>Quản lý API</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="package-search" class="w-4 h-4"></i>
+            <span>Service & Package</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Transaction Log</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-violet-600/30 to-violet-900/10 text-violet-400 border border-violet-500/20 shadow-md">
+            <i data-lucide="file-bar-chart" class="w-4 h-4"></i>
+            <span>Báo cáo đối soát</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="user-cog" class="w-4 h-4"></i>
+            <span>Người dùng & Phân quyền</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center font-bold text-xs text-white">AD</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Admin System</p>
+            <p class="text-gray-500 font-mono">v2.1.0</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-500 hover:text-red-400 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Hệ Thống</span>
+          <span class="text-gray-600 font-medium">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-violet-400">Báo cáo Đối soát</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="bg-violet-950 text-violet-300 border border-violet-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Admin Portal</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-violet-400 shadow">A</div>
+            <span>Admin System ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-7xl mx-auto space-y-8">
+        
+        <!-- VIEW 1: SUMMARY REPORTS TABLE -->
+        <div id="view-summary" class="space-y-6">
+          <div>
+            <h1 class="text-2xl font-black text-gray-100 tracking-tight">Đối soát Doanh Thu Viễn Thông (Reconciliations)</h1>
+            <p class="text-xs text-gray-500 mt-1">Kết toán chênh lệch, tổng hợp số lượng giao dịch thành công/thất bị, và kết chuyển dòng tiền định kỳ.</p>
+          </div>
+
+          <!-- Filter bar -->
+          <div class="bg-card border border-gray-800 p-4 rounded-xl flex items-center flex-wrap gap-4 text-xs">
+            <div class="flex items-center gap-2">
+              <label class="text-gray-400 uppercase text-[10px] font-bold">Partner:</label>
+              <select class="bg-black/30 border border-gray-700 rounded-lg p-2 text-xs text-gray-300 outline-none focus:border-accent">
+                <option value="all">Tất cả</option>
+                <option value="garena">Garena VN</option>
+                <option value="vng">VNG Corp</option>
+              </select>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <label class="text-gray-400 uppercase text-[10px] font-bold- mr-1">Từ ngày:</label>
+              <input type="date" value="2026-06-01" class="bg-black/30 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 outline-none">
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-gray-400 uppercase text-[10px] font-bold- mr-1">Đến ngày:</label>
+              <input type="date" value="2026-06-30" class="bg-black/30 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 outline-none">
+            </div>
+
+            <div class="flex items-center gap-2 ml-auto">
+              <button onclick="applyFilters()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase px-4 py-2.5 rounded-lg flex items-center gap-1 cursor-pointer">Lọc</button>
+              <button onclick="showToast('info', 'Làm mới kết toán.')" class="border border-gray-700 p-2 text-gray-400 hover:text-white rounded-lg cursor-pointer"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+
+          <!-- Main Table -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-4">Đối Tác</th>
+                  <th class="px-6 py-4 text-center">Kỳ Đối Soát</th>
+                  <th class="px-6 py-4 font-mono text-center">Tổng GD</th>
+                  <th class="px-6 py-4 font-mono text-center text-green-400">Thành công</th>
+                  <th class="px-6 py-4 font-mono text-center text-red-400">Thất bại</th>
+                  <th class="px-6 py-4 font-mono text-right">Doanh thu kết toán</th>
+                  <th class="px-6 py-4 text-right">Đối soát chi tiết</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-850/30 text-xs font-medium text-gray-300">
+                
+                <!-- Garena -->
+                <tr class="hover:bg-gray-800/10 transition-colors">
+                  <td class="px-6 py-4.5 font-bold text-gray-200">Garena VN</td>
+                  <td class="px-6 py-4.5 text-center text-gray-400">Tháng 06/2026</td>
+                  <td class="px-6 py-4.5 font-mono text-center font-bold text-gray-300">870,412</td>
+                  <td class="px-6 py-4.5 font-mono text-center text-green-400">869,940</td>
+                  <td class="px-6 py-4.5 font-mono text-center text-red-400">472</td>
+                  <td class="px-6 py-4.5 font-mono text-right text-cyan-400 text-sm font-bold">256,120,000 ₫</td>
+                  <td class="px-6 py-4.5 text-right">
+                    <button onclick="inspectReport('Garena VN', '256,120,000')" class="bg-violet-600/15 border border-violet-500/25 text-violet-400 font-bold uppercase tracking-wider text-[10px] px-3.5 py-1.5 rounded-lg cursor-pointer hover:bg-violet-600 hover:text-white transition-all">Xem</button>
+                  </td>
+                </tr>
+
+                <!-- VNG -->
+                <tr class="hover:bg-gray-800/10 transition-colors">
+                  <td class="px-6 py-4.5 font-bold text-gray-200">VNG Corp</td>
+                  <td class="px-6 py-4.5 text-center text-gray-400">Tháng 06/2026</td>
+                  <td class="px-6 py-4.5 font-mono text-center font-bold text-gray-300">401,920</td>
+                  <td class="px-6 py-4.5 font-mono text-center text-green-400">401,890</td>
+                  <td class="px-6 py-4.5 font-mono text-center text-red-400">30</td>
+                  <td class="px-6 py-4.5 font-mono text-right text-cyan-400 text-sm font-bold">120,440,000 ₫</td>
+                  <td class="px-6 py-4.5 text-right">
+                    <button onclick="inspectReport('VNG Corp', '120,440,000')" class="bg-violet-600/15 border border-violet-500/25 text-violet-400 font-bold uppercase tracking-wider text-[10px] px-3.5 py-1.5 rounded-lg cursor-pointer hover:bg-violet-600 hover:text-white transition-all">Xem</button>
+                  </td>
+                </tr>
+
+                <!-- Krafton -->
+                <tr class="hover:bg-gray-800/10 transition-colors">
+                  <td class="px-6 py-4.5 font-bold text-gray-200">Krafton VN</td>
+                  <td class="px-6 py-4.5 text-center text-gray-400">Tháng 06/2026</td>
+                  <td class="px-6 py-4.5 font-mono text-center font-bold text-gray-300">120,105</td>
+                  <td class="px-6 py-4.5 font-mono text-center text-green-400">119,950</td>
+                  <td class="px-6 py-4.5 font-mono text-center text-red-400">155</td>
+                  <td class="px-6 py-4.5 font-mono text-right text-cyan-400 text-sm font-bold">25,890,000 ₫</td>
+                  <td class="px-6 py-4.5 text-right">
+                    <button onclick="inspectReport('Krafton VN', '25,890,000')" class="bg-violet-600/15 border border-violet-500/25 text-violet-400 font-bold uppercase tracking-wider text-[10px] px-3.5 py-1.5 rounded-lg cursor-pointer hover:bg-violet-600 hover:text-white transition-all">Xem</button>
+                  </td>
+                </tr>
+
+                <!-- Moonton -->
+                <tr class="hover:bg-gray-800/10 transition-colors">
+                  <td class="px-6 py-4.5 font-bold text-gray-200">Moonton VN</td>
+                  <td class="px-6 py-4.5 text-center text-gray-400">Tháng 06/2026</td>
+                  <td class="px-6 py-4.5 font-mono text-center font-bold text-gray-300">4,124</td>
+                  <td class="px-6 py-4.5 font-mono text-center text-green-400">4,103</td>
+                  <td class="px-6 py-4.5 font-mono text-center text-red-400">21</td>
+                  <td class="px-6 py-4.5 font-mono text-right text-cyan-400 text-sm font-bold">900,000 ₫</td>
+                  <td class="px-6 py-4.5 text-right">
+                    <button onclick="inspectReport('Moonton VN', '900,000')" class="bg-violet-600/15 border border-violet-500/25 text-violet-400 font-bold uppercase tracking-wider text-[10px] px-3.5 py-1.5 rounded-lg cursor-pointer hover:bg-violet-600 hover:text-white transition-all">Xem</button>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 2: DETAIL VIEW PANEL (HIDDEN BY DEFAULT) -->
+        <div id="view-detail" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <button onclick="switchView('summary')" class="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider cursor-pointer">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại kết toán chung
+            </button>
+            
+            <div class="flex items-center gap-2 text-xs">
+              <button onclick="triggerExport('Excel')" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-1.5 cursor-pointer shadow">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> 📊 Xuất Excel
+              </button>
+              <button onclick="triggerExport('PDF')" class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-1.5 cursor-pointer shadow">
+                <i data-lucide="file-text" class="w-4 h-4"></i> 📄 Xuất PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Headers details -->
+          <div>
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-widest block">Báo cáo kiểm toán chi tiết</span>
+            <h2 class="text-xl font-extrabold text-white mt-1" id="det-title-partner">Đối tác: Garena VN</h2>
+          </div>
+
+          <!-- KPI row of 4 inside report -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- KPI 1 -->
+            <div class="bg-card border border-gray-800 p-5 rounded-xl">
+              <span class="text-[10px] text-gray-500 uppercase font-black block tracking-wider mb-2">Tổng số GD Gateway</span>
+              <p class="text-2xl font-bold font-mono tracking-tight text-white mb-0.5">870,412</p>
+              <span class="text-[10px] text-gray-400 font-medium">Số liệu nhận diện cổng kết nối</span>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="bg-card border border-gray-800 p-5 rounded-xl">
+              <span class="text-[10px] text-gray-500 uppercase font-black block tracking-wider mb-2">Số Giao Dịch Thành Công</span>
+              <p class="text-2xl font-bold font-mono tracking-tight text-green-400 mb-0.5">869,940</p>
+              <span class="text-[10px] text-green-400 font-medium font-sans">Tỷ lệ thành công: 99.94%</span>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="bg-card border border-gray-800 p-5 rounded-xl">
+              <span class="text-[10px] text-gray-500 uppercase font-black block tracking-wider mb-2">Số Giao Dịch Thất Bại</span>
+              <p class="text-2xl font-bold font-mono tracking-tight text-red-500 mb-0.5">472</p>
+              <span class="text-[10px] text-red-400 font-medium font-sans">Chặn rate limit và timeouts</span>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="bg-card border border-gray-800 p-5 rounded-xl">
+              <span class="text-[10px] text-gray-500 uppercase font-black block tracking-wider mb-2">Doanh Thu Đối Soát</span>
+              <p class="text-2xl font-bold font-mono tracking-tight text-cyan-400 mb-0.5" id="det-revenue-value">256,120,000 ₫</p>
+              <span class="text-[10px] text-gray-400 font-medium font-sans">Đã bao gồm VAT và chiết khấu</span>
+            </div>
+
+          </div>
+
+          <!-- Tab Bar details -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <div class="flex border-b border-gray-805 bg-black/10">
+              <button onclick="switchTab('daily')" id="tab-btn-daily" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300">Biểu đồ Theo ngày (30 ngày)</button>
+              <button onclick="switchTab('services')" id="tab-btn-services" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">Theo dịch vụ game</button>
+              <button onclick="switchTab('packages')" id="tab-btn-packages" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">Theo gói cước</button>
+            </div>
+
+            <div class="p-6">
+              
+              <!-- Tab Daily Chart: SVG BAR CHART -->
+              <div id="tab-content-daily" class="space-y-6">
+                <div>
+                  <h4 class="text-sm font-bold text-gray-200 uppercase tracking-widest text-[11px]">Bảng Doanh Thu Từng Ngày (30 ngày qua)</h4>
+                  <p class="text-xs text-gray-500 mt-0.5">Lưu lượng doanh thu nạp game đối soát liên kết</p>
+                </div>
+
+                <!-- Custom Bar graph SVG representation -->
+                <div class="relative w-full h-[200px] flex items-end bg-black/10 p-4 border border-gray-850 rounded-xl">
+                  <svg class="w-full h-full" viewBox="0 0 600 150" overflow="visible" preserveAspectRatio="none">
+                    <!-- Grid background -->
+                    <line x1="0" y1="0" x2="600" y2="0" stroke="#1f2937" stroke-dasharray="2" stroke-width="1"></line>
+                    <line x1="0" y1="50" x2="600" y2="50" stroke="#1f2937" stroke-dasharray="2" stroke-width="1"></line>
+                    <line x1="0" y1="100" x2="600" y2="100" stroke="#1f2937" stroke-dasharray="2" stroke-width="1"></line>
+                    <line x1="0" y1="150" x2="600" y2="150" stroke="#374151" stroke-width="1"></line>
+
+                    <!-- Render 30 vertical bar lines representing 30 days -->
+                    <!-- Week 1 -->
+                    <rect x="10" y="80" width="8" height="70" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="30" y="60" width="8" height="90" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="50" y="90" width="8" height="60" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="70" y="40" width="8" height="110" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="90" y="30" width="8" height="120" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="110" y="55" width="8" height="95" rx="2" fill="#06B6D4" opacity="0.85"></rect>
+                    <rect x="130" y="45" width="8" height="105" rx="2" fill="#06B6D4" opacity="0.85"></rect>
+
+                    <!-- Week 2 -->
+                    <rect x="160" y="70" width="8" height="80" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="180" y="85" width="8" height="65" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="200" y="95" width="8" height="55" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="220" y="50" width="8" height="100" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="240" y="20" width="8" height="130" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="260" y="35" width="8" height="115" rx="2" fill="#06B6D4" opacity="0.85"></rect>
+                    <rect x="280" y="40" width="8" height="110" rx="2" fill="#06B6D4" opacity="0.85"></rect>
+
+                    <!-- Week 3 -->
+                    <rect x="310" y="60" width="8" height="90" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="330" y="75" width="8" height="75" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="350" y="85" width="8" height="65" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="370" y="40" width="8" height="110" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="390" y="30" width="8" height="120" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="410" y="25" width="8" height="125" rx="2" fill="#06B6D4" opacity="0.85"></rect>
+                    <rect x="430" y="50" width="8" height="100" rx="2" fill="#06B6D4" opacity="0.85"></rect>
+
+                    <!-- Week 4 -->
+                    <rect x="460" y="80" width="8" height="70" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="480" y="90" width="8" height="60" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="500" y="100" width="8" height="50" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="520" y="55" width="8" height="95" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="540" y="40" width="8" height="110" rx="2" fill="#7C3AED" opacity="0.85"></rect>
+                    <rect x="560" y="15" width="8" height="135" rx="2" fill="#06B6D4" opacity="0.85"></rect>
+                    <rect x="580" y="30" width="8" height="120" rx="2" fill="#06B6D4" opacity="0.85"></rect>
+
+                  </svg>
+                </div>
+                
+                <div class="flex justify-between items-center text-[10px] font-mono text-gray-500 uppercase tracking-widest px-2 select-none">
+                  <span>Ngày 1</span>
+                  <span>Ngày 10</span>
+                  <span>Ngày 20</span>
+                  <span>Ngày 30</span>
+                </div>
+              </div>
+
+              <!-- Tab Services Table -->
+              <div id="tab-content-services" class="hidden">
+                <div class="border border-gray-800 rounded-xl overflow-hidden bg-black/10">
+                  <table class="w-full text-left">
+                    <thead>
+                      <tr class="bg-black/30 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
+                        <th class="px-6 py-3">Tên Game (Service)</th>
+                        <th class="px-6 py-3 font-mono">Tổng Giao dịch</th>
+                        <th class="px-6 py-3 text-right">Doanh thu tạm tính</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-850/30 text-xs">
+                      <tr>
+                        <td class="px-6 py-3 font-bold text-gray-200">Free Fire</td>
+                        <td class="px-6 py-3 font-mono text-gray-400">620,124</td>
+                        <td class="px-6 py-3 font-mono font-bold text-cyan-400 text-right pr-6">182,040,000 ₫</td>
+                      </tr>
+                      <tr>
+                        <td class="px-6 py-3 font-bold text-gray-200">Liên Quân Mobile</td>
+                        <td class="px-6 py-3 font-mono text-gray-400">250,288</td>
+                        <td class="px-6 py-3 font-mono font-bold text-cyan-400 text-right pr-6">74,080,000 ₫</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Tab Packages Table -->
+              <div id="tab-content-packages" class="hidden">
+                <div class="border border-gray-800 rounded-xl overflow-hidden bg-black/10">
+                  <table class="w-full text-left">
+                    <thead>
+                      <tr class="bg-black/30 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
+                        <th class="px-6 py-3">Mã Gói Cước</th>
+                        <th class="px-6 py-3 font-mono">Đăng ký</th>
+                        <th class="px-6 py-3 text-right">Số tiền kết cước</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-850/30 text-xs">
+                      <tr>
+                        <td class="px-6 py-3 font-bold text-gray-200">Gói 7 ngày (FF_7D)</td>
+                        <td class="px-6 py-3 font-mono text-gray-400">312,045</td>
+                        <td class="px-6 py-3 font-mono font-bold text-cyan-400 text-right pr-6">95,840,000 ₫</td>
+                      </tr>
+                      <tr>
+                        <td class="px-6 py-3 font-bold text-gray-200">Gói 30 ngày (FF_30D)</td>
+                        <td class="px-6 py-3 font-mono text-gray-400">558,367</td>
+                        <td class="px-6 py-3 font-mono font-bold text-cyan-400 text-right pr-6">160,280,000 ₫</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <script>
+      function init() {
+        lucide.createIcons();
+      }
+
+      function switchView(view) {
+        if (view === 'summary') {
+          document.getElementById('view-summary').classList.remove('hidden');
+          document.getElementById('view-detail').classList.add('hidden');
+        } else {
+          document.getElementById('view-summary').classList.add('hidden');
+          document.getElementById('view-detail').classList.remove('hidden');
+        }
+      }
+
+      // Inspect details
+      function inspectReport(partner, revenue) {
+        document.getElementById('det-title-partner').textContent = `Đối tác: ${partner}`;
+        document.getElementById('det-revenue-value').textContent = `${revenue} ₫`;
+        
+        switchView('detail');
+        switchTab('daily');
+      }
+
+      // Switch Tab inside Details view
+      function switchTab(tabId) {
+        const tabs = ['daily', 'services', 'packages'];
+        tabs.forEach(t => {
+          document.getElementById(`tab-content-${t}`).classList.add('hidden');
+          const btn = document.getElementById(`tab-btn-${t}`);
+          btn.className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent";
+        });
+
+        document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+        document.getElementById(`tab-btn-${tabId}`).className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300";
+      }
+
+      // Export handler
+      function triggerExport(type) {
+        showToast('success', `✅ Xuất báo cáo ${type} thành công! Tập tin đang được chuẩn bị tải xuống.`);
+      }
+
+      function applyFilters() {
+        showToast('info', 'Lọc và tải kết toán thông số.');
+      }
+
+      // TOASTS HELPER
+      function showToast(type, text) {
+        const container = document.getElementById('toast-container');
+        const id = 'toast-' + Math.random().toString(36).substr(2, 9);
+
+        let iconColor = type === 'success' ? 'text-green-400' : 'text-cyan-400';
+        let iconName = type === 'success' ? 'check-circle' : 'info';
+
+        const toastHtml = `
+          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
+            <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
+            <span class="text-gray-200 font-medium">${text}</span>
+          </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        lucide.createIcons();
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('translate-y-2', 'opacity-0');
+        }, 10);
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0', 'translate-y-[-4px]');
+            setTimeout(() => el.remove(), 300);
+          }
+        }, 3000);
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

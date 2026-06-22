@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Admin - Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+      /* Custom scrollbars */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0D1117;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #30363D;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #8B5CF6;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <!-- Logo -->
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🎮</span>
+          <span class="font-extrabold text-lg text-transparent bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text">GameHub Admin</span>
+        </div>
+
+        <!-- System Roll ID -->
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Hệ Thống Admin</span>
+          </div>
+        </div>
+
+        <!-- NAV Menu -->
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-violet-600/30 to-violet-900/10 text-violet-400 border border-violet-500/20 shadow-md">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="partners.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Quản lý Partner</span>
+          </a>
+          <a href="apis.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="code" class="w-4 h-4"></i>
+            <span>Quản lý API</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="package-search" class="w-4 h-4"></i>
+            <span>Service & Package</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Transaction Log</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="file-bar-chart" class="w-4 h-4"></i>
+            <span>Báo cáo đối soát</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="user-cog" class="w-4 h-4"></i>
+            <span>Người dùng & Phân quyền</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- User footer profile -->
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center font-bold text-xs text-white">AD</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Admin System</p>
+            <p class="text-gray-500 font-mono">v2.1.0</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-500 hover:text-red-400 transition-colors duration-200" title="Đăng xuất">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Hệ Thống</span>
+          <span class="text-gray-600 font-medium">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-violet-400">Dashboard</span>
+        </div>
+
+        <!-- Portal Info & Quick Actions -->
+        <div class="flex items-center gap-4">
+          <span class="bg-violet-950 text-violet-300 border border-violet-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow">
+            Admin Portal
+          </span>
+          <div class="flex items-center gap-2 relative group cursor-pointer">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-violet-400 shadow">
+              A
+            </div>
+            <span class="text-sm font-medium text-gray-300">Admin System ▾</span>
+            <!-- Simple Dropdown -->
+            <div class="absolute right-0 top-full mt-2 w-48 bg-card border border-gray-800 rounded-lg shadow-xl opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto transition-all duration-150 p-1">
+              <a href="users.html" class="flex items-center gap-2 px-3 py-2 text-xs rounded hover:bg-gray-800 transition-colors">
+                <i data-lucide="user" class="w-3.5 h-3.5 text-gray-400"></i> Hồ sơ
+              </a>
+              <a href="../index.html" class="flex items-center gap-2 px-3 py-2 text-xs rounded hover:bg-red-950/20 hover:text-red-400 transition-colors text-red-400 border-t border-gray-800">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Đăng xuất
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <main class="p-8 max-w-7xl mx-auto space-y-8">
+        
+        <!-- ROW 1: KPI CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- KPI 1 -->
+          <div class="bg-card border border-gray-800 rounded-xl p-6 shadow-sm hover:border-violet-500/20 transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-violet-500/5 to-transparent pointer-events-none transition-all duration-350 group-hover:w-32"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Tổng Partner</p>
+                <p id="kpi-total-partner" class="text-3xl font-bold tracking-tight text-white mb-1">24</p>
+                <p class="text-[11px] text-green-400 flex items-center gap-1">
+                  <i data-lucide="arrow-up-right" class="w-3 h-3"></i> +12% so với tháng trước
+                </p>
+              </div>
+              <div class="w-11 h-11 rounded-lg bg-violet-950/55 border border-violet-800/30 flex items-center justify-center text-xl text-violet-400 font-bold shadow-inner">
+                🏢
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 2 -->
+          <div class="bg-card border border-gray-800 rounded-xl p-6 shadow-sm hover:border-green-500/20 transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-green-500/5 to-transparent pointer-events-none transition-all duration-350 group-hover:w-32"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Partner Active</p>
+                <p id="kpi-active-partner" class="text-3xl font-bold tracking-tight text-white mb-1">21</p>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                  <span class="text-[11px] text-gray-400 font-medium font-mono">Tỷ lệ: 87.5%</span>
+                </div>
+              </div>
+              <div class="w-11 h-11 rounded-lg bg-green-950/55 border border-green-800/30 flex items-center justify-center text-xl text-green-400 shadow-inner">
+                ✅
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 3 -->
+          <div class="bg-card border border-gray-800 rounded-xl p-6 shadow-sm hover:border-cyan-500/20 transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-cyan-500/5 to-transparent pointer-events-none transition-all duration-350 group-hover:w-32"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">API Calls Hôm Nay</p>
+                <p id="kpi-api-calls" class="text-3xl font-bold tracking-tight text-white mb-1 font-mono">1,234,567</p>
+                <p class="text-[11px] text-cyan-400 flex items-center gap-1">
+                  <i data-lucide="trending-up" class="w-3 h-3"></i> +4.5% vs TB Giờ
+                </p>
+              </div>
+              <div class="w-11 h-11 rounded-lg bg-cyan-950/55 border border-cyan-800/30 flex items-center justify-center text-xl text-cyan-400 shadow-inner">
+                ⚡
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 4 -->
+          <div class="bg-card border border-gray-800 rounded-xl p-6 shadow-sm hover:border-yellow-500/20 transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-yellow-500/5 to-transparent pointer-events-none transition-all duration-350 group-hover:w-32"></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Doanh Thu Tháng</p>
+                <p id="kpi-revenue" class="text-2xl font-bold tracking-tight text-white mb-1 font-mono">403,350,000 ₫</p>
+                <p class="text-[11px] text-green-400 flex items-center gap-1">
+                  <i data-lucide="arrow-up-right" class="w-3 h-3"></i> Tăng 18,2M so với T5
+                </p>
+              </div>
+              <div class="w-11 h-11 rounded-lg bg-yellow-950/55 border border-yellow-800/20 flex items-center justify-center text-xl text-yellow-400 shadow-inner">
+                💰
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ROW 2: CHART + PENDING REQUESTS -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- LEFT 60%: LINE CHART -->
+          <div class="bg-card border border-gray-800 rounded-xl p-6 shadow-sm lg:col-span-7 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-6">
+                <div>
+                  <h3 class="text-base font-bold text-gray-100 uppercase tracking-wider">API Calls 7 ngày qua</h3>
+                  <p class="text-xs text-gray-500">Thống kê lưu lượng yêu cầu tích hợp toàn hệ thống</p>
+                </div>
+                <div class="flex items-center gap-2 text-xs font-mono text-gray-400 bg-gray-800/40 px-3 py-1.5 border border-gray-700/50 rounded-lg">
+                  <span class="w-2.5 h-2.5 rounded-full bg-violet-500 inline-block"></span>
+                  <span>Tổng Yêu Cầu</span>
+                </div>
+              </div>
+
+              <!-- SVG LINE CHART -->
+              <div class="relative w-full h-[220px] flex items-end">
+                <svg viewBox="0 0 700 220" class="w-full h-full text-gray-800" overflow="visible">
+                  <!-- Grid Lines -->
+                  <line x1="0" y1="20" x2="700" y2="20" stroke="#1f2937" stroke-dasharray="3" stroke-width="1"></line>
+                  <line x1="0" y1="70" x2="700" y2="70" stroke="#1f2937" stroke-dasharray="3" stroke-width="1"></line>
+                  <line x1="0" y1="120" x2="700" y2="120" stroke="#1f2937" stroke-dasharray="3" stroke-width="1"></line>
+                  <line x1="0" y1="170" x2="700" y2="170" stroke="#1f2937" stroke-dasharray="3" stroke-width="1"></line>
+                  <line x1="0" y1="220" x2="700" y2="220" stroke="#374151" stroke-width="1"></line>
+
+                  <!-- SVG Fill under path -->
+                  <path d="M 0,220 L 0,160 Q 60,110 116,130 T 233,180 T 350,60 T 466,50 T 583,90 T 700,40 L 700,220 Z" fill="url(#violet-gradient-fill)" opacity="0.12"></path>
+
+                  <!-- Main Line Path -->
+                  <path d="M 0,160 Q 60,110 116,130 T 233,180 T 350,60 T 466,50 T 583,90 T 700,40" fill="none" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round"></path>
+
+                  <!-- Dots on graph and values -->
+                  <!-- Day 1 (T2): 0, 160 -->
+                  <circle cx="0" cy="160" r="5" fill="#0D1117" stroke="#06B6D4" stroke-width="3"></circle>
+                  <!-- Day 2 (T3): 116, 130 -->
+                  <circle cx="116" cy="130" r="5" fill="#0D1117" stroke="#06B6D4" stroke-width="3"></circle>
+                  <!-- Day 3 (T4): 233, 180 -->
+                  <circle cx="233" cy="180" r="5" fill="#0D1117" stroke="#06B6D4" stroke-width="3"></circle>
+                  <!-- Day 4 (T5): 350, 60 -->
+                  <circle cx="350" cy="60" r="5" fill="#0D1117" stroke="#06B6D4" stroke-width="3"></circle>
+                  <!-- Day 5 (T6): 466, 50 -->
+                  <circle cx="466" cy="50" r="5" fill="#0D1117" stroke="#06B6D4" stroke-width="3"></circle>
+                  <!-- Day 6 (T7): 583, 90 -->
+                  <circle cx="583" cy="90" r="5" fill="#0D1117" stroke="#06B6D4" stroke-width="3"></circle>
+                  <!-- Day 7 (CN): 700, 40 -->
+                  <circle cx="700" cy="40" r="5" fill="#0D1117" stroke="#06B6D4" stroke-width="3"></circle>
+
+                  <!-- Gradients -->
+                  <defs>
+                    <linearGradient id="violet-gradient-fill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#8B5CF6"></stop>
+                      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0"></stop>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+
+            <!-- X-Axis Labels -->
+            <div class="flex justify-between items-center text-xs font-semibold text-gray-500 mt-4 px-1 select-none font-mono">
+              <span>Thứ 2</span>
+              <span>Thứ 3</span>
+              <span>Thứ 4</span>
+              <span>Thứ 5</span>
+              <span>Thứ 6</span>
+              <span>Thứ 7</span>
+              <span>Chủ Nhật</span>
+            </div>
+          </div>
+
+          <!-- RIGHT 40%: PENDING REQUESTS -->
+          <div class="bg-card border border-gray-800 rounded-xl p-6 shadow-sm lg:col-span-5 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-6">
+                <div>
+                  <h3 class="text-base font-bold text-gray-100 uppercase tracking-wider">Yêu cầu chờ duyệt</h3>
+                  <p class="text-xs text-gray-500">Các yêu cầu đăng ký và cấu hình mới chờ phê duyệt</p>
+                </div>
+                <span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-0.5 rounded text-[11px] font-mono font-bold">3 Chờ Duyệt</span>
+              </div>
+
+              <!-- List of pending requests -->
+              <div class="space-y-4">
+                
+                <!-- Ticket 1 -->
+                <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-800 bg-gray-900/30 hover:border-gray-700 transition-colors">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-yellow-950/40 border border-yellow-800/20 flex items-center justify-center font-bold text-sm text-yellow-500">S</div>
+                    <div>
+                      <h4 class="text-sm font-semibold text-gray-200">Garena Vietnam</h4>
+                      <p class="text-xs text-gray-500">Kích hoạt game: <span class="text-gray-300 font-medium">Free Fire Max</span></p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Pending</span>
+                    <a href="partners.html" class="bg-violet-600 hover:bg-violet-500 text-white font-semibold text-xs px-3.5 py-1.5 rounded-lg shadow-sm transition-all focus:ring-2 focus:ring-violet-500/20">Review</a>
+                  </div>
+                </div>
+
+                <!-- Ticket 2 -->
+                <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-800 bg-gray-900/30 hover:border-gray-700 transition-colors">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-cyan-950/40 border border-cyan-800/20 flex items-center justify-center font-bold text-sm text-cyan-400">A</div>
+                    <div>
+                      <h4 class="text-sm font-semibold text-gray-200">VNG Corporation</h4>
+                      <p class="text-xs text-gray-500">Yêu cầu nâng Rate-Limit API</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Pending</span>
+                    <a href="partners.html" class="bg-violet-600 hover:bg-violet-500 text-white font-semibold text-xs px-3.5 py-1.5 rounded-lg shadow-sm transition-all focus:ring-2 focus:ring-violet-500/20">Review</a>
+                  </div>
+                </div>
+
+                <!-- Ticket 3 -->
+                <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-800 bg-gray-900/30 hover:border-gray-700 transition-colors">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-purple-950/40 border border-purple-800/20 flex items-center justify-center font-bold text-sm text-purple-400">P</div>
+                    <div>
+                      <h4 class="text-sm font-semibold text-gray-200">Krafton Vietnam</h4>
+                      <p class="text-xs text-gray-500">Đăng ký thêm 4 IP Whitelist mới</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Pending</span>
+                    <a href="partners.html" class="bg-violet-600 hover:bg-violet-500 text-white font-semibold text-xs px-3.5 py-1.5 rounded-lg shadow-sm transition-all focus:ring-2 focus:ring-violet-500/20">Review</a>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+            <a href="partners.html?tab=requests" class="text-xs text-center text-violet-400 hover:text-violet-300 font-semibold uppercase tracking-wider border-t border-gray-800/50 pt-4 cursor-pointer block mt-4 hover:underline">
+              Xem toàn bộ danh sách yêu cầu
+            </a>
+          </div>
+
+        </div>
+
+        <!-- ROW 3: RECENTLY ACTIVE PARTNERS -->
+        <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow-sm">
+          <div class="px-6 py-5 border-b border-gray-800 flex justify-between items-center">
+            <div>
+              <h3 class="text-base font-bold text-gray-100 uppercase tracking-wider">Đối tác hoạt động gần đây</h3>
+              <p class="text-xs text-gray-500">Lưu lượng cuộc gọi API của các Partner trong ngày hôm nay</p>
+            </div>
+            <a href="partners.html" class="text-xs font-semibold text-violet-400 hover:text-violet-300 transition-colors tracking-wide hover:underline">Xem Tất cả Partner</a>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-4">Tên Partner</th>
+                  <th class="px-6 py-4">SP Code</th>
+                  <th class="px-6 py-4">API Calls Hôm Nay</th>
+                  <th class="px-6 py-4">Trạng thái</th>
+                  <th class="px-6 py-4 text-right">Hành động</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-850/30 text-sm">
+                
+                <!-- Row 1 -->
+                <tr class="hover:bg-gray-800/20 transition-colors">
+                  <td class="px-6 py-4.5 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-orange-600/15 border border-orange-500/20 flex items-center justify-center font-bold text-xs text-orange-400">G</div>
+                    <span class="font-bold text-gray-200">Garena Vietnam</span>
+                  </td>
+                  <td class="px-6 py-4.5 font-mono text-xs text-gray-400 uppercase tracking-wide">VN_VTL_001</td>
+                  <td class="px-6 py-4.5 font-mono font-medium text-cyan-400">653,124</td>
+                  <td class="px-6 py-4.5">
+                    <span class="inline-flex items-center gap-1.5 bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Active
+                    </span>
+                  </td>
+                  <td class="px-6 py-4.5 text-right">
+                    <a href="partners.html?id=1" class="border border-gray-800 hover:border-gray-600 hover:bg-gray-800 bg-[#0D1117] text-gray-300 hover:text-gray-100 text-xs font-bold uppercase tracking-wider py-1.5 px-3.5 rounded-lg transition-all">Xem</a>
+                  </td>
+                </tr>
+
+                <!-- Row 2 -->
+                <tr class="hover:bg-gray-800/20 transition-colors">
+                  <td class="px-6 py-4.5 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-600/15 border border-blue-500/20 flex items-center justify-center font-bold text-xs text-blue-400">V</div>
+                    <span class="font-bold text-gray-200">VNG Corporation</span>
+                  </td>
+                  <td class="px-6 py-4.5 font-mono text-xs text-gray-400 uppercase tracking-wide">VN_MBF_002</td>
+                  <td class="px-6 py-4.5 font-mono font-medium text-cyan-400">412,056</td>
+                  <td class="px-6 py-4.5">
+                    <span class="inline-flex items-center gap-1.5 bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Active
+                    </span>
+                  </td>
+                  <td class="px-6 py-4.5 text-right">
+                    <a href="partners.html?id=2" class="border border-gray-800 hover:border-gray-600 hover:bg-gray-800 bg-[#0D1117] text-gray-300 hover:text-gray-100 text-xs font-bold uppercase tracking-wider py-1.5 px-3.5 rounded-lg transition-all">Xem</a>
+                  </td>
+                </tr>
+
+                <!-- Row 3 -->
+                <tr class="hover:bg-gray-800/20 transition-colors">
+                  <td class="px-6 py-4.5 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-red-600/15 border border-red-500/20 flex items-center justify-center font-bold text-xs text-red-400">K</div>
+                    <span class="font-bold text-gray-200">Krafton Vietnam</span>
+                  </td>
+                  <td class="px-6 py-4.5 font-mono text-xs text-gray-400 uppercase tracking-wide">VN_VNP_003</td>
+                  <td class="px-6 py-4.5 font-mono font-medium text-cyan-400">129,540</td>
+                  <td class="px-6 py-4.5">
+                    <span class="inline-flex items-center gap-1.5 bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Active
+                    </span>
+                  </td>
+                  <td class="px-6 py-4.5 text-right">
+                    <a href="partners.html?id=3" class="border border-gray-800 hover:border-gray-600 hover:bg-gray-800 bg-[#0D1117] text-gray-300 hover:text-gray-100 text-xs font-bold uppercase tracking-wider py-1.5 px-3.5 rounded-lg transition-all">Xem</a>
+                  </td>
+                </tr>
+
+                <!-- Row 4 -->
+                <tr class="hover:bg-gray-800/20 transition-colors">
+                  <td class="px-6 py-4.5 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-rose-600/15 border border-rose-500/20 flex items-center justify-center font-bold text-xs text-rose-400">S</div>
+                    <span class="font-bold text-gray-200">Sea Limited (Garena Intl)</span>
+                  </td>
+                  <td class="px-6 py-4.5 font-mono text-xs text-gray-400 uppercase tracking-wide">VN_GTL_004</td>
+                  <td class="px-6 py-4.5 font-mono font-medium text-gray-500">0</td>
+                  <td class="px-6 py-4.5">
+                    <span class="inline-flex items-center gap-1.5 bg-red-500/10 text-red-400 border border-red-500/20 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Locked
+                    </span>
+                  </td>
+                  <td class="px-6 py-4.5 text-right">
+                    <a href="partners.html?id=4" class="border border-gray-800 hover:border-gray-600 hover:bg-gray-800 bg-[#0D1117] text-gray-300 hover:text-gray-100 text-xs font-bold uppercase tracking-wider py-1.5 px-3.5 rounded-lg transition-all">Xem</a>
+                  </td>
+                </tr>
+
+                <!-- Row 5 -->
+                <tr class="hover:bg-gray-800/20 transition-colors">
+                  <td class="px-6 py-4.5 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-yellow-600/15 border border-yellow-500/20 flex items-center justify-center font-bold text-xs text-yellow-500">M</div>
+                    <span class="font-bold text-gray-200">Moonton VN</span>
+                  </td>
+                  <td class="px-6 py-4.5 font-mono text-xs text-gray-400 uppercase tracking-wide">VN_VTL_005</td>
+                  <td class="px-6 py-4.5 font-mono font-medium text-cyan-400">39,847</td>
+                  <td class="px-6 py-4.5">
+                    <span class="inline-flex items-center gap-1.5 bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Active
+                    </span>
+                  </td>
+                  <td class="px-6 py-4.5 text-right">
+                    <a href="partners.html?id=5" class="border border-gray-800 hover:border-gray-600 hover:bg-gray-800 bg-[#0D1117] text-gray-300 hover:text-gray-100 text-xs font-bold uppercase tracking-wider py-1.5 px-3.5 rounded-lg transition-all">Xem</a>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Footer section -->
+      <footer class="h-16 flex items-center justify-between border-t border-gray-800 px-8 py-4 bg-[#0D1117] mt-12">
+        <span class="text-xs text-gray-500">Copyright © 2026 GameHub B2B. All rights reserved.</span>
+        <span class="text-xs text-gray-500 font-mono">Server Status: Active</span>
+      </footer>
+
+    </div>
+
+    <script>
+      // Initialize Lucide Icons
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

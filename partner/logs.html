@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Partner - Lịch sử Giao dịch</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex p-0">
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🤝</span>
+          <span class="font-extrabold text-md text-transparent bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text">GameHub Partner</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Đối tác Liên Kết</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="info.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="building" class="w-4 h-4"></i>
+            <span>Hồ sơ Doanh nghiệp</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+            <span>Cấu hình Dịch vụ & Gói cước</span>
+          </a>
+          <a href="config.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>Thông số API & IP Whitelist</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-cyan-600/30 to-cyan-900/10 text-cyan-400 border border-cyan-500/20 shadow-md">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Lịch sử Giao dịch</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Nhân viên nội bộ</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Đối soát Doanh thu</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center font-bold text-xs text-white">GA</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Garena VN</p>
+            <p class="text-gray-500 font-mono">ID: PTN_001</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-550 hover:text-red-400 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Không gian làm việc</span>
+          <span class="text-gray-600 font-medium font-bold">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-cyan-400">Transaction Logs</span>
+        </div>
+         <div class="flex items-center gap-4">
+          <span class="bg-cyan-950 text-cyan-300 border border-cyan-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Garena Vietnam</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-cyan-400 shadow">G</div>
+            <span>Garena Admin ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-7xl mx-auto space-y-6">
+        <div>
+          <h1 class="text-2xl font-black text-gray-100 tracking-tight">Nhật ký kết nối Gateway (API Transaction Logs)</h1>
+          <p class="text-xs text-gray-500">Giám sát trạng thái hoạt động trực tuyến các truy vấn từ máy chủ của bạn tới Kênh cước GameHub.</p>
+        </div>
+
+        <!-- Filter widgets -->
+        <div class="bg-card border border-gray-800 p-4 rounded-xl grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+          <div class="space-y-1">
+            <label class="text-gray-500 font-bold uppercase text-[9px] tracking-widest">Từ ngày</label>
+            <input type="date" value="2026-06-15" class="w-full bg-black/30 border border-gray-700 rounded p-2 text-gray-300 outline-none">
+          </div>
+          <div class="space-y-1">
+            <label class="text-gray-500 font-bold uppercase text-[9px] tracking-widest">Đến ngày</label>
+            <input type="date" value="2026-06-22" class="w-full bg-black/30 border border-gray-700 rounded p-2 text-gray-300 outline-none">
+          </div>
+          <div class="space-y-1">
+            <label class="text-gray-500 font-bold uppercase text-[9px] tracking-widest">API Endpoint</label>
+            <select id="api-opt" class="w-full bg-black/30 border border-gray-700 rounded p-2 text-gray-300 outline-none">
+              <option value="all">Mọi Endpoint</option>
+              <option value="/v1/check-status">/v1/check-status</option>
+              <option value="/v1/register">/v1/register</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button onclick="applyFilters()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold uppercase tracking-wider py-2 rounded-lg cursor-pointer shadow">Truy vấn Lọc</button>
+          </div>
+        </div>
+
+        <!-- System table -->
+        <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-black/20 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                <th class="px-6 py-3.5"># Request ID</th>
+                <th class="px-6 py-3.5">Thời gian</th>
+                <th class="px-6 py-3.5 font-mono">Dịch vụ API</th>
+                <th class="px-6 py-3.5 text-center">HTTP Status</th>
+                <th class="px-6 py-3.5 text-center">Độ trễ (Latency)</th>
+                <th class="px-6 py-3.5 text-right">Chi tiết</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-850/30 text-xs font-medium font-mono text-gray-350">
+              
+              <!-- row 1 -->
+              <tr class="hover:bg-gray-800/10">
+                <td class="px-6 py-3.5 font-bold text-gray-300 select-all">req-ab-12345</td>
+                <td class="px-6 py-3.5 text-gray-500">2026-06-22 10:30:25</td>
+                <td class="px-6 py-3.5 text-cyan-400">/v1/check-status</td>
+                <td class="px-6 py-3.5 text-center">
+                  <span class="bg-green-500/10 border border-green-500/20 text-green-400 font-bold px-2 py-0.5 rounded text-[10px]">200 OK</span>
+                </td>
+                <td class="px-6 py-3.5 text-center text-gray-400">145ms</td>
+                <td class="px-6 py-3.5 text-right font-sans">
+                  <button onclick="inspectLogMsg('req-ab-12345', 200, 'success')" class="border border-gray-800 bg-[#0D1117] hover:border-cyan hover:text-white px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider cursor-pointer">Xem</button>
+                </td>
+              </tr>
+
+              <!-- row 2 -->
+              <tr class="hover:bg-gray-800/10">
+                <td class="px-6 py-3.5 font-bold text-gray-300 select-all">req-ab-12346</td>
+                <td class="px-6 py-3.5 text-gray-500">2026-06-22 10:30:50</td>
+                <td class="px-6 py-3.5 text-cyan-400">/v1/check-status</td>
+                <td class="px-6 py-3.5 text-center">
+                  <span class="bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 font-bold px-2 py-0.5 rounded text-[10px]">429 LIMIT</span>
+                </td>
+                <td class="px-6 py-3.5 text-center text-gray-400">12ms</td>
+                <td class="px-6 py-3.5 text-right font-sans">
+                  <button onclick="inspectLogMsg('req-ab-12346', 429, 'tps_failed')" class="border border-gray-800 bg-[#0D1117] hover:border-cyan hover:text-white px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider cursor-pointer">Xem</button>
+                </td>
+              </tr>
+
+              <!-- row 3 -->
+              <tr class="hover:bg-gray-800/10">
+                <td class="px-6 py-3.5 font-bold text-gray-300 select-all">req-ab-33012</td>
+                <td class="px-6 py-3.5 text-gray-500">2026-06-22 10:31:11</td>
+                <td class="px-6 py-3.5 text-cyan-300">/v1/register</td>
+                <td class="px-6 py-3.5 text-center">
+                  <span class="bg-green-500/10 border border-green-500/20 text-green-400 font-bold px-2 py-0.5 rounded text-[10px]">200 OK</span>
+                </td>
+                <td class="px-6 py-3.5 text-center text-gray-400">182ms</td>
+                <td class="px-6 py-3.5 text-right font-sans">
+                  <button onclick="inspectLogMsg('req-ab-33012', 200, 'registered_success')" class="border border-gray-800 bg-[#0D1117] hover:border-cyan hover:text-white px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider cursor-pointer">Xem</button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+
+    <!-- GENERAL LOG INFO MODAL -->
+    <div id="partner-log-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="closeLogModal()" class="absolute inset-0 bg-black/80 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden">
+        
+        <div class="px-6 py-4 border-b border-gray-800 bg-[#0D1117] flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest font-mono" id="m-label-reqid">Request ID</span>
+          </div>
+          <button onclick="closeLogModal()" class="text-gray-400 hover:text-white text-xl font-bold">&times;</button>
+        </div>
+
+        <div class="p-6 space-y-4">
+          
+          <div class="space-y-1">
+            <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest block font-sans">Request URL and Header Parameters</span>
+            <pre class="bg-black/30 border border-gray-800 p-3.5 rounded-lg text-xs leading-relaxed text-gray-300 overflow-x-auto">
+Content-Type: application/json
+X-Client-Id: cli_gar_vn_99182a
+Client-IP: 103.45.18.91</pre>
+          </div>
+
+          <div class="space-y-1">
+            <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest block font-sans">Response Json Schema</span>
+            <pre id="m-body-block" class="bg-black/30 border border-gray-800 p-3.5 rounded-lg text-xs leading-relaxed text-cyan-300 overflow-y-auto max-h-48">
+{}</pre>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+      function init() {
+        lucide.createIcons();
+      }
+
+      function inspectLogMsg(reqId, status, payloadKey) {
+        document.getElementById('m-label-reqid').textContent = `REQ: ${reqId} [HTTP ${status}]`;
+        
+        const block = document.getElementById('m-body-block');
+        if (payloadKey === 'success') {
+          block.textContent = JSON.stringify({
+            status: "success",
+            code: 200,
+            data: {
+              active: true,
+              user_balance: 15000,
+              latency_ns: 12400
+            }
+          }, null, 2);
+        } else if (payloadKey === 'tps_failed') {
+          block.textContent = JSON.stringify({
+            status: "failed",
+            code: 429,
+            error: {
+              reason: "Burst rate limit exceeded. Max 100/s.",
+              wait_ms: 500
+            }
+          }, null, 2);
+        } else {
+          block.textContent = JSON.stringify({
+            status: "success",
+            code: 200,
+            registration: {
+              player_id: "lao_88201",
+              assigned_package: "FF_7D",
+              billing_status: "processed_ok"
+            }
+          }, null, 2);
+        }
+
+        document.getElementById('partner-log-modal').classList.remove('hidden');
+      }
+
+      function closeLogModal() {
+        document.getElementById('partner-log-modal').classList.add('hidden');
+      }
+
+      function applyFilters() {
+        lucide.createIcons();
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Partner - Đối soát Doanh thu</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex p-0">
+
+    <!-- TOASTS -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🤝</span>
+          <span class="font-extrabold text-md text-transparent bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text">GameHub Partner</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Đối tác Liên Kết</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="info.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="building" class="w-4 h-4"></i>
+            <span>Hồ sơ Doanh nghiệp</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+            <span>Cấu hình Dịch vụ & Gói cước</span>
+          </a>
+          <a href="config.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>Thông số API & IP Whitelist</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Lịch sử Giao dịch</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Nhân viên nội bộ</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-cyan-600/30 to-cyan-900/10 text-cyan-400 border border-cyan-500/20 shadow-md">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Đối soát Doanh thu</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center font-bold text-xs text-white">GA</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Garena VN</p>
+            <p class="text-gray-500 font-mono">ID: PTN_001</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-550 hover:text-red-400 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Không gian làm việc</span>
+          <span class="text-gray-600 font-medium font-bold">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-cyan-400">Kết Toán Chuyên Môn</span>
+        </div>
+         <div class="flex items-center gap-4">
+          <span class="bg-cyan-950 text-cyan-300 border border-cyan-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Garena Vietnam</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-cyan-400 shadow">G</div>
+            <span>Garena Admin ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-7xl mx-auto space-y-8">
+        
+        <!-- VIEW 1: BILLING LIST -->
+        <div id="view-index" class="space-y-6">
+          <div>
+            <h1 class="text-2xl font-black text-gray-100 tracking-tight">Đối soát dòng tiền hàng tháng (Reconciliations)</h1>
+            <p class="text-xs text-gray-500 mt-1">Tổng hợp báo cáo thuế và doanh thu đối chiếu giữa Garena VN và GameHub Platform.</p>
+          </div>
+
+          <!-- Billing Table -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-4">Kỳ Kết Toán</th>
+                  <th class="px-6 py-4 font-mono text-center">Tổng cuộc gọi Gateway</th>
+                  <th class="px-6 py-4 font-mono text-center text-green-400">Giao dịch thành công</th>
+                  <th class="px-6 py-4 font-mono text-center text-red-400">Giao dịch thất bại</th>
+                  <th class="px-6 py-4 font-mono text-right">Doanh thu kết toán</th>
+                  <th class="px-6 py-4 text-right">Mở báo cáo</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-850/30 text-xs font-medium text-gray-350">
+                <tr class="hover:bg-gray-800/10">
+                  <td class="px-6 py-4.5 font-bold text-white">Tháng 06/2026</td>
+                  <td class="px-6 py-4.5 text-center font-mono">870,412</td>
+                  <td class="px-6 py-4.5 text-center font-mono text-green-400">869,940</td>
+                  <td class="px-6 py-4.5 text-center font-mono text-red-400 font-bold">472</td>
+                  <td class="px-6 py-4.5 text-right font-mono text-cyan-400 text-sm font-black">256,120,000 ₫</td>
+                  <td class="px-6 py-4.5 text-right">
+                    <button onclick="inspectReportDetails('Tháng 06/2026')" class="bg-cyan-600/15 border border-cyan-500/20 text-cyan-400 hover:bg-cyan-600 hover:text-white font-bold uppercase tracking-wider text-[10px] px-3.5 py-1.5 rounded-lg cursor-pointer transition-all">Xem Chi Tiết ▾</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 2: BILLING DETAILS -->
+        <div id="view-detail" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <button onclick="switchView('index')" class="flex items-center gap-1.5 text-xs text-cyan-400 hover:underline font-bold uppercase tracking-wider cursor-pointer">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại kỳ đối soát
+            </button>
+
+            <div class="flex items-center gap-2">
+              <button onclick="triggerExport('Excel')" class="bg-green-600 hover:bg-green-500 text-white font-bold text-xs uppercase py-2 px-4 rounded-xl flex items-center gap-1.5 cursor-pointer shadow">
+                📊 Xuất Excel
+              </button>
+              <button onclick="triggerExport('PDF')" class="bg-red-800 hover:bg-red-700 text-white font-bold text-xs uppercase py-2 px-4 rounded-xl flex items-center gap-1.5 cursor-pointer shadow">
+                📄 Xuất PDF
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-xs text-gray-500 font-bold uppercase tracking-widest block font-mono">Bảng chi tiết kết toán</span>
+            <h2 class="text-xl font-extrabold text-white mt-0.5" id="det-cycle-title">Tháng 06/2026</h2>
+          </div>
+
+          <!-- KPI indicators of 4 inside report -->
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div class="bg-card border border-gray-800 p-4.5 rounded-xl">
+              <span class="text-[9px] text-gray-500 uppercase font-black block tracking-wider mb-2">Tổng cuộc gọi Gateway</span>
+              <p class="text-xl font-bold font-mono tracking-tight text-white">870,412</p>
+            </div>
+
+            <div class="bg-card border border-gray-800 p-4.5 rounded-xl">
+              <span class="text-[9px] text-gray-500 uppercase font-black block tracking-wider mb-2">Giao dịch thành công</span>
+              <p class="text-xl font-bold font-mono tracking-space-none text-green-400">869,940</p>
+            </div>
+
+            <div class="bg-card border border-gray-800 p-4.5 rounded-xl">
+              <span class="text-[9px] text-gray-500 uppercase font-black block tracking-wider mb-2">Giao dịch thất bại</span>
+              <p class="text-xl font-bold font-mono tracking-space-none text-red-400">472</p>
+            </div>
+
+            <div class="bg-card border border-gray-800 p-4.5 rounded-xl">
+              <span class="text-[9px] text-gray-500 uppercase font-black block tracking-wider mb-2">Doanh thu nạp game</span>
+              <p class="text-xl font-bold font-mono tracking-space-none text-cyan-400">256,120,000 ₫</p>
+            </div>
+          </div>
+
+          <!-- Details Tabs bar -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <div class="flex border-b border-gray-805 bg-black/10">
+              <button onclick="switchTab('daily')" id="tab-btn-daily" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-cyan-400 border-b-2 border-cyan hover:text-cyan-300">Biểu đồ Theo ngày (30 ngày)</button>
+              <button onclick="switchTab('products')" id="tab-btn-products" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">Phân phối cước nạp Gói</button>
+            </div>
+
+            <div class="p-6">
+              
+              <!-- Tab 1: Daily custom chart -->
+              <div id="tab-content-daily" class="space-y-4">
+                <span class="text-xs font-bold text-gray-300 uppercase tracking-widest text-[10px]">Tỷ suất doanh thu từng kỳ theo ngày nạp</span>
+                
+                <!-- SVG diagram -->
+                <div class="relative bg-black/20 p-4 rounded-xl border border-gray-850">
+                  <svg class="w-full h-[150px]" viewBox="0 0 600 120" overflow="visible" preserveAspectRatio="none">
+                    <line x1="0" y1="0" x2="600" y2="0" stroke="#1f2937" stroke-dasharray="2"></line>
+                    <line x1="0" y1="60" x2="600" y2="60" stroke="#1f2937" stroke-dasharray="2"></line>
+                    <line x1="0" y1="120" x2="600" y2="120" stroke="#374151"></line>
+
+                    <!-- Days bar representation -->
+                    <rect x="15" y="60" width="10" height="60" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="55" y="40" width="10" height="80" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="95" y="70" width="10" height="50" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="135" y="20" width="10" height="100" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="175" y="30" width="10" height="90" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="215" y="50" width="10" height="70" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="255" y="45" width="10" height="75" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="295" y="35" width="10" height="85" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="335" y="55" width="10" height="65" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="375" y="15" width="10" height="105" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="415" y="25" width="10" height="95" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="455" y="55" width="10" height="65" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="495" y="70" width="10" height="50" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="535" y="10" width="10" height="110" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                    <rect x="575" y="30" width="10" height="90" rx="1.5" fill="#06B6D4" opacity="0.8"></rect>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Tab 2: Products breakdown -->
+              <div id="tab-content-products" class="hidden">
+                <div class="border border-gray-800 rounded-xl overflow-hidden bg-black/10">
+                  <table class="w-full text-left">
+                    <thead>
+                      <tr class="bg-black/30 text-[10px] uppercase font-bold text-gray-500 tracking-wider border-b border-gray-800">
+                        <th class="px-5 py-3">Tên Gói Dịch Vụ</th>
+                        <th class="px-5 py-3 font-mono">Lượt nạp thành công</th>
+                        <th class="px-5 py-3 text-right">Tổng thanh toán sau thuế Garena</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-850/30 text-xs">
+                      <tr>
+                        <td class="px-5 py-3 font-bold text-white">Gói cước tuần 15,000₫ (FF_7D)</td>
+                        <td class="px-5 py-3 font-mono text-gray-400">312,045</td>
+                        <td class="px-5 py-3 font-mono font-bold text-cyan-400 text-right pr-6">95,840,000 ₫</td>
+                      </tr>
+                      <tr>
+                        <td class="px-5 py-3 font-bold text-white">Gói cước tháng 45,000₫ (FF_30D)</td>
+                        <td class="px-5 py-3 font-mono text-gray-400">558,367</td>
+                        <td class="px-5 py-3 font-mono font-bold text-cyan-400 text-right pr-6">160,280,000 ₫</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <script>
+      function init() {
+        lucide.createIcons();
+      }
+
+      function switchView(view) {
+        if (view === 'index') {
+          document.getElementById('view-index').classList.remove('hidden');
+          document.getElementById('view-detail').classList.add('hidden');
+        } else {
+          document.getElementById('view-index').classList.add('hidden');
+          document.getElementById('view-detail').classList.remove('hidden');
+        }
+      }
+
+      function inspectReportDetails(cycleName) {
+        document.getElementById('det-cycle-title').textContent = cycleName;
+        switchView('detail');
+        switchTab('daily');
+      }
+
+      function switchTab(tabId) {
+        const tabs = ['daily', 'products'];
+        tabs.forEach(t => {
+          document.getElementById(`tab-content-${t}`).classList.add('hidden');
+          const btn = document.getElementById(`tab-btn-${t}`);
+          btn.className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent";
+        });
+
+        document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+        document.getElementById(`tab-btn-${tabId}`).className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-cyan-400 border-b-2 border-cyan hover:text-cyan-300";
+      }
+
+      function triggerExport(type) {
+        showToast('success', `✅ Xuất tài liệu kết cước ${type} thành công! Garena có thể tải xuống sau vài giây.`);
+      }
+
+      // TOASTS HELPER
+      function showToast(type, text) {
+        const container = document.getElementById('toast-container');
+        const id = 'toast-' + Math.random().toString(36).substr(2, 9);
+
+        let iconColor = type === 'success' ? 'text-green-400' : 'text-cyan-400';
+        let iconName = type === 'success' ? 'check-circle' : 'info';
+
+        const toastHtml = `
+          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
+            <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
+            <span class="text-gray-200 font-medium">${text}</span>
+          </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        lucide.createIcons();
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('translate-y-2', 'opacity-0');
+        }, 10);
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0', 'translate-y-[-4px]');
+            setTimeout(() => el.remove(), 300);
+          }
+        }, 3000);
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

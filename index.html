@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub - Đăng nhập</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background: radial-gradient(circle at center, #1a0533 0%, #0D1117 70%);
+        background-size: 200% 200%;
+        animation: gradientBG 15s ease infinite;
+      }
+      @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      .glass-card {
+        background: rgba(22, 27, 34, 0.75);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(124, 58, 237, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      }
+      .demo-btn-active {
+        background: rgba(124, 58, 237, 0.15) !important;
+        border-color: #8B5CF6 !important;
+        box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+      }
+    </style>
+    <!-- Embed shared authentication engine -->
+    <script src="assets/auth-helper.js"></script>
+  </head>
+  <body class="min-h-screen text-gray-100 flex flex-col justify-between items-center p-4">
+    <!-- Spacer -->
+    <div class="h-4"></div>
+
+    <!-- Main Container -->
+    <div class="w-full max-w-[850px] flex flex-col md:flex-row gap-6 items-stretch justify-center my-auto">
+      
+      <!-- Left side: Interactive Demo Accounts Showcase (The multi-role & multi-site accounts request) -->
+      <div class="w-full md:w-[420px] glass-card rounded-2xl p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-xs font-bold text-accent px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20 tracking-wider">TẢI TRƯỚC HỆ THỐNG</span>
+            <span class="text-xs font-mono text-cyan-400">DEMO ACCOUNTS</span>
+          </div>
+          <h2 class="text-xl font-bold text-white tracking-tight mb-2">Tài khoản đa năng làm sẵn</h2>
+          <p class="text-xs text-gray-400 leading-relaxed mb-4">Click chọn một tài khoản dưới đây để tự điền thông tin và trải nghiệm chức năng phân vai vế, quản trị vỹ mô:</p>
+          
+          <div class="space-y-3" id="demo-accounts-list">
+            
+            <!-- MASTER ACCOUNTS -->
+            <button 
+              type="button" 
+              onclick="selectDemoAccount(0)" 
+              id="demo-idx-0"
+              class="w-full text-left p-3 rounded-xl border border-gray-800 bg-black/35 hover:border-violet-500/30 transition-all cursor-pointer group flex flex-col gap-1"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-xs text-violet-300 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
+                  Super Master Admin
+                </span>
+                <span class="text-[9px] bg-violet-950/80 text-violet-300 border border-violet-850 px-2 py-0.5 rounded-full font-bold">2 CỔNG / ĐA ĐỐI TÁC</span>
+              </div>
+              <span class="text-xs font-mono text-gray-300">master@gamehub.vn</span>
+              <p class="text-[10px] text-gray-400 leading-normal mt-0.5 group-hover:text-gray-200 transition-colors">🚀 Đóng vai trò ở cả 2 site (Admin & Partner). Đăng nhập có menu chuyển đổi công ty & chuyển site tiện lợi!</p>
+            </button>
+
+            <!-- PARTNER MULTI -->
+            <button 
+              type="button" 
+              onclick="selectDemoAccount(1)" 
+              id="demo-idx-1"
+              class="w-full text-left p-3 rounded-xl border border-gray-800 bg-black/35 hover:border-cyan-500/30 transition-all cursor-pointer group flex flex-col gap-1"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-xs text-cyan-300 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                  Multi-Partner Operator
+                </span>
+                <span class="text-[9px] bg-cyan-950/80 text-cyan-300 border border-cyan-850 px-2 py-0.5 rounded-full font-bold font-mono">PARTNER SITE</span>
+              </div>
+              <span class="text-xs font-mono text-gray-300">partner.multi@gamehub.vn</span>
+              <p class="text-[10px] text-gray-400 leading-normal mt-0.5 group-hover:text-gray-200 transition-colors">✓ Thuộc cổng Partner, quản trị liên thông nhiều brand lớn (VNG, Garena, VTC) trên cùng 1 Dashboard.</p>
+            </button>
+
+            <!-- SINGLE PARTNER -->
+            <button 
+              type="button" 
+              onclick="selectDemoAccount(2)" 
+              id="demo-idx-2"
+              class="w-full text-left p-3 rounded-xl border border-gray-800 bg-black/35 hover:border-orange-500/30 transition-all cursor-pointer group flex flex-col gap-1"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-xs text-orange-400 flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                  Garena CEO
+                </span>
+                <span class="text-[9px] bg-orange-950/80 text-orange-300 border border-orange-850 px-2 py-0.5 rounded-full font-bold">GARENA CHUYÊN BIỆT</span>
+              </div>
+              <span class="text-xs font-mono text-gray-300">partner@garena.vn</span>
+              <p class="text-[10px] text-gray-400 leading-normal mt-0.5 group-hover:text-gray-200 transition-colors">✓ Tài khoản doanh nghiệp truyền thống, chỉ được vận hành trong không gian Garena Vietnam.</p>
+            </button>
+
+            <!-- SYSTEM ADMIN -->
+            <button 
+              type="button" 
+              onclick="selectDemoAccount(3)" 
+              id="demo-idx-3"
+              class="w-full text-left p-3 rounded-xl border border-gray-800 bg-black/35 hover:border-gray-500/30 transition-all cursor-pointer group flex flex-col gap-1"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-xs text-gray-300 flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                  SysAdmin Only
+                </span>
+                <span class="text-[9px] bg-gray-900 text-gray-400 border border-gray-800 px-2 py-0.5 rounded-full font-bold font-mono">ADMIN SITE</span>
+              </div>
+              <span class="text-xs font-mono text-gray-300">admin@gamehub.vn</span>
+              <p class="text-[10px] text-gray-400 leading-normal mt-0.5 group-hover:text-gray-200 transition-colors">✓ Chuyên viên quản lý vĩ mô phê duyệt cước súng, đấu trường, duyệt game hệ thống.</p>
+            </button>
+
+          </div>
+        </div>
+
+        <div class="text-[10px] text-gray-500 mt-4 font-mono select-none">
+          ℹ️ Hãy chọn tài khoản <strong class="text-violet-300">Super Master</strong> để thấy tính năng switch site độc quyền của bạn!
+        </div>
+      </div>
+
+      <!-- Right side: Login Box -->
+      <div id="login-card" class="w-full md:w-[400px] glass-card rounded-2xl p-8 flex flex-col justify-between items-center">
+        <div class="w-full">
+          <!-- Logo -->
+          <div class="flex items-center gap-2 mb-2 text-3xl font-extrabold tracking-tight justify-center">
+            <span class="text-accent">🎮</span>
+            <span class="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">GameHub</span>
+          </div>
+          <p class="text-xs text-gray-400 font-medium tracking-wide uppercase mb-6 text-center">Nền tảng quản lý game tích hợp</p>
+
+          <!-- Form -->
+          <form class="w-full space-y-4" onsubmit="handleLoginSubmit(event)">
+            <!-- Email Input -->
+            <div class="space-y-1.5">
+              <label for="email" class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                  <i data-lucide="mail" class="w-4 h-4"></i>
+                </span>
+                <input 
+                  type="email" 
+                  id="email" 
+                  placeholder="name@company.com" 
+                  value="master@gamehub.vn"
+                  class="w-full bg-black/45 border border-gray-700 focus:border-accent rounded-xl py-3 pl-11 pr-4 text-sm text-gray-100 placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-accent/20"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="space-y-1.5">
+              <label for="password" class="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Mật khẩu</label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                  <i data-lucide="lock" class="w-4 h-4"></i>
+                </span>
+                <input 
+                  type="password" 
+                  id="password" 
+                  value="master123"
+                  placeholder="••••••••••••"
+                  class="w-full bg-black/45 border border-gray-700 focus:border-accent rounded-xl py-3 pl-11 pr-11 text-sm text-gray-100 placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-accent/20"
+                  required
+                />
+                <button 
+                  type="button" 
+                  id="toggle-password" 
+                  class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-100 transition-colors"
+                >
+                  <i data-lucide="eye" class="w-4 h-4" id="eye-icon"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Checkbox -->
+            <div class="flex items-center justify-between pt-1">
+              <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                <input 
+                  type="checkbox" 
+                  id="remember" 
+                  checked
+                  class="w-4 h-4 rounded border-gray-700 bg-black/40 text-accent focus:ring-accent focus:ring-offset-0 outline-none accent-accent/80" 
+                />
+                <span>Ghi nhớ đăng nhập</span>
+              </label>
+              <a href="#" class="text-xs text-accent hover:underline">Quên mật khẩu?</a>
+            </div>
+
+            <!-- Double logical login triggers -->
+            <div class="pt-2 space-y-3">
+              <button 
+                type="submit" 
+                id="main-login-btn"
+                class="w-full bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white font-bold text-sm py-3.5 px-4 rounded-xl shadow-lg transition-all transform active:scale-[0.98] cursor-pointer text-center flex items-center justify-center gap-2"
+              >
+                <span>Xác nhận Đăng nhập</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-xs text-gray-500 font-mono tracking-wide py-4" id="footer-version">
+      version v2.1.0 (Full Dual-Site Managed)
+    </div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // Toggle password visibility
+      const passwordInput = document.getElementById('password');
+      const togglePasswordBtn = document.getElementById('toggle-password');
+      const eyeIcon = document.getElementById('eye-icon');
+
+      togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        eyeIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+        lucide.createIcons();
+      });
+
+      // Quick select preset demo accounts
+      function selectDemoAccount(index) {
+        const user = DEMO_USERS[index];
+        if (!user) return;
+
+        document.getElementById('email').value = user.email;
+        document.getElementById('password').value = user.password;
+
+        // Reset class triggers
+        for(let i=0; i<4; i++) {
+          const btn = document.getElementById(`demo-idx-${i}`);
+          if (btn) btn.classList.remove('demo-btn-active');
+        }
+
+        // Add active highlighting
+        document.getElementById(`demo-idx-${index}`).classList.add('demo-btn-active');
+        
+        showToast(`Đã chọn tài khoản: ${user.roleLabel}`, "info");
+      }
+
+      // Handle unified login submission
+      function handleLoginSubmit(event) {
+        event.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        const success = performLogin(email, password);
+        if (!success) {
+          showToast("Mật khẩu hoặc email demo chưa phù hợp!", "error");
+        }
+      }
+
+      // Initial active styling on the first master account
+      selectDemoAccount(0);
+    </script>
+  </body>
+</html>

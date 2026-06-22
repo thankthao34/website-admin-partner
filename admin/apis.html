@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Admin - Quản lý API</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex">
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🎮</span>
+          <span class="font-extrabold text-lg text-transparent bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text">GameHub Admin</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Hệ Thống Admin</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="partners.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Quản lý Partner</span>
+          </a>
+          <a href="apis.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-violet-600/30 to-violet-900/10 text-violet-400 border border-violet-500/20 shadow-md">
+            <i data-lucide="code" class="w-4 h-4"></i>
+            <span>Quản lý API</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="package-search" class="w-4 h-4"></i>
+            <span>Service & Package</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Transaction Log</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="file-bar-chart" class="w-4 h-4"></i>
+            <span>Báo cáo đối soát</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="user-cog" class="w-4 h-4"></i>
+            <span>Người dùng & Phân quyền</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center font-bold text-xs text-white">AD</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Admin System</p>
+            <p class="text-gray-500 font-mono">v2.1.0</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-500 hover:text-red-400 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Hệ Thống</span>
+          <span class="text-gray-600 font-medium">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-violet-400">Quản lý API</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="bg-violet-950 text-violet-300 border border-violet-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Admin Portal</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-violet-400 shadow">A</div>
+            <span>Admin System ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-7xl mx-auto">
+        
+        <!-- VIEW 1: API LIST -->
+        <div id="view-list" class="space-y-6">
+          <div>
+            <h1 class="text-2xl font-black text-gray-100 tracking-tight">Cấu hình API & Gateway Router</h1>
+            <p class="text-xs text-gray-500 font-medium">Định nghĩa định tuyến, API endpoint, và phân phối tải Rate Limit cho từng đối tác chơi game.</p>
+          </div>
+
+          <!-- Filters -->
+          <div class="bg-card border border-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
+            <div class="flex-1 max-w-lg flex items-center gap-3">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="api-search" placeholder="Tìm kiếm tên API hoặc URL routing..." onkeyup="filterApis()" class="w-full bg-black/30 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-xs text-gray-200 outline-none focus:border-accent">
+              </div>
+              <select id="api-status" onchange="filterApis()" class="bg-black/30 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 outline-none focus:border-accent">
+                <option value="all">Trạng thái (Tất cả)</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <button onclick="resetFilters()" class="border border-gray-700 hover:border-gray-500 bg-gray-905 p-2 rounded-lg text-gray-450 hover:text-gray-100 text-xs flex items-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Làm mới
+            </button>
+          </div>
+
+          <!-- Table -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-4">Tên API</th>
+                  <th class="px-6 py-4">URL Routing / Code</th>
+                  <th class="px-6 py-4">Trạng thái</th>
+                  <th class="px-6 py-4 font-mono text-center">Partners Active</th>
+                  <th class="px-6 py-4">Ngày tạo</th>
+                  <th class="px-6 py-4 text-right">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="api-table-body" class="divide-y divide-gray-850/30 text-xs">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 2: API DETAIL (HIDDEN BY DEFAULT) -->
+        <div id="view-detail" class="hidden space-y-8">
+          <div>
+            <button onclick="switchView('list')" class="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider cursor-pointer">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại danh sách API
+            </button>
+          </div>
+
+          <!-- Description Card -->
+          <div class="bg-card border border-gray-800 p-6 rounded-xl shadow relative overflow-hidden flex flex-col justify-between md:flex-row gap-6">
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-lg bg-violet-600/10 border border-violet-500/20 flex items-center justify-center text-xl">🔌</span>
+                <div>
+                  <h2 id="det-name" class="text-lg font-extrabold text-white">Check Status Service</h2>
+                  <p id="det-url" class="text-xs font-mono text-cyan-400 mt-1">/v1/check-status</p>
+                </div>
+              </div>
+              <p id="det-desc" class="text-xs text-gray-400 max-w-2xl leading-relaxed">Giúp kiểm tra trạng thái hoạt động thực tế của tài khoản game, phản hồi thời gian dưới 2 giây theo cam kết cam kết chất lượng dịch vụ.</p>
+              
+              <div class="flex items-center gap-4 text-xs font-mono">
+                <span id="det-status-badge" class="bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-0.5 rounded-full font-sans font-semibold">Active</span>
+                <span class="text-gray-500 text-[11px]">|</span>
+                <span class="text-gray-300 font-bold" id="det-partners-count">12 Partners đang dùng</span>
+              </div>
+            </div>
+
+            <!-- Detail Action tools -->
+            <div class="shrink-0 flex md:flex-col justify-end gap-3 h-full">
+              <button onclick="showToast('info', '✏️ Sửa API sẽ được đồng bộ.')" class="bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow.">
+                <i data-lucide="edit" class="w-4 h-4"></i> Sửa API
+              </button>
+              <button onclick="changeApiStatus('Active')" class="border border-green-800 hover:bg-green-950/20 text-green-400 font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-lg flex items-center justify-center gap-2">
+                <i data-lucide="check" class="w-4 h-4"></i> Kích hoạt
+              </button>
+              <button onclick="changeApiStatus('Inactive')" class="border border-red-900 hover:bg-red-950/20 text-red-400 font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-lg flex items-center justify-center gap-2">
+                <i data-lucide="power" class="w-4 h-4"></i> Khóa API
+              </button>
+            </div>
+          </div>
+
+          <!-- Bottom Tab Content: List of assigned partners -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <div class="px-6 py-5 border-b border-gray-800 flex justify-between items-center bg-black/10">
+              <div>
+                <h3 class="text-sm font-bold text-gray-100 uppercase tracking-wider">Danh sách Partner được phân quyền</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Danh sách các đối tác được cấp quyền truy cập với bộ Rate-Limit tuỳ biến.</p>
+              </div>
+              <button onclick="showAssignModal(true)" class="bg-accent hover:bg-accent/90 text-white font-bold text-[11px] uppercase tracking-wider px-4 py-2.5 rounded-lg flex items-center gap-1.5 shadow">
+                <i data-lucide="plus" class="w-4 h-4"></i> Gán Partner
+              </button>
+            </div>
+
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-black/10 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-3.5">Partner</th>
+                  <th class="px-6 py-3.5">Trạng thái cấp quyền</th>
+                  <th class="px-6 py-3.5">Ngày cấp</th>
+                  <th class="px-6 py-3.5 font-mono">Rate Limit (TPS / Sec / Burst)</th>
+                  <th class="px-6 py-3.5 text-right">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="assigned-partners-table" class="divide-y divide-gray-850/30 text-xs">
+                <!-- Assigned rows dynamic -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- MODAL 1: GÁN PARTNER -->
+    <div id="assign-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="showAssignModal(false)" class="absolute inset-0 bg-black/75 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 p-6 rounded-2xl w-full max-w-md shadow-2xl space-y-5">
+        
+        <div class="flex items-center gap-2.5 text-violet-400">
+          <i data-lucide="plus-circle" class="w-6 h-6"></i>
+          <div>
+            <h3 class="text-base font-bold text-gray-100">Gán Partner mới cho API</h3>
+            <p class="text-[11px] text-gray-400">Chọn Partner và tuỳ biến cấu hình Rate-Limit giới hạn.</p>
+          </div>
+        </div>
+
+        <form onsubmit="event.preventDefault(); submitAssignment();" class="space-y-4 text-xs">
+          <!-- Dropdown partners -->
+          <div class="space-y-1.5">
+            <label class="block text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Chọn Partner *</label>
+            <select id="assign-partner-id" class="w-full bg-black/40 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-200 focus:border-accent">
+              <option value="SohaGame">SohaGame Vietnam (VN_VTL_003)</option>
+              <option value="Riot Games VN">Riot Games VN (VN_MBF_006)</option>
+              <option value="Funtap">Funtap Corporation (VN_VNP_009)</option>
+            </select>
+          </div>
+
+          <!-- Status -->
+          <div class="space-y-1.5">
+            <label class="block text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Trạng thái cấp quyền</label>
+            <div class="flex items-center gap-5 mt-1">
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="assign-status" value="Active" checked class="accent-accent"> Active
+              </label>
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="radio" name="assign-status" value="Inactive" class="accent-accent"> Inactive
+              </label>
+            </div>
+          </div>
+
+          <!-- Rate Limit Config -->
+          <div class="border border-gray-800 p-4 rounded-xl bg-black/20 space-y-3">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Cấu hình Rate Limit</span>
+              <button type="button" onclick="loadDefaultRateLimits()" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white px-2 py-0.5 rounded font-bold uppercase transition-colors">Áp dụng mặc định</button>
+            </div>
+            <div class="grid grid-cols-3 gap-3 font-mono">
+              <div class="space-y-1">
+                <label class="text-[9px] text-gray-500 uppercase block font-sans">Req / sec</label>
+                <input type="number" id="assign-req-limit" value="100" class="w-full bg-black/40 border border-gray-700 rounded p-2 text-xs text-cyan-400 outline-none focus:border-accent">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[9px] text-gray-500 uppercase block font-sans">Window (s)</label>
+                <input type="number" id="assign-window" value="1" class="w-full bg-black/40 border border-gray-700 rounded p-2 text-xs text-gray-300 outline-none focus:border-accent">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[9px] text-gray-500 uppercase block font-sans">Burst</label>
+                <input type="number" id="assign-burst" value="150" class="w-full bg-black/40 border border-gray-700 rounded p-2 text-xs text-gray-300 outline-none focus:border-accent">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 font-semibold text-xs tracking-wide uppercase pt-2">
+            <button type="button" onclick="showAssignModal(false)" class="border border-gray-700 text-gray-400 hover:text-white px-4 py-2.5 rounded-lg">Hủy</button>
+            <button type="submit" class="bg-accent hover:bg-accent/90 text-white px-5 py-2.5 rounded-lg">Lưu cấu hình</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 2: THU HỒI XÁC NHẬN (Dangerous Style) -->
+    <div id="revoke-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="showRevokeModal(false)" class="absolute inset-0 bg-black/75 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 p-6 rounded-2xl w-full max-w-md shadow-2xl space-y-5">
+        
+        <div class="flex items-center gap-3 text-red-500">
+          <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+          <div>
+            <h3 class="text-base font-bold text-gray-100">⚠️ Xác nhận thu hồi API</h3>
+            <p class="text-[11px] text-gray-400">Hành động dứt khoát không thể tự động phục hồi.</p>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-205 leading-relaxed bg-black/20 p-3.5 rounded-xl border border-gray-800" id="revoke-warning-text">
+          Bạn có chắc chắn muốn THU HỒI quyền sử dụng dịch vụ này của Partner không?
+        </p>
+
+        <div class="flex justify-end gap-3 font-semibold text-xs tracking-wide uppercase">
+          <button onclick="showRevokeModal(false)" class="border border-gray-700 text-gray-400 hover:text-white px-4 py-2.5 rounded-lg cursor-pointer">Hủy</button>
+          <button id="revoke-confirm-btn" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2.5 rounded-lg cursor-pointer">Xác nhận Thu hồi</button>
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+      // Mock APIs list
+      let apiCollection = [
+        { id: 1, name: "Check Status", url: "/v1/check-status", status: "Active", partners: 12, created: "01/01/2024", desc: "Giúp kiểm tra trạng thái hoạt động thực tế của tài khoản game, phản hồi thời gian dưới 2 giây theo cam kết chất lượng dịch vụ." },
+        { id: 2, name: "Register Account", url: "/v1/register", status: "Active", partners: 8, created: "01/01/2024", desc: "Thực hiện đăng ký nhanh nhân vật, tạo tài khoản từ xa đồng bộ hoá dữ liệu nhà mạng." },
+        { id: 3, name: "Unregister Account", url: "/v1/unregister", status: "Active", partners: 8, created: "01/01/2024", desc: "Thu hồi tài khoản game của Partner, hủy gói cước ngay lập tức trên hệ thống." },
+        { id: 4, name: "Get Balance", url: "/v1/balance", status: "Inactive", partners: 0, created: "15/02/2024", desc: "Kiểm tra số dư tài khoản, tích lũy điểm thưởng Game, đồng bộ tức thì cho các ví điện tử liên kết." },
+        { id: 5, name: "Query Transaction Status", url: "/v1/query", status: "Active", partners: 5, created: "20/02/2024", desc: "Đối chiếu mã giao dịch, tìm kiếm nhật ký chuyển tiền, hỗ trợ nạp hoàn tiền game an toàn." }
+      ];
+
+      // Assigned partners of currently inspected API
+      let assignedPartners = [
+        { partnerName: "Garena Vietnam", status: "Active", date: "15/02/2024", rate: "100 / 1s / 150" },
+        { partnerName: "VNG Corporation", status: "Active", date: "20/02/2024", rate: "120 / 1s / 180" },
+        { partnerName: "Krafton VN", status: "Active", date: "01/03/2024", rate: "50 / 1s / 75" }
+      ];
+
+      let inspectedApiId = null;
+      let targetRevokeIdx = null;
+
+      function init() {
+        renderApiTable();
+        lucide.createIcons();
+      }
+
+      function renderApiTable() {
+        const searchVal = document.getElementById('api-search').value.toLowerCase();
+        const statusVal = document.getElementById('api-status').value;
+        const tbody = document.getElementById('api-table-body');
+        tbody.innerHTML = '';
+
+        let filtered = apiCollection.filter(api => {
+          const mSearch = api.name.toLowerCase().includes(searchVal) || api.url.toLowerCase().includes(searchVal);
+          const mStatus = statusVal === 'all' || api.status === statusVal;
+          return mSearch && mStatus;
+        });
+
+        filtered.forEach(api => {
+          let badgeColor = api.status === 'Active' 
+            ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
+            : 'bg-gray-500/10 text-gray-400 border border-gray-500/20';
+
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/20 transition-colors">
+              <td class="px-6 py-4 font-bold text-gray-200">${api.name}</td>
+              <td class="px-6 py-4 font-mono text-cyan-400">${api.url}</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${badgeColor}">
+                  <span class="w-1.5 h-1.5 rounded-full ${api.status === 'Active' ? 'bg-green-500' : 'bg-gray-500'}"></span> ${api.status}
+                </span>
+              </td>
+              <td class="px-6 py-4 font-mono font-bold text-gray-300 text-center">${api.partners}</td>
+              <td class="px-6 py-4 text-gray-500 font-mono">${api.created}</td>
+              <td class="px-6 py-4 text-right">
+                <button onclick="inspectApi(${api.id})" class="border border-gray-800 hover:border-gray-550 hover:bg-gray-850 bg-[#0D1117] text-gray-300 font-bold uppercase tracking-wider text-[10px] py-1.5 px-3.5 rounded-lg cursor-pointer">Xem</button>
+              </td>
+            </tr>
+          `);
+        });
+        
+        lucide.createIcons();
+      }
+
+      function filterApis() {
+        renderApiTable();
+      }
+
+      function resetFilters() {
+        document.getElementById('api-search').value = '';
+        document.getElementById('api-status').value = 'all';
+        renderApiTable();
+        showToast('info', '🔄 Bộ lọc API đã được phục hồi mặc định.');
+      }
+
+      function inspectApi(apiId) {
+        inspectedApiId = apiId;
+        const api = apiCollection.find(a => a.id === apiId);
+        if (!api) return;
+
+        document.getElementById('det-name').textContent = api.name;
+        document.getElementById('det-url').textContent = api.url;
+        document.getElementById('det-desc').textContent = api.desc;
+        document.getElementById('det-partners-count').textContent = `${api.partners} Partners đang dùng`;
+        
+        let badge = document.getElementById('det-status-badge');
+        badge.textContent = api.status;
+        if (api.status === 'Active') {
+          badge.className = "bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-0.5 rounded-full font-sans font-semibold";
+        } else {
+          badge.className = "bg-gray-500/10 text-gray-400 border border-gray-500/20 px-2.5 py-0.5 rounded-full font-sans font-semibold";
+        }
+
+        renderAssignedPartners();
+        switchView('detail');
+      }
+
+      function selectDropdown() {}
+
+      function switchView(view) {
+        if (view === 'list') {
+          document.getElementById('view-list').classList.remove('hidden');
+          document.getElementById('view-detail').classList.add('hidden');
+        } else {
+          document.getElementById('view-list').classList.add('hidden');
+          document.getElementById('view-detail').classList.remove('hidden');
+        }
+      }
+
+      function renderAssignedPartners() {
+        const tbody = document.getElementById('assigned-partners-table');
+        tbody.innerHTML = '';
+
+        if (assignedPartners.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-6 text-center text-gray-500 font-medium italic">Chưa gán Partner nào tương thích với API này.</td></tr>';
+          return;
+        }
+
+        assignedPartners.forEach((ap, idx) => {
+          let badgeColor = ap.status === "Active" ? "bg-green-500/10 text-green-400 border border-green-500/20" : "bg-red-500/10 text-red-500 border border-red-500/20";
+          
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/20 transition-colors">
+              <td class="px-6 py-4.5 font-bold text-gray-200">${ap.partnerName}</td>
+              <td class="px-6 py-4.5">
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-semibold ${badgeColor}">
+                  ${ap.status}
+                </span>
+              </td>
+              <td class="px-6 py-4.5 text-gray-500 font-mono">${ap.date}</td>
+              <td class="px-6 py-4.5 font-mono text-cyan-400 font-semibold">${ap.rate}</td>
+              <td class="px-6 py-4.5 text-right space-x-2">
+                <button onclick="editAssignedRateLimit(${idx})" class="text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Sửa</button>
+                <button onclick="showRevokeModal(true, ${idx})" class="text-red-400 hover:text-red-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Thu hồi</button>
+              </td>
+            </tr>
+          `);
+        });
+
+        lucide.createIcons();
+      }
+
+      function changeApiStatus(status) {
+        const api = apiCollection.find(a => a.id === inspectedApiId);
+        if (!api) return;
+
+        api.status = status;
+        inspectApi(api.id);
+        renderApiTable();
+        showToast('success', `✅ Đã đổi trạng thái API sang: ${status}`);
+      }
+
+      // ASSIGN PARTNER FLOW
+      function showAssignModal(open) {
+        const modal = document.getElementById('assign-modal');
+        if (open) {
+          modal.classList.remove('hidden');
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
+
+      function loadDefaultRateLimits() {
+        document.getElementById('assign-req-limit').value = "100";
+        document.getElementById('assign-window').value = "1";
+        document.getElementById('assign-burst').value = "150";
+        showToast('info', 'Áp dụng giới hạn Rate-Limit chuẩn hệ thống (100 TPS).');
+      }
+
+      function submitAssignment() {
+        const name = document.getElementById('assign-partner-id').value;
+        const status = document.querySelector('input[name="assign-status"]:checked').value;
+        const reqs = document.getElementById('assign-req-limit').value;
+        const wind = document.getElementById('assign-window').value;
+        const burst = document.getElementById('assign-burst').value;
+
+        // Check duplicate
+        const exists = assignedPartners.some(ap => ap.partnerName === name);
+        if (exists) {
+          showToast('error', 'Partner này đã được gán trước đó, vui lòng cập nhật tại dòng.');
+          return;
+        }
+
+        assignedPartners.push({
+          partnerName: name,
+          status: status,
+          date: new Date().toLocaleDateString('vi-VN'),
+          rate: `${reqs} / ${wind}s / ${burst}`
+        });
+
+        // Increment count in parent collection
+        const api = apiCollection.find(a => a.id === inspectedApiId);
+        if (api) {
+          api.partners = assignedPartners.length;
+          document.getElementById('det-partners-count').textContent = `${api.partners} Partners đang dùng`;
+        }
+
+        renderAssignedPartners();
+        renderApiTable();
+        showAssignModal(false);
+        showToast('success', `✅ Đã gán thành công Partner "${name}"!`);
+      }
+
+      // REVOKE FLOW (Dangerous)
+      function showRevokeModal(open, index = null) {
+        const modal = document.getElementById('revoke-modal');
+        const warnText = document.getElementById('revoke-warning-text');
+        
+        if (open) {
+          targetRevokeIdx = index;
+          const ap = assignedPartners[index];
+          const currApi = apiCollection.find(a => a.id === inspectedApiId);
+
+          warnText.textContent = `Bạn có chắc chắn muốn THU HỒI hoàn toàn quyền gọi API "${currApi.url}" của đối tác "${ap.partnerName}"? Giao dịch lập tức bị chặn hoàn toàn!`;
+          modal.classList.remove('hidden');
+
+          document.getElementById('revoke-confirm-btn').onclick = () => {
+            assignedPartners.splice(targetRevokeIdx, 1);
+            
+            // Adjust count in master array
+            const api = apiCollection.find(a => a.id === inspectedApiId);
+            if (api) {
+              api.partners = assignedPartners.length;
+              document.getElementById('det-partners-count').textContent = `${api.partners} Partners đang dùng`;
+            }
+
+            renderAssignedPartners();
+            renderApiTable();
+            showRevokeModal(false);
+            showToast('success', '❌ Đã thu hồi quyền sử dụng thành công!');
+          };
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
+
+      function editAssignedRateLimit(idx) {
+        const ap = assignedPartners[idx];
+        showToast('info', `✏️ Chỉnh sửa Rate limit cho ${ap.partnerName}`);
+      }
+
+      // TOAST MESSAGES
+      function showToast(type, text) {
+        const container = document.getElementById('toast-container');
+        const id = 'toast-' + Math.random().toString(36).substr(2, 9);
+
+        let iconColor = type === 'success' ? 'text-green-400' : 'text-cyan-400';
+        let iconName = type === 'success' ? 'check-circle' : 'info';
+        if (type === 'error') {
+          iconColor = 'text-red-400';
+          iconName = 'x-circle';
+        }
+
+        const toastHtml = `
+          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
+            <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
+            <span class="text-gray-200 font-medium">${text}</span>
+          </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        lucide.createIcons();
+
+        // animate in
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('translate-y-2', 'opacity-0');
+        }, 10);
+
+        // remove
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0', 'translate-y-[-4px]');
+            setTimeout(() => el.remove(), 300);
+          }
+        }, 3000);
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

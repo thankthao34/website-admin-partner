@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Admin - Transaction Log</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex p-0">
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🎮</span>
+          <span class="font-extrabold text-lg text-transparent bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text">GameHub Admin</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Hệ Thống Admin</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="partners.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Quản lý Partner</span>
+          </a>
+          <a href="apis.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="code" class="w-4 h-4"></i>
+            <span>Quản lý API</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="package-search" class="w-4 h-4"></i>
+            <span>Service & Package</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-violet-600/30 to-violet-900/10 text-violet-400 border border-violet-500/20 shadow-md">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Transaction Log</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="file-bar-chart" class="w-4 h-4"></i>
+            <span>Báo cáo đối soát</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="user-cog" class="w-4 h-4"></i>
+            <span>Người dùng & Phân quyền</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center font-bold text-xs text-white">AD</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Admin System</p>
+            <p class="text-gray-500 font-mono">v2.1.0</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-500 hover:text-red-400 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Hệ Thống</span>
+          <span class="text-gray-600 font-medium">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-violet-400">Transaction Log</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="bg-violet-950 text-violet-300 border border-violet-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Admin Portal</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-violet-400 shadow">A</div>
+            <span>Admin System ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-7xl mx-auto space-y-6">
+        <div>
+          <h1 class="text-2xl font-black text-gray-100 tracking-tight">Nhật ký giao dịch hệ thống (Transaction Logs)</h1>
+          <p class="text-xs text-gray-500">Giám sát vết thời gian thực thi, HTTP status phản hồi, và latencies của tất cả API kết nối.</p>
+        </div>
+
+        <!-- Filter bar (2 rows) -->
+        <div class="bg-card border border-gray-800 p-5 rounded-xl space-y-4">
+          <!-- Row 1 -->
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+            <div class="space-y-1">
+              <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Từ ngày</label>
+              <input type="date" id="log-from-date" value="2026-06-15" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none">
+            </div>
+            <div class="space-y-1">
+              <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Đến ngày</label>
+              <input type="date" id="log-to-date" value="2026-06-21" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none">
+            </div>
+            <div class="space-y-1">
+              <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Lọc theo Partner</label>
+              <select id="log-partner" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-300 outline-none focus:border-accent">
+                <option value="all">Tất cả Partner</option>
+                <option value="Garena VN">Garena VN</option>
+                <option value="VNG Corp">VNG Corp</option>
+                <option value="Krafton VN">Krafton VN</option>
+                <option value="Moonton VN">Moonton VN</option>
+              </select>
+            </div>
+            <div class="space-y-1">
+              <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Gọi API Endpoint</label>
+              <select id="log-api" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-300 outline-none focus:border-accent">
+                <option value="all">Tất cả API Endpoints</option>
+                <option value="/v1/check-status">/v1/check-status</option>
+                <option value="/v1/register">/v1/register</option>
+                <option value="/v1/unregister">/v1/unregister</option>
+                <option value="/v1/balance">/v1/balance</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-gray-400 font-semibold uppercase tracking-wider text-[10px] mr-2">HTTP Status:</span>
+              <button onclick="setStatusFilter('all')" id="btn-http-all" class="bg-violet-600 text-white px-3 py-1.5 rounded-lg font-medium cursor-pointer shadow">Tất cả</button>
+              <button onclick="setStatusFilter('200')" id="btn-http-200" class="border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3 py-1.5 rounded-lg cursor-pointer">200 OK</button>
+              <button onclick="setStatusFilter('429')" id="btn-http-429" class="border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3 py-1.5 rounded-lg cursor-pointer">429 Rate Exceeded</button>
+              <button onclick="setStatusFilter('500')" id="btn-http-500" class="border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3 py-1.5 rounded-lg cursor-pointer">500 Server Error</button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="applyFilters()" class="bg-accent hover:bg-accent/90 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg flex items-center gap-1.5 cursor-pointer shadow">
+                <i data-lucide="filter" class="w-4 h-4"></i> Lọc
+              </button>
+              <button onclick="resetFilters()" class="border border-gray-700 bg-black/10 hover:border-gray-500 p-2 text-gray-450 hover:text-white rounded-lg cursor-pointer" title="Làm mới">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- System log table -->
+        <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-4"># Request ID</th>
+                  <th class="px-6 py-4">Thời gian</th>
+                  <th class="px-6 py-4 font-bold">Partner Code</th>
+                  <th class="px-6 py-4 font-mono">Dịch Vụ API</th>
+                  <th class="px-6 py-4 font-mono">Method</th>
+                  <th class="px-6 py-4 text-center">HTTP Status</th>
+                  <th class="px-6 py-4 text-center">Xử lý (Latency)</th>
+                  <th class="px-6 py-4 text-right">Chi tiết</th>
+                </tr>
+              </thead>
+              <tbody id="logs-tbody" class="divide-y divide-gray-850/30 text-xs">
+                <!-- Log rows dynamic -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="px-6 py-4 border-t border-gray-800 flex items-center justify-between text-gray-500 text-xs font-medium">
+            <span>Hiển thị 1 - 10 trên tổng số <span class="font-mono text-gray-300">125,430</span> bản ghi</span>
+            <div class="flex items-center gap-1 font-mono">
+              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">&lt;</button>
+              <button class="bg-accent/15 border border-accent/30 text-violet-400 px-2 py-0.5 rounded">1</button>
+              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">2</button>
+              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">3</button>
+              <span class="px-1 text-gray-650">...</span>
+              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">25087</button>
+              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">&gt;</button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- TRANSACTION DETAIL MODAL (Tabs style) -->
+    <div id="detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="closeDetailModal()" class="absolute inset-0 bg-black/80 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[550px] overflow-hidden">
+        
+        <!-- Modal Tabs Header -->
+        <div class="px-6 py-4 border-b border-gray-800 bg-[#0D1117] flex justify-between items-center shrink-0">
+          <div class="flex gap-4">
+            <button onclick="switchModalTab('summary')" id="modal-tab-btn-summary" class="text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent pb-2">Tổng quan bản tin</button>
+            <button onclick="switchModalTab('compare')" id="modal-tab-btn-compare" class="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent pb-2">So sánh hai Log (Compare)</button>
+          </div>
+          <button onclick="closeDetailModal()" class="text-gray-400 hover:text-white text-xl font-bold font-sans">&times;</button>
+        </div>
+
+        <!-- Modal Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-6 bg-black/10">
+          
+          <!-- TAB 1: SUMMARY -->
+          <div id="modal-content-summary" class="space-y-6">
+            
+            <!-- General metadata row -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs bg-[#0D1117]/80 p-4 border border-gray-850 rounded-xl">
+              <div>
+                <span class="text-gray-500 block mb-0.5">Partner</span>
+                <span class="font-bold text-gray-200" id="m-partner">Garena VN</span>
+              </div>
+              <div>
+                <span class="text-gray-500 block mb-0.5">API Endpoint</span>
+                <span class="font-mono text-cyan-400" id="m-api">/v1/check-status</span>
+              </div>
+              <div>
+                <span class="text-gray-500 block mb-0.5">HTTP Status</span>
+                <span class="inline-block" id="m-http">-</span>
+              </div>
+              <div>
+                <span class="text-gray-500 block mb-0.5">Request ID</span>
+                <span class="font-mono text-gray-300 text-[11px]" id="m-reqid">req-abc-12345</span>
+              </div>
+            </div>
+
+            <!-- Monospace Technical Boxes -->
+            <div class="space-y-4">
+              <!-- HEADERS -->
+              <div class="space-y-1">
+                <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block">Request Headers</span>
+                <pre class="bg-black/30 border border-gray-800 p-3.5 rounded-lg text-[11px] font-mono text-gray-300 overflow-x-auto leading-relaxed">
+X-Api-Key: gar***nm1234
+Content-Type: application/json
+Accept: application/json
+User-Agent: GameHub-Gateway/2.1 (Client: GarenaApp-v4)
+Client-IP: 103.45.18.91</pre>
+              </div>
+
+              <!-- REQUEST BODY -->
+              <div class="space-y-1">
+                <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block">Request Payload (Body)</span>
+                <pre class="bg-black/30 border border-gray-800 p-3.5 rounded-lg text-[11px] font-mono text-violet-300 overflow-x-auto leading-relaxed" id="m-request-body">
+{
+  "player_id": "lao_88201",
+  "service_code": "FF_VN_001",
+  "request_timestamp": "15/06/2024 10:30:25"
+}</pre>
+              </div>
+
+              <!-- RESPONSE BODY -->
+              <div class="space-y-1">
+                <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block font-sans">Response Payload (Body)</span>
+                <pre class="bg-black/30 border border-gray-800 p-3.5 rounded-lg text-[11px] font-mono text-cyan-300 overflow-x-auto leading-relaxed" id="m-response-body">
+{
+  "status": "success",
+  "code": "200",
+  "data": {
+    "active": true,
+    "user_balance": 15000
+  }
+}</pre>
+              </div>
+            </div>
+
+            <!-- Footer Compare shortcut -->
+            <div class="flex justify-end pt-2 border-t border-gray-805">
+              <button onclick="switchModalTab('compare')" class="border border-violet-850 hover:bg-violet-950/20 hover:border-violet-500 text-violet-300 text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xl flex items-center gap-1.5 transition-colors">
+                <i data-lucide="columns" class="w-4 h-4"></i> So sánh Log
+              </button>
+            </div>
+
+          </div>
+
+          <!-- TAB 2: COMPARATOR -->
+          <div id="modal-content-compare" class="hidden h-full flex flex-col justify-between">
+            <div class="space-y-4">
+              <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Bảng so sánh đối chiếu dải mã bản tin</h3>
+              
+              <div class="grid grid-cols-2 gap-4 h-[350px]">
+                
+                <!-- Present log body -->
+                <div class="flex flex-col border border-gray-800 rounded-xl bg-black/30 overflow-hidden">
+                  <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between items-center text-xs">
+                    <span class="font-bold text-violet-400" id="comp-label-left">Bản ghi hiện tại (200 OK)</span>
+                    <span class="font-mono text-[10px] text-gray-500">TXN00001</span>
+                  </div>
+                  <pre class="p-3 text-[11px] font-mono text-violet-300/80 overflow-y-auto leading-relaxed flex-1 leading-relaxed">
+{
+  "status": "success",
+  "code": "200",
+  "data": {
+    "active": true,
+    "user_balance": 15000,
+    "latency_ns": 145000
+  }
+}</pre>
+                </div>
+
+                <!-- Contrast log body -->
+                <div class="flex flex-col border border-gray-800 rounded-xl bg-black/30 overflow-hidden">
+                  <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between items-center text-xs">
+                    <span class="font-bold text-yellow-500" id="comp-label-right">Bản ghi đối chứng (Error 429)</span>
+                    <span class="font-mono text-[10px] text-gray-500">TXN00002</span>
+                  </div>
+                  <pre class="p-3 text-[11px] font-mono text-yellow-300/80 overflow-y-auto leading-relaxed flex-1 leading-relaxed">
+{
+  "status": "failed",
+  "code": "429",
+  "error": {
+    "reason": "TPS limits exceeded (100 req/s)",
+    "recommend_delay_ms": 1000
+  }
+}</pre>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global Logs array
+      const initialLogs = [
+        { id: "TXN00001", time: "15/06/2024 10:30:25", partner:"Garena VN", api:"/v1/check-status", reqid:"req-ab-12345", http:200, latency:"145ms", reqBody: '{\n  "player_id": "lao_88201",\n  "service_code": "FF_VN_001",\n  "request_timestamp": "15/06/2024 10:30:25"\n}', resBody: '{\n  "status": "success",\n  "code": "200",\n  "data": {\n    "active": true,\n    "user_balance": 15000\n  }\n}' },
+        { id: "TXN00002", time: "15/06/2024 10:30:50", partner:"Garena VN", api:"/v1/check-status", reqid:"req-ab-12346", http:429, latency:"12ms", reqBody: '{\n  "player_id": "lao_88201",\n  "service_code": "FF_VN_001"\n}', resBody: '{\n  "status": "failed",\n  "code": "429",\n  "error": {\n    "reason": "TPS limit exceeded (100 req/s)",\n    "wait_ms": 500\n  }\n}' },
+        { id: "TXN00003", time: "15/06/2024 11:15:02", partner:"VNG Corp", api:"/v1/register", reqid:"req-xy-45671", http:200, latency:"202ms", reqBody: '{\n  "lao_id": "lao_vng_442",\n  "package_code": "AOV_7D",\n  "register_ip": "103.45.18.2"\n}', resBody: '{\n  "status": "success",\n  "code": "200",\n  "transaction_id": "vng_reg_abc44123"\n}' },
+        { id: "TXN00004", time: "15/06/2024 12:44:11", partner:"Krafton VN", api:"/v1/unregister", reqid:"req-kr-90123", http:500, latency:"2005ms", reqBody: '{\n  "player_id": "kr_pubg_002"\n}', resBody: '{\n  "status": "failed",\n  "code": "500",\n  "error": {\n    "message": "Uniservices database timeout connection (Gateway 504)"\n  }\n}' },
+        { id: "TXN00005", time: "15/06/2024 14:02:18", partner:"Moonton VN", api:"/v1/check-status", reqid:"req-mn-77881", http:200, latency:"80ms", reqBody: '{\n  "player_id": "mn_9910"\n}', resBody: '{\n  "status": "success",\n  "data": {\n    "exists": true\n  }\n}' },
+        { id: "TXN00006", time: "15/06/2024 15:30:11", partner:"Garena VN", api:"/v1/register", reqid:"req-ab-99321", http:200, latency:"190ms", reqBody: '{\n  "player_id": "lao_3321"\n}', resBody: '{\n  "status": "success"\n}' },
+        { id: "TXN00007", time: "15/06/2024 16:50:22", partner:"VNG Corp", api:"/v1/check-status", reqid:"req-xy-10023", http:429, latency:"8ms", reqBody: '{\n  "player_id": "lao_vng_91"\n}', resBody: '{\n  "error": "Too Many Requests (Burst policy triggered)"\n}' },
+        { id: "TXN00008", time: "16/06/2024 09:12:05", partner:"Krafton VN", api:"/v1/check-status", reqid:"req-kr-88221", http:200, latency:"112ms", reqBody: '{\n  "player_id": "kr_005"\n}', resBody: '{\n  "status": "success"\n}' },
+        { id: "TXN00009", time: "16/06/2024 10:15:33", partner:"Moonton VN", api:"/v1/unregister", reqid:"req-mn-44331", http:200, latency:"250ms", reqBody: '{\n  "player_id": "mn_112"\n}', resBody: '{\n  "status": "unregistered_ok"\n}' },
+        { id: "TXN00010", time: "16/06/2024 11:20:18", partner:"Garena VN", api:"/v1/check-status", reqid:"req-ab-50505", http:200, latency:"95ms", reqBody: '{\n  "player_id": "lao_990"\n}', resBody: '{\n  "status": "success"\n}' }
+      ];
+
+      let selectedHttpStatusFilter = 'all';
+      let activeInspectedLogId = null;
+
+      function init() {
+        renderLogsTable();
+        lucide.createIcons();
+      }
+
+      function renderLogsTable() {
+        const tbody = document.getElementById('logs-tbody');
+        tbody.innerHTML = '';
+
+        const partnerFilter = document.getElementById('log-partner').value;
+        const apiFilter = document.getElementById('log-api').value;
+
+        let filtered = initialLogs.filter(log => {
+          const mPartner = partnerFilter === 'all' || log.partner === partnerFilter;
+          const mApi = apiFilter === 'all' || log.api === apiFilter;
+          
+          let mHttp = true;
+          if (selectedHttpStatusFilter !== 'all') {
+            if (selectedHttpStatusFilter === '200') mHttp = log.http === 200;
+            else if (selectedHttpStatusFilter === '429') mHttp = log.http === 429;
+            else if (selectedHttpStatusFilter === '500') mHttp = log.http === 500;
+          }
+
+          return mPartner && mApi && mHttp;
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500 italic">Không tìm thấy bản ghi log nào khớp với điều kiện lọc.</td></tr>';
+          return;
+        }
+
+        filtered.forEach(log => {
+          let httpBadge = "bg-green-500/10 text-green-400 border border-green-500/20";
+          if (log.http === 429) {
+            httpBadge = "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20";
+          } else if (log.http === 500) {
+            httpBadge = "bg-red-500/10 text-red-500 border border-red-500/20 font-bold";
+          }
+
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/20 transition-colors">
+              <td class="px-6 py-4 font-mono font-medium text-gray-400 font-bold">${log.id}</td>
+              <td class="px-6 py-4 font-mono text-gray-500 tracking-tight">${log.time}</td>
+              <td class="px-6 py-4 text-gray-300 font-bold">${log.partner}</td>
+              <td class="px-6 py-4 font-mono text-cyan-400 text-xs">${log.api}</td>
+              <td class="px-6 py-4 font-mono text-gray-500 text-[10px] tracking-wide select-all">${log.reqid}</td>
+              <td class="px-6 py-4 text-center">
+                <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${httpBadge}">${log.http}</span>
+              </td>
+              <td class="px-6 py-4 text-center font-mono text-gray-400">${log.latency}</td>
+              <td class="px-6 py-4 text-right">
+                <button onclick="inspectLog('${log.id}')" class="border border-gray-850 hover:bg-gray-800 hover:border-gray-650 bg-[#0D1117] text-gray-400 hover:text-white font-bold text-[10px] py-1 px-2.5 rounded-lg cursor-pointer">Xem</button>
+              </td>
+            </tr>
+          `);
+        });
+
+        lucide.createIcons();
+      }
+
+      function setStatusFilter(value) {
+        selectedHttpStatusFilter = value;
+        const buttons = ['all', '200', '429', '500'];
+        buttons.forEach(btn => {
+          const el = document.getElementById(`btn-http-${btn}`);
+          if (btn === value) {
+            el.className = "bg-violet-600 text-white px-3 py-1.5 rounded-lg font-medium cursor-pointer shadow";
+          } else {
+            el.className = "border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3 py-1.5 rounded-lg cursor-pointer";
+          }
+        });
+
+        renderLogsTable();
+      }
+
+      function applyFilters() {
+        renderLogsTable();
+      }
+
+      function resetFilters() {
+        document.getElementById('log-partner').value = 'all';
+        document.getElementById('log-api').value = 'all';
+        setStatusFilter('all');
+      }
+
+      // INSPECT LOG MODAL
+      function inspectLog(logId) {
+        activeInspectedLogId = logId;
+        const log = initialLogs.find(l => l.id === logId);
+        if (!log) return;
+
+        // Apply metadata to summary
+        document.getElementById('m-partner').textContent = log.partner;
+        document.getElementById('m-api').textContent = log.api;
+        document.getElementById('m-reqid').textContent = log.reqid;
+        document.getElementById('m-request-body').textContent = log.reqBody;
+        document.getElementById('m-response-body').textContent = log.resBody;
+
+        let badge = document.getElementById('m-http');
+        badge.textContent = log.http;
+        if (log.http === 200) {
+          badge.className = "bg-green-500/10 text-green-400 border border-green-500/20 px-2 py-0.5 rounded font-bold font-sans";
+        } else if (log.http === 429) {
+          badge.className = "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-2 py-0.5 rounded font-bold font-sans";
+        } else {
+          badge.className = "bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-0.5 rounded font-bold font-sans";
+        }
+
+        // Apply companion comparator left text
+        document.getElementById('comp-label-left').textContent = `Bản ghi hiện tại (${log.id} - HTTP ${log.http})`;
+        document.querySelector('#modal-content-compare div:first-child pre').textContent = log.resBody;
+
+        // If current log is TXN00001, configure second comparison item as TXN00002. Otherwise use TXN00001
+        let altLog = logId === "TXN00001" ? initialLogs[1] : initialLogs[0];
+        document.getElementById('comp-label-right').textContent = `Bản ghi đối chứng (${altLog.id} - HTTP ${altLog.http})`;
+        document.querySelector('#modal-content-compare div:last-child pre').textContent = altLog.resBody;
+
+        // Open modal
+        document.getElementById('detail-modal').classList.remove('hidden');
+        switchModalTab('summary');
+        lucide.createIcons();
+      }
+
+      function switchModalTab(tabId) {
+        document.getElementById('modal-content-summary').classList.add('hidden');
+        document.getElementById('modal-content-compare').classList.add('hidden');
+        
+        document.getElementById('modal-tab-btn-summary').className = "text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent pb-2";
+        document.getElementById('modal-tab-btn-compare').className = "text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent pb-2";
+
+        if (tabId === 'summary') {
+          document.getElementById('modal-content-summary').classList.remove('hidden');
+          document.getElementById('modal-tab-btn-summary').className = "text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent pb-2";
+        } else {
+          document.getElementById('modal-content-compare').classList.remove('hidden');
+          document.getElementById('modal-tab-btn-compare').className = "text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent pb-2";
+        }
+      }
+
+      function closeDetailModal() {
+        document.getElementById('detail-modal').classList.add('hidden');
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

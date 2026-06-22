@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHub Admin - Service & Package</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/auth-helper.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              bg: '#0D1117',
+              card: '#161B22',
+              accent: '#7C3AED',
+              cyan: '#06B6D4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0D1117;
+      }
+      .drawer-transition {
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-gray-100 flex">
+
+    <!-- TOASTS -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-[240px] border-r border-gray-800 bg-[#0D1117] flex flex-col justify-between shrink-0 fixed h-full z-10">
+      <div>
+        <div class="h-16 flex items-center px-6 border-b border-gray-800 gap-2.5">
+          <span class="text-xl">🎮</span>
+          <span class="font-extrabold text-lg text-transparent bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text">GameHub Admin</span>
+        </div>
+        <div class="px-6 py-4 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse"></span>
+            <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Hệ Thống Admin</span>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="partners.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Quản lý Partner</span>
+          </a>
+          <a href="apis.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="code" class="w-4 h-4"></i>
+            <span>Quản lý API</span>
+          </a>
+          <a href="services.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-gradient-to-r from-violet-600/30 to-violet-900/10 text-violet-400 border border-violet-500/20 shadow-md">
+            <i data-lucide="package-search" class="w-4 h-4"></i>
+            <span>Service & Package</span>
+          </a>
+          <a href="logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="terminal" class="w-4 h-4"></i>
+            <span>Transaction Log</span>
+          </a>
+          <a href="reports.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="file-bar-chart" class="w-4 h-4"></i>
+            <span>Báo cáo đối soát</span>
+          </a>
+          <a href="users.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-800/40 transition-colors">
+            <i data-lucide="user-cog" class="w-4 h-4"></i>
+            <span>Người dùng & Phân quyền</span>
+          </a>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center font-bold text-xs text-white">AD</div>
+          <div class="text-xs">
+            <p class="font-bold text-gray-200">Admin System</p>
+            <p class="text-gray-500 font-mono">v2.1.0</p>
+          </div>
+        </div>
+        <a href="../index.html" class="text-gray-500 hover:text-red-400 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </aside>
+
+    <!-- WRAPPER -->
+    <div class="flex-1 pl-[240px]">
+      
+      <!-- TOPBAR -->
+      <header class="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#0D1117] sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Hệ Thống</span>
+          <span class="text-gray-600 font-medium">/</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-violet-400">Service & Package</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="bg-violet-950 text-violet-300 border border-violet-800/50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Admin Portal</span>
+          <div class="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-violet-400 shadow">A</div>
+            <span>Admin System ▾</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="p-8 max-w-7xl mx-auto">
+        
+        <!-- VIEW 1: SERVICE LIST -->
+        <div id="view-list" class="space-y-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <h1 class="text-2xl font-black text-gray-100 tracking-tight">Kênh Dịch Vụ & Gói Cước Game</h1>
+              <p class="text-xs text-gray-500">Quản lý dải IP kết nối, cấu hình IP Whitelist bảo mật, và biểu phí gói cước theo tuần/tháng.</p>
+            </div>
+            <button onclick="toggleDrawer(true)" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg shadow flex items-center gap-2 cursor-pointer">
+              <i data-lucide="plus" class="w-4 h-4"></i> Thêm Service
+            </button>
+          </div>
+
+          <!-- Filters -->
+          <div class="bg-card border border-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
+            <div class="flex-1 max-w-lg flex items-center gap-3">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="svc-search" placeholder="Tìm kiếm theo Tên game hoặc Sub-code..." onkeyup="filterServices()" class="w-full bg-black/30 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-xs text-gray-200 focus:border-accent outline-none">
+              </div>
+              <select id="svc-status" onchange="filterServices()" class="bg-black/30 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 outline-none focus:border-accent">
+                <option value="all">Trạng thái (Tất cả)</option>
+                <option value="Active">Active</option>
+                <option value="Pilot">Pilot</option>
+                <option value="Pending Approval">Pending Approval</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <button onclick="resetFilters()" class="border border-gray-700 hover:border-gray-500 bg-gray-905 p-2 rounded-lg text-gray-450 hover:text-gray-100 text-xs flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Làm mới
+            </button>
+          </div>
+
+          <!-- Service Table -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-4">Tên Game (Service)</th>
+                  <th class="px-6 py-4">Sub-code</th>
+                  <th class="px-6 py-4 font-bold">Partner quản lý</th>
+                  <th class="px-6 py-4">Trạng thái</th>
+                  <th class="px-6 py-4">IP Whitelist</th>
+                  <th class="px-6 py-4">Ngày tạo</th>
+                  <th class="px-6 py-4 text-right">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="services-table-body" class="divide-y divide-gray-850/30 text-xs">
+                <!-- Data rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 2: PACKAGE LIST OF A SERVICE -->
+        <div id="view-packages" class="hidden space-y-6">
+          <!-- Breadcrumbs and back -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider">
+              <button onclick="switchView('list')" class="text-violet-400 hover:underline cursor-pointer">Service & Package</button>
+              <span class="text-gray-600 font-bold">&gt;</span>
+              <span class="text-gray-200" id="pkg-breadcrumb-game-name">Free Fire</span>
+              <span class="text-gray-600 font-bold">&gt;</span>
+              <span class="text-gray-500">Gói Gói Cước (Packages)</span>
+            </div>
+            <button onclick="showToast('info', '✏️ Thêm Package mới')" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg flex items-center gap-1 cursor-pointer">
+              <i data-lucide="plus" class="w-4 h-4"></i> Thêm Package
+            </button>
+          </div>
+
+          <!-- Master Package Table -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <div class="p-6 border-b border-gray-800 bg-black/10">
+              <h3 class="text-base font-extrabold text-white" id="pkg-title-game">Danh sách biểu phí: Free Fire</h3>
+              <p class="text-xs text-gray-500 mt-1">Gói cước viễn thông tích hợp được nhà mạng kích hoạt từ xa.</p>
+            </div>
+
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-black/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-4">Tên Gói</th>
+                  <th class="px-6 py-4">Giá bán (VND)</th>
+                  <th class="px-6 py-4 font-mono">Chu kỳ thời hạn</th>
+                  <th class="px-6 py-4">Trạng thái cấu hình</th>
+                  <th class="px-6 py-4 text-right">Danh mục hành động</th>
+                </tr>
+              </thead>
+              <tbody id="package-table-rows" class="divide-y divide-gray-850/30 text-xs font-medium">
+                <!-- Package rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 3: SERVICE DETAILS -->
+        <div id="view-detail" class="hidden space-y-8">
+          <div>
+            <button onclick="switchView('list')" class="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider cursor-pointer">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại danh sách Dịch Vụ
+            </button>
+          </div>
+
+          <!-- Service header card details -->
+          <div class="bg-card border border-gray-800 p-6 rounded-xl shadow relative overflow-hidden flex flex-col justify-between md:flex-row gap-6">
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <span id="det-emoji" class="w-12 h-12 rounded-xl bg-violet-600/10 border border-violet-500/20 flex items-center justify-center text-2xl">🔥</span>
+                <div>
+                  <h2 id="det-name" class="text-xl font-extrabold text-white">Free Fire</h2>
+                  <p id="det-partner" class="text-xs text-violet-400 mt-1">Đối tác sở hữu: <span class="text-gray-300 font-bold font-mono uppercase">Garena VN</span></p>
+                </div>
+              </div>
+              <p id="det-desc" class="text-xs text-gray-400 max-w-2xl leading-relaxed">Dịch vụ game bắn súng sinh tồn, cấu hình đồng bộ hóa gói mạng Viettel 3G/4G.</p>
+              
+              <div class="flex items-center gap-4 text-xs font-mono">
+                <span id="det-status-badge" class="bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-0.5 rounded-full font-sans font-semibold">Active</span>
+                <span class="text-gray-500 text-[11px]">|</span>
+                <span class="text-gray-300 font-bold" id="det-subcode">Mã Sub-Service: FF_VN_001</span>
+              </div>
+            </div>
+
+            <!-- Detail Admin Action Tools -->
+            <div class="shrink-0 flex md:flex-col justify-star gap-3 h-full">
+              <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block md:mb-1">Hành động phê duyệt</span>
+              <button onclick="showApproveModal(true, 'Approve')" class="bg-green-600 hover:bg-green-500 text-white font-bold text-xs uppercase tracking-wider py-3 px-4.5 rounded-xl flex items-center justify-center gap-2 shadow cursor-pointer">
+                <i data-lucide="check-circle" class="w-4 h-4"></i> Approve Service
+              </button>
+              <button onclick="showApproveModal(true, 'Reject')" class="border border-red-950/40 hover:bg-red-950/20 hover:border-red-500/20 text-red-400 font-bold text-xs uppercase tracking-wider py-3 px-4.5 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer">
+                <i data-lucide="x-circle" class="w-4 h-4"></i> Reject Service
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabs details -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <div class="flex border-b border-gray-805 bg-black/10">
+              <button onclick="switchTab('info')" id="tab-btn-info" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300">Thông tin chung</button>
+              <button onclick="switchTab('ips')" id="tab-btn-ips" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">IP Whitelist</button>
+              <button onclick="switchTab('pks')" id="tab-btn-pks" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">Danh sách gói cước</button>
+              <button onclick="switchTab('his')" id="tab-btn-his" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">Lịch sử</button>
+            </div>
+
+            <div class="p-6">
+              
+              <!-- Tab Info -->
+              <div id="tab-content-info" class="space-y-4">
+                <h4 class="text-sm font-bold text-gray-200">Tổng quan và thông tin liên kết viễn thông</h4>
+                <p class="text-xs text-gray-400 leading-relaxed max-w-xl">Thông tin chi tiết về game dịch vụ. Đồng bộ dữ liệu IP Gateway định tuyến và điều khiển tài khoản cước.</p>
+              </div>
+
+              <!-- Tab IP Whitelist -->
+              <div id="tab-content-ips" class="hidden space-y-6">
+                <div class="flex justify-between items-center bg-black/25 border border-dashed border-gray-800 p-4 rounded-xl">
+                  <div class="space-y-1">
+                    <span class="text-xs font-bold text-gray-200">Đăng tuyển IP/CIDR bảo mật cho API Client</span>
+                    <p class="text-[11px] text-gray-500">Chặn tất cả các cuộc gọi API nằm ngoài dải Whitelist đã khai báo (HTTP 403).</p>
+                  </div>
+                  <div class="flex gap-2 max-w-xs">
+                    <input type="text" id="new-ip-input" placeholder="Ví dụ: 192.168.1.1/24" class="bg-black/40 border border-gray-700 rounded px-3 py-1.5 text-xs text-gray-200 outline-none font-mono">
+                    <button onclick="addNewIp()" class="bg-accent hover:bg-accent/90 text-white text-xs font-bold uppercase px-3.5 py-1 rounded">Thêm</button>
+                  </div>
+                </div>
+
+                <div class="border border-gray-800 rounded-xl overflow-hidden bg-black/10">
+                  <table class="w-full text-left text-xs font-mono">
+                    <thead>
+                      <tr class="bg-black/30 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
+                        <th class="px-6 py-3">STT</th>
+                        <th class="px-6 py-3">Địa chỉ IP (CIDR)</th>
+                        <th class="px-6 py-3 font-sans">Mục đích sử dụng</th>
+                        <th class="px-6 py-3 text-right">Xóa</th>
+                      </tr>
+                    </thead>
+                    <tbody id="detail-ip-table-rows" class="divide-y divide-gray-850/30">
+                      <!-- IP Rows dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Tab Packages -->
+              <div id="tab-content-pks" class="hidden">
+                <p class="text-xs text-gray-400 mb-4">Danh sách các gói cước được Partner gán bán cho game này. Để cập nhật chi tiết, vui lòng nhấp "Packages" từ màn hình danh sách chính.</p>
+                <div class="border border-gray-800 rounded-xl overflow-hidden">
+                  <table id="associated-packages-mini" class="w-full text-left text-xs">
+                    <tr class="bg-black/20 text-[10px] font-bold text-gray-500 uppercase tracking-wider border-b border-gray-800">
+                      <th class="px-4 py-2.5">Tên Gói</th>
+                      <th class="px-4 py-2.5">Chu kỳ</th>
+                      <th class="px-4 py-2.5">Trạng thái</th>
+                    </tr>
+                    <tbody class="divide-y divide-gray-850/30 font-medium">
+                      <tr>
+                        <td class="px-4 py-2.5">Gói 7 ngày (15,000₫)</td>
+                        <td class="px-4 py-2.5 font-mono">7 ngày</td>
+                        <td class="px-4 py-2.5 text-green-400">Active</td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2.5">Gói 30 ngày (45,000₫)</td>
+                        <td class="px-4 py-2.5 font-mono">30 ngày</td>
+                        <td class="px-4 py-2.5 text-green-400">Active</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Tab History -->
+              <div id="tab-content-his" class="hidden text-xs">
+                <div class="pl-4 border-l border-gray-800 space-y-4 font-normal">
+                  <div>
+                    <span class="text-[10px] text-gray-500 font-mono">20/06/2026 10:15</span>
+                    <p class="font-bold text-gray-200 mt-1">Hệ thống tạo Service</p>
+                    <p class="text-gray-500 text-[11px]">Trạng thái ban đầu: Pilot.</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- DRAWER: THÊM SERVICE (Right side) -->
+    <div id="drawer-container" class="fixed inset-0 z-50 overflow-hidden hidden">
+      <div onclick="toggleDrawer(false)" class="absolute inset-0 bg-black/65 backdrop-blur-xs"></div>
+      <div class="absolute inset-y-0 right-0 max-w-full flex">
+        <div id="drawer-panel" class="w-screen max-w-[560px] bg-card border-l border-gray-800 flex flex-col justify-between shadow-2xl transform translate-x-full drawer-transition">
+          
+          <div class="px-6 py-5 border-b border-gray-800 bg-[#0D1117] flex justify-between items-center">
+            <div>
+              <h3 class="text-base font-bold text-gray-100 uppercase tracking-wider">Thêm mới Service (Game)</h3>
+              <p class="text-xs text-gray-500">Khởi tạo định tuyến game B2B và IP liên kết ban đầu.</p>
+            </div>
+            <button onclick="toggleDrawer(false)" class="text-gray-400 hover:text-white p-2 text-xl font-bold">&times;</button>
+          </div>
+
+          <!-- Drawer form body -->
+          <div class="flex-1 overflow-y-auto p-6 space-y-5">
+            <div class="space-y-4">
+              <div class="grid grid-cols-2 gap-4 text-xs">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-semibold text-gray-400 uppercase">Tên Game (Service) *</label>
+                  <input type="text" id="f-game" placeholder="Ví dụ: Free Fire" class="w-full bg-black/30 border border-gray-700 focus:border-accent rounded-lg p-2.5 text-xs text-gray-100 outline-none">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-semibold text-gray-400 uppercase">Sub-service Code *</label>
+                  <input type="text" id="f-subcode" placeholder="Ví dụ: FF_VN_001" class="w-full bg-black/30 border border-gray-700 focus:border-accent rounded-lg p-2.5 text-xs text-gray-100 outline-none font-mono">
+                </div>
+              </div>
+
+              <div class="space-y-1.5 text-xs">
+                <label class="block text-xs font-semibold text-gray-400 uppercase">Partner quản lý *</label>
+                <select id="f-partner" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-300 outline-none focus:border-accent">
+                  <option value="Garena VN">Garena VN (Garena Vietnam)</option>
+                  <option value="VNG Corp">VNG Corp (VNG Corporation)</option>
+                  <option value="Krafton VN">Krafton VN (Krafton Vietnam)</option>
+                  <option value="Moonton VN">Moonton VN (Moonton Vietnam)</option>
+                </select>
+              </div>
+
+              <div class="space-y-1.5 text-xs">
+                <label class="block text-xs font-semibold text-gray-400 uppercase">Mô tả chi tiết</label>
+                <textarea id="f-desc" placeholder="Tóm tắt nội dung cung cấp..." class="w-full bg-black/30 border border-gray-700 focus:border-accent rounded-lg p-2.5 text-xs text-gray-100 outline-none h-16"></textarea>
+              </div>
+
+              <div class="space-y-1.5 text-xs">
+                <label class="block text-xs font-semibold text-gray-400 uppercase">Trạng thái khởi tạo</label>
+                <div class="p-3 bg-black/30 border border-gray-800 rounded-lg text-xs font-mono text-cyan-400">
+                  Mặc định khởi tạo: Pilot (Thử nghiệm ban đầu)
+                </div>
+              </div>
+
+              <!-- IP Whitelist Section -->
+              <div class="border border-gray-800 rounded-xl p-4 bg-black/10 space-y-3 text-xs">
+                <span class="text-xs font-bold text-gray-300 block">Khai báo IP Whitelist ban đầu</span>
+                <div class="flex gap-2">
+                  <input type="text" id="f-ip" placeholder="192.168.100.10" class="flex-1 bg-black/30 border border-gray-700 rounded px-2.5 py-2 text-xs text-gray-200 outline-none font-mono">
+                  <button type="button" onclick="addDrawerIp()" class="bg-gray-800 hover:bg-gray-700 hover:text-white px-4 text-xs font-bold uppercase rounded border border-gray-700">+ Thêm</button>
+                </div>
+
+                <div class="overflow-x-auto border border-gray-800 rounded-lg max-h-32">
+                  <table class="w-full text-left font-mono text-[11px]">
+                    <tbody id="drawer-ip-list" class="divide-y divide-gray-850/40">
+                      <!-- IP list in drawer -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="px-6 py-4 border-t border-gray-800 bg-[#0D1117] flex justify-end gap-3.5">
+            <button onclick="toggleDrawer(false)" class="border border-gray-700 hover:border-gray-500 hover:bg-gray-800 text-gray-300 font-semibold text-xs uppercase px-5 py-3 rounded-xl cursor-pointer">Hủy</button>
+            <button onclick="submitNewServiceForm()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase px-6 py-3 rounded-xl cursor-pointer">Lưu Service</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: APPROVE / REJECT CONFIRMTION -->
+    <div id="approve-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="showApproveModal(false)" class="absolute inset-0 bg-black/75 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 p-6 rounded-2xl w-full max-w-md shadow-2xl space-y-4">
+        
+        <div class="flex items-center gap-3 text-violet-400" id="approve-modal-header-icon">
+          <i data-lucide="check-square" class="w-8 h-8"></i>
+          <div>
+            <h3 class="text-base font-bold text-gray-100" id="approve-modal-title">Phê duyệt kích hoạt Game Service</h3>
+            <p class="text-[11px] text-gray-400">Thao tác này sẽ cập nhật trạng thái hoạt động chính của kênh kết nối.</p>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-300 bg-black/20 border border-gray-800 p-3 rounded-xl font-mono leading-relaxed" id="approve-modal-text">
+          Bạn có chắc chắn muốn phê duyệt...?
+        </p>
+
+        <div class="flex justify-end gap-3 font-semibold text-xs uppercase tracking-wider pt-2">
+          <button onclick="showApproveModal(false)" class="border border-gray-700 text-gray-400 hover:text-white px-4 py-2.5 rounded-lg">Hủy</button>
+          <button id="approve-confirm-submit" class="bg-violet-600 hover:bg-violet-500 text-white px-5 py-2.5 rounded-lg">Xác nhận</button>
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+      // Global Services Mock array
+      let servicesCollection = [
+        { id: 1, name: "Free Fire", subcode: "FF_VN_001", partner: "Garena VN", status: "Active", ips: 3, created: "10/01/2024", desc: "Dịch vụ game bắn súng sinh tồn nổi tiếng, liên kết kết nối gói cước Viettel 3G/4G thế hệ mới.", ipList: ["192.168.1.24/32", "10.0.0.12/24", "172.16.5.4/24"] },
+        { id: 2, name: "Liên Quân Mobile", subcode: "AoV_VN_001", partner: "VNG Corp", status: "Pilot", ips: 1, created: "15/01/2024", desc: "Dịch vụ đấu trường võ đài di động, cấu hình IP riêng liên thông nhà mạng MobiFone.", ipList: ["103.45.18.2/24"] },
+        { id: 3, name: "PUBG Mobile", subcode: "PUBG_VN_001", partner: "Krafton VN", status: "Pending Approval", ips: 2, created: "20/01/2024", desc: "Game sinh tồn, đang đề nghị kích hoạt cước gói tuần nạp VIP 30 ngày.", ipList: ["192.16.0.40/32", "192.16.0.41/32"] },
+        { id: 4, name: "Mobile Legends", subcode: "ML_VN_001", partner: "Moonton VN", status: "Active", ips: 2, created: "25/01/2024", desc: "Kênh MOBA Mobile thịnh hành châu Á.", ipList: ["113.12.90.1/24", "113.12.90.2/24"] },
+        { id: 5, name: "Valorant", subcode: "VAL_VN_001", partner: "Riot VN", status: "Inactive", ips: 0, created: "01/03/2024", desc: "Kênh game bắn súng chiến thuật trên PC.", ipList: [] }
+      ];
+
+      // Packages under Free Fire
+      let ffPackages = [
+        { name: "Gói 7 ngày", price: "15,000", cycle: "7 ngày", status: "Active" },
+        { name: "Gói 30 ngày", price: "45,000", cycle: "30 ngày", status: "Active" },
+        { name: "Gói VIP 30 ngày", price: "99,000", cycle: "30 ngày", status: "Pending Approval" }
+      ];
+
+      let inspectedServiceId = null;
+      let activeDrawerIps = [];
+
+      function init() {
+        renderServicesTable();
+        lucide.createIcons();
+      }
+
+      function renderServicesTable() {
+        const search = document.getElementById('svc-search').value.toLowerCase();
+        const status = document.getElementById('svc-status').value;
+        const tbody = document.getElementById('services-table-body');
+        tbody.innerHTML = '';
+
+        let filtered = servicesCollection.filter(s => {
+          const mSearch = s.name.toLowerCase().includes(search) || s.subcode.toLowerCase().includes(search);
+          const mStatus = status === 'all' || s.status === status;
+          return mSearch && mStatus;
+        });
+
+        filtered.forEach(s => {
+          let badgeColor = "bg-gray-500/10 text-gray-400 border border-gray-500/20";
+          let dotColor = "bg-gray-500";
+
+          if (s.status === 'Active') {
+            badgeColor = "bg-green-500/10 text-green-400 border border-green-500/20";
+            dotColor = "bg-green-500";
+          } else if (s.status === 'Pilot') {
+            badgeColor = "bg-violet-500/10 text-violet-400 border border-violet-500/20";
+            dotColor = "bg-violet-400";
+          } else if (s.status === 'Pending Approval') {
+            badgeColor = "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20";
+            dotColor = "bg-yellow-500 animate-pulse";
+          }
+
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/20 transition-colors">
+              <td class="px-6 py-4.5 font-bold text-gray-200">${s.name}</td>
+              <td class="px-6 py-4.5 font-mono text-cyan-400 uppercase tracking-wide">${s.subcode}</td>
+              <td class="px-6 py-4.5 text-gray-300 font-semibold">${s.partner}</td>
+              <td class="px-6 py-4.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${badgeColor}">
+                  <span class="w-1.5 h-1.5 rounded-full ${dotColor}"></span> ${s.status}
+                </span>
+              </td>
+              <td class="px-6 py-4.5 font-mono text-gray-400">${s.ips} IPs</td>
+              <td class="px-6 py-4.5 text-gray-500 font-mono">${s.created}</td>
+              <td class="px-6 py-4.5 text-right space-x-2">
+                <button onclick="inspectService(${s.id})" class="border border-gray-800 hover:border-gray-550 hover:bg-gray-850 bg-[#0D1117] text-gray-300 font-bold uppercase tracking-wider text-[10px] py-1.5 px-2.5 rounded-lg cursor-pointer">Xem</button>
+                <button onclick="viewPackagesList(${s.id})" class="text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider text-[10px] py-1 px-1.5 cursor-pointer">Packages</button>
+              </td>
+            </tr>
+          `);
+        });
+
+        lucide.createIcons();
+      }
+
+      function filterServices() {
+        renderServicesTable();
+      }
+
+      function resetFilters() {
+        document.getElementById('svc-search').value = '';
+        document.getElementById('svc-status').value = 'all';
+        renderServicesTable();
+        showToast('info', '🔄 Biểu mẫu lọc của bạn đã được dọn sạch.');
+      }
+
+      function switchView(view) {
+        document.getElementById('view-list').classList.add('hidden');
+        document.getElementById('view-packages').classList.add('hidden');
+        document.getElementById('view-detail').classList.add('hidden');
+
+        if (view === 'list') {
+          document.getElementById('view-list').classList.remove('hidden');
+        } else if (view === 'packages') {
+          document.getElementById('view-packages').classList.remove('hidden');
+        } else {
+          document.getElementById('view-detail').classList.remove('hidden');
+        }
+      }
+
+      // PACKAGES MANAGEMENT LIST (View 2)
+      function viewPackagesList(serviceId) {
+        const s = servicesCollection.find(svc => svc.id === serviceId);
+        if (!s) return;
+
+        document.getElementById('pkg-breadcrumb-game-name').textContent = s.name;
+        document.getElementById('pkg-title-game').textContent = `Danh sách biểu phí: ${s.name} (${s.partner})`;
+        
+        const tbody = document.getElementById('package-table-rows');
+        tbody.innerHTML = '';
+
+        ffPackages.forEach(pkg => {
+          let badge = pkg.status === 'Active' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20';
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/10 transition-colors">
+              <td class="px-6 py-4 font-bold text-gray-200">${pkg.name}</td>
+              <td class="px-6 py-4 font-mono text-cyan-400 font-bold text-right pr-24">${pkg.price} ₫</td>
+              <td class="px-6 py-4 font-mono font-medium text-gray-400">${pkg.cycle}</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${badge}">${pkg.status}</span>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button onclick="showToast('info', '✏️ Chi tiết cấu hình Gói')" class="text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Sửa</button>
+              </td>
+            </tr>
+          `);
+        });
+
+        switchView('packages');
+        lucide.createIcons();
+      }
+
+      // SERVICE DETAILS (View 3)
+      function inspectService(serviceId) {
+        inspectedServiceId = serviceId;
+        const s = servicesCollection.find(svc => svc.id === serviceId);
+        if (!s) return;
+
+        document.getElementById('det-name').textContent = s.name;
+        document.getElementById('det-partner').innerHTML = `Đối tác sở hữu: <span class="text-gray-300 font-bold font-mono uppercase">${s.partner}</span>`;
+        document.getElementById('det-subcode').textContent = `Mã Sub-Service: ${s.subcode}`;
+        document.getElementById('det-desc').textContent = s.desc;
+
+        // Emoji matching
+        const emojiPlaceholder = document.getElementById('det-emoji');
+        if (s.name.includes("Free")) emojiPlaceholder.textContent = "🔥";
+        else if (s.name.includes("Liên Quân")) emojiPlaceholder.textContent = "🛡️";
+        else if (s.name.includes("PUBG")) emojiPlaceholder.textContent = "🔫";
+        else if (s.name.includes("Mobile")) emojiPlaceholder.textContent = "⚔️";
+        else emojiPlaceholder.textContent = "🎮";
+
+        // Status badge
+        const badge = document.getElementById('det-status-badge');
+        badge.textContent = s.status;
+        if (s.status === 'Active') {
+          badge.className = "bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-0.5 rounded-full font-sans font-semibold";
+        } else if (s.status === 'Pilot') {
+          badge.className = "bg-violet-500/10 text-violet-400 border border-violet-500/20 px-2.5 py-0.5 rounded-full font-sans font-semibold";
+        } else if (s.status === 'Pending Approval') {
+          badge.className = "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-2.5 py-0.5 rounded-full font-sans font-semibold animate-pulse";
+        } else {
+          badge.className = "bg-gray-500/10 text-gray-400 border border-gray-500/20 px-2.5 py-0.5 rounded-full font-sans font-semibold";
+        }
+
+        renderIpsList();
+        switchView('detail');
+        switchTab('info');
+      }
+
+      function switchTab(tabId) {
+        const tabs = ['info', 'ips', 'pks', 'his'];
+        tabs.forEach(t => {
+          document.getElementById(`tab-content-${t}`).classList.add('hidden');
+          const btn = document.getElementById(`tab-btn-${t}`);
+          btn.className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent";
+        });
+
+        document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+        document.getElementById(`tab-btn-${tabId}`).className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300";
+      }
+
+      // Render IP Whitelists of selected Service
+      function renderIpsList() {
+        const svc = servicesCollection.find(s => s.id === inspectedServiceId);
+        if (!svc) return;
+
+        const tbody = document.getElementById('detail-ip-table-rows');
+        tbody.innerHTML = '';
+
+        if (svc.ipList.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 italic font-sans">Chưa gán địa chỉ IP nào cho game này. IP Gateway sẽ từ chối kết nối.</td></tr>';
+          return;
+        }
+
+        svc.ipList.forEach((ip, idx) => {
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/20 transition-colors">
+              <td class="px-6 py-2.5 text-gray-500 font-bold">${idx + 1}</td>
+              <td class="px-6 py-2.5 text-cyan-400 font-semibold">${ip}</td>
+              <td class="px-6 py-2.5 text-gray-300 font-sans">Máy chủ App Server chính của Partner</td>
+              <td class="px-6 py-2.5 text-right font-sans">
+                <button onclick="deleteIp(${idx})" class="text-red-500 hover:text-red-400 p-1">Xóa IP</button>
+              </td>
+            </tr>
+          `);
+        });
+      }
+
+      function addNewIp() {
+        const input = document.getElementById('new-ip-input');
+        const value = input.value.trim();
+        if (!value) return;
+
+        const svc = servicesCollection.find(s => s.id === inspectedServiceId);
+        if (!svc) return;
+
+        svc.ipList.push(value);
+        svc.ips = svc.ipList.length;
+
+        input.value = '';
+        renderIpsList();
+        renderServicesTable();
+        showToast('success', `✅ Đã đăng Whitelist IP: ${value}`);
+      }
+
+      function deleteIp(idx) {
+        const svc = servicesCollection.find(s => s.id === inspectedServiceId);
+        if (!svc) return;
+
+        const removedIp = svc.ipList.splice(idx, 1)[0];
+        svc.ips = svc.ipList.length;
+
+        renderIpsList();
+        renderServicesTable();
+        showToast('info', `🗑 Đã xóa IP: ${removedIp}`);
+      }
+
+      // DRAWER INTERACTION
+      function toggleDrawer(open) {
+        const container = document.getElementById('drawer-container');
+        const panel = document.getElementById('drawer-panel');
+
+        if (open) {
+          container.classList.remove('hidden');
+          setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+          activeDrawerIps = [];
+          renderDrawerIps();
+        } else {
+          panel.classList.add('translate-x-full');
+          setTimeout(() => container.classList.add('hidden'), 350);
+        }
+      }
+
+      function addDrawerIp() {
+        const ipVal = document.getElementById('f-ip').value.trim();
+        if (!ipVal) return;
+
+        activeDrawerIps.push(ipVal);
+        document.getElementById('f-ip').value = '';
+        renderDrawerIps();
+      }
+
+      function deleteDrawerIp(idx) {
+        activeDrawerIps.splice(idx, 1);
+        renderDrawerIps();
+      }
+
+      function renderDrawerIps() {
+        const list = document.getElementById('drawer-ip-list');
+        list.innerHTML = '';
+
+        if (activeDrawerIps.length === 0) {
+          list.innerHTML = '<tr><td class="py-3 text-center text-gray-500 italic font-sans text-xs">Chưa khai báo IP Whitelist nào.</td></tr>';
+          return;
+        }
+
+        activeDrawerIps.forEach((ip, idx) => {
+          list.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/10">
+              <td class="p-2 text-cyan-400">${ip}</td>
+              <td class="p-2 text-right">
+                <button type="button" onclick="deleteDrawerIp(${idx})" class="text-red-500 hover:text-red-400 p-0.5 font-sans">🗑</button>
+              </td>
+            </tr>
+          `);
+        });
+      }
+
+      function submitNewServiceForm() {
+        const game = document.getElementById('f-game').value.trim();
+        const subcode = document.getElementById('f-subcode').value.trim();
+        const partner = document.getElementById('f-partner').value;
+        const desc = document.getElementById('f-desc').value.trim();
+
+        if (!game || !subcode) {
+          showToast('error', 'Vui lòng nhập tên Game và Sub-service code bắt buộc (*)');
+          return;
+        }
+
+        const newSvc = {
+          id: servicesCollection.length + 1,
+          name: game,
+          subcode: subcode,
+          partner: partner,
+          status: "Pilot",
+          ips: activeDrawerIps.length,
+          created: new Date().toLocaleDateString('vi-VN'),
+          desc: desc || "Dịch vụ Game viễn thông thử nghiệm.",
+          ipList: [...activeDrawerIps]
+        };
+
+        servicesCollection.unshift(newSvc);
+        renderServicesTable();
+        toggleDrawer(false);
+
+        // Reset
+        document.getElementById('f-game').value = '';
+        document.getElementById('f-subcode').value = '';
+        document.getElementById('f-desc').value = '';
+
+        showToast('success', '✅ Khởi tạo và liên kết game dịch vụ "Pilot" thành công!');
+      }
+
+      // APPROVAL AND DISAPPROVE CONFIGS
+      function showApproveModal(open, decisionType = 'Approve') {
+        const modal = document.getElementById('approve-confirm-modal');
+        const text = document.getElementById('approve-modal-text');
+        const title = document.getElementById('approve-modal-title');
+        const iconContainer = document.getElementById('approve-modal-header-icon');
+
+        if (open) {
+          const s = servicesCollection.find(svc => svc.id === inspectedServiceId);
+          if (!s) return;
+
+          if (decisionType === 'Approve') {
+            title.textContent = "Phê duyệt kích hoạt Game Service";
+            iconContainer.className = "flex items-center gap-3 text-green-400";
+            text.innerHTML = `Hệ thống xác minh tất cả gói cước IP máy chủ của game <span class="text-white font-bold">${s.name} (${s.partner})</span> đã tuân thủ. Đồng ý đổi trạng thái sang <span class="text-green-400 font-bold">Active</span>?`;
+          } else {
+            title.textContent = "Từ chối kích hoạt Game Service";
+            iconContainer.className = "flex items-center gap-3 text-red-500";
+            text.innerHTML = `Từ chối cấp phép cước và hoàn lại hồ sơ cho game <span class="text-white font-bold">${s.name} (${s.partner})</span> về trạng thái <span class="text-red-400 font-bold">Inactive</span>?`;
+          }
+
+          modal.classList.remove('hidden');
+
+          document.getElementById('approve-confirm-submit').onclick = () => {
+            s.status = decisionType === 'Approve' ? 'Active' : 'Inactive';
+            inspectService(s.id);
+            renderServicesTable();
+            showApproveModal(false);
+            showToast('success', `✅ Đã thay đổi quyết sách game thành công: ${s.status}!`);
+          };
+
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
+
+      // TOASTS MESSAGES
+      function showToast(type, text) {
+        const container = document.getElementById('toast-container');
+        const id = 'toast-' + Math.random().toString(36).substr(2, 9);
+
+        let iconColor = type === 'success' ? 'text-green-400' : 'text-cyan-400';
+        let iconName = type === 'success' ? 'check-circle' : 'info';
+        if (type === 'error') {
+          iconColor = 'text-red-400';
+          iconName = 'x-circle';
+        }
+
+        const toastHtml = `
+          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
+            <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
+            <span class="text-gray-200 font-medium">${text}</span>
+          </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', toastHtml);
+        lucide.createIcons();
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('translate-y-2', 'opacity-0');
+        }, 10);
+
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0', 'translate-y-[-4px]');
+            setTimeout(() => el.remove(), 300);
+          }
+        }, 3000);
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

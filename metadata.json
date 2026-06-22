@@ -1,0 +1,8 @@
+{
+  "name": "Remix: GameHub",
+  "description": "Nền tảng quản lý game tích hợp B2B. Quản lý Partner, API, dịch vụ \u0026 gói cước, lịch sử giao dịch và đối soát.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
