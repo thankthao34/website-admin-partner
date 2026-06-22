@@ -125,380 +125,1318 @@
         
         <!-- VIEW 1: SUMMARY REPORTS TABLE -->
         <div id="view-summary" class="space-y-6">
-          <div>
-            <h1 class="text-2xl font-black text-gray-100 tracking-tight">Đối soát Doanh Thu Viễn Thông (Reconciliations)</h1>
-            <p class="text-xs text-gray-500 mt-1">Kết toán chênh lệch, tổng hợp số lượng giao dịch thành công/thất bị, và kết chuyển dòng tiền định kỳ.</p>
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 class="text-2xl font-black text-gray-100 tracking-tight flex items-center gap-2">
+                Đối soát Doanh Thu Viễn Thông <span class="bg-violet-600/10 text-violet-400 text-xs py-0.5 px-2 rounded-full border border-violet-500/20 font-bold uppercase select-none">Reconciliations</span>
+              </h1>
+              <p class="text-xs text-gray-500 mt-1">Kết toán chênh lệch, tổng hợp số lượng giao dịch thành công/thất bị, và kết chuyển dòng tiền định kỳ.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="triggerExport('Tổng Hợp')" class="bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs uppercase px-4 py-2.5 rounded-lg flex items-center gap-1.5 cursor-pointer shadow-lg transition-all">
+                <i data-lucide="download" class="w-4 h-4"></i> Xuất Báo Cáo KQ
+              </button>
+            </div>
+          </div>
+
+          <!-- Overview statistics cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="summary-stats-cards">
+            <!-- Dynamic overview status metrics cards injected here by JS -->
           </div>
 
           <!-- Filter bar -->
           <div class="bg-card border border-gray-800 p-4 rounded-xl flex items-center flex-wrap gap-4 text-xs">
             <div class="flex items-center gap-2">
-              <label class="text-gray-400 uppercase text-[10px] font-bold">Partner:</label>
-              <select class="bg-black/30 border border-gray-700 rounded-lg p-2 text-xs text-gray-300 outline-none focus:border-accent">
-                <option value="all">Tất cả</option>
-                <option value="garena">Garena VN</option>
-                <option value="vng">VNG Corp</option>
+              <label class="text-gray-400 uppercase text-[10px] font-extrabold tracking-wider">Partner:</label>
+              <select id="filter-partner" onchange="currentPage=1; renderSummaryTable()" class="bg-black/40 border border-gray-700 rounded-lg p-2 text-xs text-gray-300 outline-none focus:border-accent">
+                <option value="all">Tất cả Đối tác</option>
+                <option value="Garena VN">Garena VN</option>
+                <option value="VNG Corp">VNG Corp</option>
+                <option value="Krafton VN">Krafton VN</option>
+                <option value="Moonton VN">Moonton VN</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-gray-400 uppercase text-[10px] font-extrabold tracking-wider">Trạng thái:</label>
+              <select id="filter-status" onchange="currentPage=1; renderSummaryTable()" class="bg-black/40 border border-gray-700 rounded-lg p-2 text-xs text-gray-300 outline-none focus:border-accent">
+                <option value="all">Tất cả Trạng thái</option>
+                <option value="Khớp">Khớp hoàn toàn</option>
+                <option value="Chênh lệch">Phát hiện Chênh lệch</option>
+                <option value="Đang đối soát">Đang đối soát</option>
               </select>
             </div>
             
             <div class="flex items-center gap-2">
-              <label class="text-gray-400 uppercase text-[10px] font-bold- mr-1">Từ ngày:</label>
-              <input type="date" value="2026-06-01" class="bg-black/30 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 outline-none">
+              <label class="text-gray-400 uppercase text-[10px] font-extrabold tracking-wider mr-1">Từ ngày:</label>
+              <input type="date" id="filter-start-date" value="2026-06-15" class="bg-[#111] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 outline-none focus:border-accent">
             </div>
 
             <div class="flex items-center gap-2">
-              <label class="text-gray-400 uppercase text-[10px] font-bold- mr-1">Đến ngày:</label>
-              <input type="date" value="2026-06-30" class="bg-black/30 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 outline-none">
+              <label class="text-gray-400 uppercase text-[10px] font-extrabold tracking-wider mr-1">Đến ngày:</label>
+              <input type="date" id="filter-end-date" value="2026-06-25" class="bg-[#111] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 outline-none focus:border-accent">
             </div>
 
             <div class="flex items-center gap-2 ml-auto">
-              <button onclick="applyFilters()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase px-4 py-2.5 rounded-lg flex items-center gap-1 cursor-pointer">Lọc</button>
-              <button onclick="showToast('info', 'Làm mới kết toán.')" class="border border-gray-700 p-2 text-gray-400 hover:text-white rounded-lg cursor-pointer"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+              <button onclick="applyFilters()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase px-4 py-2.5 rounded-lg flex items-center gap-1 cursor-pointer transition-all">Lọc kết toán</button>
+              <button onclick="resetFilters()" class="border border-gray-750 p-2 text-gray-400 hover:text-white rounded-lg cursor-pointer transition-all bg-black/40" title="Đặt lại bộ lọc"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
             </div>
           </div>
 
-          <!-- Main Table -->
+          <!-- Main Table Container -->
           <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
-            <table class="w-full text-left">
-              <thead>
-                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
-                  <th class="px-6 py-4">Đối Tác</th>
-                  <th class="px-6 py-4 text-center">Kỳ Đối Soát</th>
-                  <th class="px-6 py-4 font-mono text-center">Tổng GD</th>
-                  <th class="px-6 py-4 font-mono text-center text-green-400">Thành công</th>
-                  <th class="px-6 py-4 font-mono text-center text-red-400">Thất bại</th>
-                  <th class="px-6 py-4 font-mono text-right">Doanh thu kết toán</th>
-                  <th class="px-6 py-4 text-right">Đối soát chi tiết</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-850/30 text-xs font-medium text-gray-300">
-                
-                <!-- Garena -->
-                <tr class="hover:bg-gray-800/10 transition-colors">
-                  <td class="px-6 py-4.5 font-bold text-gray-200">Garena VN</td>
-                  <td class="px-6 py-4.5 text-center text-gray-400">Tháng 06/2026</td>
-                  <td class="px-6 py-4.5 font-mono text-center font-bold text-gray-300">870,412</td>
-                  <td class="px-6 py-4.5 font-mono text-center text-green-400">869,940</td>
-                  <td class="px-6 py-4.5 font-mono text-center text-red-400">472</td>
-                  <td class="px-6 py-4.5 font-mono text-right text-cyan-400 text-sm font-bold">256,120,000 ₫</td>
-                  <td class="px-6 py-4.5 text-right">
-                    <button onclick="inspectReport('Garena VN', '256,120,000')" class="bg-violet-600/15 border border-violet-500/25 text-violet-400 font-bold uppercase tracking-wider text-[10px] px-3.5 py-1.5 rounded-lg cursor-pointer hover:bg-violet-600 hover:text-white transition-all">Xem</button>
-                  </td>
-                </tr>
-
-                <!-- VNG -->
-                <tr class="hover:bg-gray-800/10 transition-colors">
-                  <td class="px-6 py-4.5 font-bold text-gray-200">VNG Corp</td>
-                  <td class="px-6 py-4.5 text-center text-gray-400">Tháng 06/2026</td>
-                  <td class="px-6 py-4.5 font-mono text-center font-bold text-gray-300">401,920</td>
-                  <td class="px-6 py-4.5 font-mono text-center text-green-400">401,890</td>
-                  <td class="px-6 py-4.5 font-mono text-center text-red-400">30</td>
-                  <td class="px-6 py-4.5 font-mono text-right text-cyan-400 text-sm font-bold">120,440,000 ₫</td>
-                  <td class="px-6 py-4.5 text-right">
-                    <button onclick="inspectReport('VNG Corp', '120,440,000')" class="bg-violet-600/15 border border-violet-500/25 text-violet-400 font-bold uppercase tracking-wider text-[10px] px-3.5 py-1.5 rounded-lg cursor-pointer hover:bg-violet-600 hover:text-white transition-all">Xem</button>
-                  </td>
-                </tr>
-
-                <!-- Krafton -->
-                <tr class="hover:bg-gray-800/10 transition-colors">
-                  <td class="px-6 py-4.5 font-bold text-gray-200">Krafton VN</td>
-                  <td class="px-6 py-4.5 text-center text-gray-400">Tháng 06/2026</td>
-                  <td class="px-6 py-4.5 font-mono text-center font-bold text-gray-300">120,105</td>
-                  <td class="px-6 py-4.5 font-mono text-center text-green-400">119,950</td>
-                  <td class="px-6 py-4.5 font-mono text-center text-red-400">155</td>
-                  <td class="px-6 py-4.5 font-mono text-right text-cyan-400 text-sm font-bold">25,890,000 ₫</td>
-                  <td class="px-6 py-4.5 text-right">
-                    <button onclick="inspectReport('Krafton VN', '25,890,000')" class="bg-violet-600/15 border border-violet-500/25 text-violet-400 font-bold uppercase tracking-wider text-[10px] px-3.5 py-1.5 rounded-lg cursor-pointer hover:bg-violet-600 hover:text-white transition-all">Xem</button>
-                  </td>
-                </tr>
-
-                <!-- Moonton -->
-                <tr class="hover:bg-gray-800/10 transition-colors">
-                  <td class="px-6 py-4.5 font-bold text-gray-200">Moonton VN</td>
-                  <td class="px-6 py-4.5 text-center text-gray-400">Tháng 06/2026</td>
-                  <td class="px-6 py-4.5 font-mono text-center font-bold text-gray-300">4,124</td>
-                  <td class="px-6 py-4.5 font-mono text-center text-green-400">4,103</td>
-                  <td class="px-6 py-4.5 font-mono text-center text-red-400">21</td>
-                  <td class="px-6 py-4.5 font-mono text-right text-cyan-400 text-sm font-bold">900,000 ₫</td>
-                  <td class="px-6 py-4.5 text-right">
-                    <button onclick="inspectReport('Moonton VN', '900,000')" class="bg-violet-600/15 border border-violet-500/25 text-violet-400 font-bold uppercase tracking-wider text-[10px] px-3.5 py-1.5 rounded-lg cursor-pointer hover:bg-violet-600 hover:text-white transition-all">Xem</button>
-                  </td>
-                </tr>
-
-              </tbody>
-            </table>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="bg-black/20 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-800 select-none">
+                    <th class="px-5 py-4">Kỳ/Ngày đối soát</th>
+                    <th class="px-5 py-4">Đối Tác</th>
+                    <th class="px-5 py-4 text-center">GD Gateway</th>
+                    <th class="px-5 py-4 text-center">GD Partner</th>
+                    <th class="px-5 py-4 text-right">Doanh thu GW</th>
+                    <th class="px-5 py-4 text-right">Doanh thu Partner</th>
+                    <th class="px-5 py-4 text-right text-yellow-500">Chênh lệch</th>
+                    <th class="px-5 py-4 text-center">Tỷ lệ lệch %</th>
+                    <th class="px-5 py-4 text-center">Trạng thái</th>
+                    <th class="px-5 py-4 text-right">Đối soát chi tiết</th>
+                  </tr>
+                </thead>
+                <tbody id="summary-tbody" class="divide-y divide-gray-850/30 text-xs font-semibold text-gray-350">
+                  <!-- Rendered dynamically via state arrays -->
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Pagination inside Summary -->
+            <div class="px-6 py-4 border-t border-gray-850 bg-[#0F141C] flex items-center justify-between flex-wrap gap-4 select-none">
+              <span class="text-xs text-gray-500" id="summary-pagination-status"></span>
+              <div class="flex items-center gap-1.5" id="summary-pagination-controls">
+                <!-- Pagination control buttons -->
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- VIEW 2: DETAIL VIEW PANEL (HIDDEN BY DEFAULT) -->
+        <!-- VIEW 2: DETAIL AUDIT REPORT (VIEW 2) -->
         <div id="view-detail" class="hidden space-y-6">
           <div class="flex items-center justify-between">
-            <button onclick="switchView('summary')" class="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider cursor-pointer">
-              <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại kết toán chung
+            <button onclick="switchView('summary')" class="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider cursor-pointer transition-all">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại kỳ kết toán chung
             </button>
             
             <div class="flex items-center gap-2 text-xs">
-              <button onclick="triggerExport('Excel')" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-1.5 cursor-pointer shadow">
-                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> 📊 Xuất Excel
+              <button onclick="triggerExport('Excel')" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-3.5 rounded-lg flex items-center gap-1.5 cursor-pointer shadow transition-all">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Excel Đối Soát
               </button>
-              <button onclick="triggerExport('PDF')" class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-1.5 cursor-pointer shadow">
-                <i data-lucide="file-text" class="w-4 h-4"></i> 📄 Xuất PDF
+              <button onclick="triggerExport('PDF')" class="bg-red-850 hover:bg-red-700 text-white font-bold py-2 px-3.5 rounded-lg flex items-center gap-1.5 cursor-pointer shadow transition-all">
+                <i data-lucide="file-text" class="w-4 h-4"></i> Xuất PDF
               </button>
             </div>
           </div>
 
-          <!-- Headers details -->
-          <div>
-            <span class="text-xs font-semibold text-gray-500 uppercase tracking-widest block">Báo cáo kiểm toán chi tiết</span>
-            <h2 class="text-xl font-extrabold text-white mt-1" id="det-title-partner">Đối tác: Garena VN</h2>
-          </div>
-
-          <!-- KPI row of 4 inside report -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <!-- KPI 1 -->
-            <div class="bg-card border border-gray-800 p-5 rounded-xl">
-              <span class="text-[10px] text-gray-500 uppercase font-black block tracking-wider mb-2">Tổng số GD Gateway</span>
-              <p class="text-2xl font-bold font-mono tracking-tight text-white mb-0.5">870,412</p>
-              <span class="text-[10px] text-gray-400 font-medium">Số liệu nhận diện cổng kết nối</span>
+          <!-- Metadata headers card -->
+          <div class="bg-card border border-gray-800 p-6 rounded-xl space-y-4">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <span class="text-[10px] font-black text-violet-400 uppercase tracking-widest block">Báo cáo chênh lệch kết toán hệ thống</span>
+                <h2 class="text-xl font-extrabold text-white mt-1" id="det-header-title">---</h2>
+                <div class="text-xs text-gray-400 mt-2 space-y-1">
+                  <p>Kỳ đối soát ngày: <span id="det-header-period" class="font-mono text-cyan-400 font-bold">---</span></p>
+                  <p>Ngày tạo biên bản đánh giá: <span id="det-header-date" class="font-mono text-gray-500 font-medium">---</span></p>
+                </div>
+              </div>
+              <div id="det-header-status-badge">
+                <!-- Injected dynamically based on state -->
+              </div>
             </div>
 
-            <!-- KPI 2 -->
-            <div class="bg-card border border-gray-800 p-5 rounded-xl">
-              <span class="text-[10px] text-gray-500 uppercase font-black block tracking-wider mb-2">Số Giao Dịch Thành Công</span>
-              <p class="text-2xl font-bold font-mono tracking-tight text-green-400 mb-0.5">869,940</p>
-              <span class="text-[10px] text-green-400 font-medium font-sans">Tỷ lệ thành công: 99.94%</span>
-            </div>
+            <!-- Reconciliation dynamic cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-3 border-t border-gray-800/40">
+              <!-- Cards 1: Transaction totals match card -->
+              <div class="bg-black/35 border border-gray-800 p-4.5 rounded-lg">
+                <span class="text-[9px] text-gray-500 uppercase font-bold block mb-1.5 tracking-wider">Thống kê Giao dịch (GD)</span>
+                <div class="flex justify-between items-center text-xs mt-2">
+                  <span class="text-gray-400">Số GD ghi nhận Gateway:</span>
+                  <span class="font-mono font-bold text-gray-200" id="det-metrics-gw-txs">0</span>
+                </div>
+                <div class="flex justify-between items-center text-xs mt-1.5">
+                  <span class="text-gray-400">Số GD báo cáo từ Partner:</span>
+                  <span class="font-mono font-bold text-gray-300" id="det-metrics-pr-txs">0</span>
+                </div>
+                <div class="border-t border-gray-800/40 mt-3 pt-2 flex justify-between items-center text-xs">
+                  <span class="text-gray-400 font-semibold">Chênh lệch số lượng:</span>
+                  <span class="font-mono font-black" id="det-metrics-diff-txs">0 GD</span>
+                </div>
+              </div>
 
-            <!-- KPI 3 -->
-            <div class="bg-card border border-gray-800 p-5 rounded-xl">
-              <span class="text-[10px] text-gray-500 uppercase font-black block tracking-wider mb-2">Số Giao Dịch Thất Bại</span>
-              <p class="text-2xl font-bold font-mono tracking-tight text-red-500 mb-0.5">472</p>
-              <span class="text-[10px] text-red-400 font-medium font-sans">Chặn rate limit và timeouts</span>
-            </div>
+              <!-- Cards 2: Revenue offset totals card -->
+              <div class="bg-black/35 border border-gray-800 p-4.5 rounded-lg">
+                <span class="text-[9px] text-gray-500 uppercase font-bold block mb-1.5 tracking-wider">Doanh Thu Kế Toán</span>
+                <div class="flex justify-between items-center text-xs mt-2">
+                  <span class="text-gray-400">Tổng doanh thu Gateway:</span>
+                  <span class="font-mono font-bold text-cyan-450" id="det-metrics-gw-rev">0 ₫</span>
+                </div>
+                <div class="flex justify-between items-center text-xs mt-1.5">
+                  <span class="text-gray-400">Tổng doanh thu Partner:</span>
+                  <span class="font-mono font-bold text-cyan-450" id="det-metrics-pr-rev">0 ₫</span>
+                </div>
+                <div class="border-t border-gray-800/40 mt-3 pt-2 flex justify-between items-center text-xs">
+                  <span class="text-gray-400 font-semibold">Giá trị chênh lệch (đối soát):</span>
+                  <span class="font-mono font-black font-extrabold" id="det-metrics-diff-rev">0 ₫</span>
+                </div>
+              </div>
 
-            <!-- KPI 4 -->
-            <div class="bg-card border border-gray-800 p-5 rounded-xl">
-              <span class="text-[10px] text-gray-500 uppercase font-black block tracking-wider mb-2">Doanh Thu Đối Soát</span>
-              <p class="text-2xl font-bold font-mono tracking-tight text-cyan-400 mb-0.5" id="det-revenue-value">256,120,000 ₫</p>
-              <span class="text-[10px] text-gray-400 font-medium font-sans">Đã bao gồm VAT và chiết khấu</span>
-            </div>
-
-          </div>
-
-          <!-- Tab Bar details -->
-          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
-            <div class="flex border-b border-gray-805 bg-black/10">
-              <button onclick="switchTab('daily')" id="tab-btn-daily" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300">Biểu đồ Theo ngày (30 ngày)</button>
-              <button onclick="switchTab('services')" id="tab-btn-services" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">Theo dịch vụ game</button>
-              <button onclick="switchTab('packages')" id="tab-btn-packages" class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent">Theo gói cước</button>
-            </div>
-
-            <div class="p-6">
-              
-              <!-- Tab Daily Chart: SVG BAR CHART -->
-              <div id="tab-content-daily" class="space-y-6">
+              <!-- Cards 3: Error rates & proportion bars -->
+              <div class="bg-black/35 border border-gray-800 p-4.5 rounded-lg flex flex-col justify-between">
                 <div>
-                  <h4 class="text-sm font-bold text-gray-200 uppercase tracking-widest text-[11px]">Bảng Doanh Thu Từng Ngày (30 ngày qua)</h4>
-                  <p class="text-xs text-gray-500 mt-0.5">Lưu lượng doanh thu nạp game đối soát liên kết</p>
+                  <span class="text-[9px] text-gray-500 uppercase font-bold block mb-1.5 tracking-wider">Chỉ số Kỹ thuật &amp; Sai lệch kỳ</span>
+                  <div class="flex justify-between items-center text-xs mt-2">
+                    <span class="text-gray-400">Tỷ lệ sai lệch giá trị:</span>
+                    <span class="font-mono font-bold text-white" id="det-metrics-rate">0%</span>
+                  </div>
+                  <div class="flex justify-between items-center text-xs mt-1.5">
+                    <span class="text-gray-400">Tỷ lệ lỗi API trung bình:</span>
+                    <span class="font-mono font-bold text-red-400" id="det-metrics-err">0%</span>
+                  </div>
+                </div>
+                <!-- Proportional visualization meter -->
+                <div class="mt-4">
+                  <div class="flex justify-between text-[8px] uppercase font-bold text-gray-500 mb-1">
+                    <span>Doanh thu GW</span>
+                    <span>Partner</span>
+                  </div>
+                  <div class="w-full bg-gray-850 h-2 rounded-full overflow-hidden flex">
+                    <div id="det-prop-gw" class="bg-violet-500 h-full transition-all" style="width: 50%"></div>
+                    <div id="det-prop-pr" class="bg-cyan-500 h-full transition-all" style="width: 50%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Variance Analysis side-by-side with Custom graphical flex bar visualisations -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Auditing variance diagnostic report card -->
+            <div class="bg-card border border-gray-800 p-5 rounded-xl space-y-4">
+              <h3 class="text-xs font-black uppercase text-gray-400 tracking-wider flex items-center gap-1.5 border-b border-gray-800 pb-3">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-violet-400"></i> Bảng Phân Tích Chênh Lệch &amp; Khớp Dữ Liệu
+              </h3>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3.5 text-xs">
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Nguyên nhân chênh lệch</span>
+                  <p class="text-gray-200 mt-1 font-semibold text-xs leading-relaxed" id="ana-reason">---</p>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Loại hình / Phân hệ lệch</span>
+                  <p class="text-violet-400 font-bold mt-1 text-xs" id="ana-type">---</p>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Mức độ ảnh hưởng dòng tiền</span>
+                  <p class="font-bold mt-1 text-xs" id="ana-level">---</p>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Trạng thái xử lý kế toán</span>
+                  <p class="font-bold mt-1 text-xs" id="ana-status">---</p>
+                </div>
+              </div>
+
+              <!-- Link out to detailed partner transaction level matching list (View 3) -->
+              <div class="border-t border-gray-800/40 pt-4 flex flex-wrap gap-3 items-center justify-between">
+                <span class="text-xs text-gray-450 font-sans">Chi tiết từng giao dịch viễn thông trong ngày:</span>
+                <button onclick="inspectPartnerTransactions()" class="bg-violet-600 hover:bg-violet-500 text-white font-bold text-[11px] uppercase tracking-wider py-2 px-3.5 rounded-lg flex items-center gap-1.5 cursor-pointer transition-all shadow">
+                  <i data-lucide="file-check" class="w-4 h-4"></i> Xem giao dịch chi tiết đối tác
+                </button>
+              </div>
+            </div>
+
+            <!-- Clean visual visual charts (Dynamic custom SVG line/bars representation) -->
+            <div class="bg-card border border-gray-800 p-5 rounded-xl space-y-4">
+              <h3 class="text-xs font-black uppercase text-gray-400 tracking-wider flex items-center gap-1.5 border-b border-gray-800 pb-3">
+                <i data-lucide="donut-chart" class="w-4 h-4 text-cyan-400"></i> Biểu đồ Kết toán Số Liệu
+              </h3>
+
+              <div class="space-y-4 text-xs font-sans">
+                <!-- Bar 1: Gateway Revenue -->
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center text-[10px]">
+                    <span class="text-gray-450 font-semibold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-violet-500"></span> Doanh thu Gateway (Hệ thống)</span>
+                    <span class="font-mono text-gray-200" id="chart-gw-rev-txt">0 ₫</span>
+                  </div>
+                  <div class="w-full bg-black/60 border border-gray-800 h-3.5 rounded-full overflow-hidden flex items-center">
+                    <div id="chart-gw-rev-bar" class="bg-violet-500 h-full transition-all duration-700" style="width: 0%"></div>
+                  </div>
                 </div>
 
-                <!-- Custom Bar graph SVG representation -->
-                <div class="relative w-full h-[200px] flex items-end bg-black/10 p-4 border border-gray-850 rounded-xl">
-                  <svg class="w-full h-full" viewBox="0 0 600 150" overflow="visible" preserveAspectRatio="none">
-                    <!-- Grid background -->
-                    <line x1="0" y1="0" x2="600" y2="0" stroke="#1f2937" stroke-dasharray="2" stroke-width="1"></line>
-                    <line x1="0" y1="50" x2="600" y2="50" stroke="#1f2937" stroke-dasharray="2" stroke-width="1"></line>
-                    <line x1="0" y1="100" x2="600" y2="100" stroke="#1f2937" stroke-dasharray="2" stroke-width="1"></line>
-                    <line x1="0" y1="150" x2="600" y2="150" stroke="#374151" stroke-width="1"></line>
-
-                    <!-- Render 30 vertical bar lines representing 30 days -->
-                    <!-- Week 1 -->
-                    <rect x="10" y="80" width="8" height="70" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="30" y="60" width="8" height="90" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="50" y="90" width="8" height="60" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="70" y="40" width="8" height="110" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="90" y="30" width="8" height="120" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="110" y="55" width="8" height="95" rx="2" fill="#06B6D4" opacity="0.85"></rect>
-                    <rect x="130" y="45" width="8" height="105" rx="2" fill="#06B6D4" opacity="0.85"></rect>
-
-                    <!-- Week 2 -->
-                    <rect x="160" y="70" width="8" height="80" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="180" y="85" width="8" height="65" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="200" y="95" width="8" height="55" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="220" y="50" width="8" height="100" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="240" y="20" width="8" height="130" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="260" y="35" width="8" height="115" rx="2" fill="#06B6D4" opacity="0.85"></rect>
-                    <rect x="280" y="40" width="8" height="110" rx="2" fill="#06B6D4" opacity="0.85"></rect>
-
-                    <!-- Week 3 -->
-                    <rect x="310" y="60" width="8" height="90" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="330" y="75" width="8" height="75" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="350" y="85" width="8" height="65" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="370" y="40" width="8" height="110" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="390" y="30" width="8" height="120" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="410" y="25" width="8" height="125" rx="2" fill="#06B6D4" opacity="0.85"></rect>
-                    <rect x="430" y="50" width="8" height="100" rx="2" fill="#06B6D4" opacity="0.85"></rect>
-
-                    <!-- Week 4 -->
-                    <rect x="460" y="80" width="8" height="70" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="480" y="90" width="8" height="60" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="500" y="100" width="8" height="50" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="520" y="55" width="8" height="95" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="540" y="40" width="8" height="110" rx="2" fill="#7C3AED" opacity="0.85"></rect>
-                    <rect x="560" y="15" width="8" height="135" rx="2" fill="#06B6D4" opacity="0.85"></rect>
-                    <rect x="580" y="30" width="8" height="120" rx="2" fill="#06B6D4" opacity="0.85"></rect>
-
-                  </svg>
+                <!-- Bar 2: Partner Revenue -->
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center text-[10px]">
+                    <span class="text-gray-450 font-semibold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-500"></span> Doanh thu báo cáo từ Partner</span>
+                    <span class="font-mono text-gray-200" id="chart-pr-rev-txt">0 ₫</span>
+                  </div>
+                  <div class="w-full bg-black/60 border border-gray-800 h-3.5 rounded-full overflow-hidden flex items-center">
+                    <div id="chart-pr-rev-bar" class="bg-cyan-500 h-full transition-all duration-700" style="width: 0%"></div>
+                  </div>
                 </div>
+
+                <!-- Bar 3: Variance error scale -->
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center text-[10px]">
+                    <span class="text-red-400 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span> Tỷ lệ chênh lệch đối soát kỳ</span>
+                    <span class="font-mono font-bold text-red-400" id="chart-variance-txt">0%</span>
+                  </div>
+                  <div class="w-full bg-black/60 border border-gray-800 h-3.5 rounded-full overflow-hidden flex items-center">
+                    <div id="chart-variance-bar" class="bg-red-500 h-full transition-all duration-700" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Processing Notes Log History Section with update controls -->
+          <div class="bg-card border border-gray-800 p-6 rounded-xl space-y-6">
+            <h3 class="text-xs font-black uppercase text-gray-400 tracking-wider flex items-center gap-1.5 border-b border-gray-800 pb-3">
+              <i data-lucide="message-square-text" class="w-4 h-4 text-violet-400"></i> Ghi chú &amp; Lịch sử Cập nhật Biên bản xử lý (Admin Action Notes)
+            </h3>
+
+            <!-- Logs list timeline -->
+            <div id="det-notes-container" class="space-y-3.5 max-h-[220px] overflow-y-auto pr-2">
+              <!-- Logs updated by template method -->
+            </div>
+
+            <!-- Form input to add comments and update states -->
+            <div class="bg-black/20 p-4 border border-gray-850 rounded-xl space-y-3.5">
+              <span class="text-[10px] font-bold text-violet-300 uppercase tracking-wider block">Thêm Ghi chú xử lý &amp; Cập nhật trạng thái kết toán</span>
+              <div class="flex flex-col md:flex-row gap-4">
+                <textarea id="note-input" rows="2" placeholder="Ghi nhận nguyên nhân lỗi do đối tác trễ giờ cập nhật, đối soát lại chênh lệch số dư thành công..." class="flex-1 bg-black/40 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-200 focus:border-accent ring-0 focus:ring-1 focus:ring-accent outline-none font-sans"></textarea>
                 
-                <div class="flex justify-between items-center text-[10px] font-mono text-gray-500 uppercase tracking-widest px-2 select-none">
-                  <span>Ngày 1</span>
-                  <span>Ngày 10</span>
-                  <span>Ngày 20</span>
-                  <span>Ngày 30</span>
+                <div class="flex flex-row md:flex-col gap-3 justify-between md:justify-start min-w-[200px]">
+                  <div class="space-y-1">
+                    <label class="text-[9px] uppercase font-bold text-gray-500 block">Trạng thái kết toán:</label>
+                    <select id="note-process-status" class="w-full bg-black/60 border border-gray-700 text-xs rounded-lg p-2 text-gray-300 outline-none focus:border-accent font-semibold">
+                      <option value="Đang xử lý">Đang xử lý</option>
+                      <option value="Chờ duyệt">Chờ duyệt</option>
+                      <option value="Đã hoàn thành">Đã hoàn thành</option>
+                    </select>
+                  </div>
+                  <button onclick="handleAddNote()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase px-4 py-2.5 rounded-lg cursor-pointer flex items-center justify-center gap-1.5 transition-all w-full select-none">
+                    <i data-lucide="save" class="w-4 h-4"></i> Cập nhật biên bản
+                  </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <!-- Tab Services Table -->
-              <div id="tab-content-services" class="hidden">
-                <div class="border border-gray-800 rounded-xl overflow-hidden bg-black/10">
-                  <table class="w-full text-left">
-                    <thead>
-                      <tr class="bg-black/30 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
-                        <th class="px-6 py-3">Tên Game (Service)</th>
-                        <th class="px-6 py-3 font-mono">Tổng Giao dịch</th>
-                        <th class="px-6 py-3 text-right">Doanh thu tạm tính</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-850/30 text-xs">
-                      <tr>
-                        <td class="px-6 py-3 font-bold text-gray-200">Free Fire</td>
-                        <td class="px-6 py-3 font-mono text-gray-400">620,124</td>
-                        <td class="px-6 py-3 font-mono font-bold text-cyan-400 text-right pr-6">182,040,000 ₫</td>
-                      </tr>
-                      <tr>
-                        <td class="px-6 py-3 font-bold text-gray-200">Liên Quân Mobile</td>
-                        <td class="px-6 py-3 font-mono text-gray-400">250,288</td>
-                        <td class="px-6 py-3 font-mono font-bold text-cyan-400 text-right pr-6">74,080,000 ₫</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+        <!-- VIEW 3: PARTNER TRANSACTIONS DRILLDOWN TABLE (VIEW 3) -->
+        <div id="view-partner-txs" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <button onclick="switchView('detail')" class="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider cursor-pointer transition-all">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại chi tiết kết toán
+            </button>
+            <span class="text-xs text-cyan-400 font-mono tracking-widest font-black uppercase bg-cyan-950/20 px-2.5 py-1 rounded border border-cyan-800/35" id="drill-report-subtitle">---</span>
+          </div>
 
-              <!-- Tab Packages Table -->
-              <div id="tab-content-packages" class="hidden">
-                <div class="border border-gray-800 rounded-xl overflow-hidden bg-black/10">
-                  <table class="w-full text-left">
-                    <thead>
-                      <tr class="bg-black/30 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
-                        <th class="px-6 py-3">Mã Gói Cước</th>
-                        <th class="px-6 py-3 font-mono">Đăng ký</th>
-                        <th class="px-6 py-3 text-right">Số tiền kết cước</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-850/30 text-xs">
-                      <tr>
-                        <td class="px-6 py-3 font-bold text-gray-200">Gói 7 ngày (FF_7D)</td>
-                        <td class="px-6 py-3 font-mono text-gray-400">312,045</td>
-                        <td class="px-6 py-3 font-mono font-bold text-cyan-400 text-right pr-6">95,840,000 ₫</td>
-                      </tr>
-                      <tr>
-                        <td class="px-6 py-3 font-bold text-gray-200">Gói 30 ngày (FF_30D)</td>
-                        <td class="px-6 py-3 font-mono text-gray-400">558,367</td>
-                        <td class="px-6 py-3 font-mono font-bold text-cyan-400 text-right pr-6">160,280,000 ₫</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          <div>
+            <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Phân hệ tra cứu chi tiết giao dịch gốc</span>
+            <h2 class="text-xl font-extrabold text-white mt-1" id="drill-partner-title">Chi tiết các Giao Dịch: Garena VN</h2>
+          </div>
 
+          <!-- Transaction Filtering inside View 3 -->
+          <div class="bg-card border border-gray-800 p-4 rounded-xl flex items-center flex-wrap gap-4 text-xs font-sans">
+            <div class="flex items-center gap-2">
+              <label class="text-gray-400 uppercase text-[10px] font-bold">Transaction ID:</label>
+              <input type="text" id="drill-filter-txid" onkeyup="renderDrillTable()" placeholder="Nhập mã TXID..." class="bg-black/30 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 outline-none w-44 focus:border-accent font-mono">
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-gray-400 uppercase text-[10px] font-bold">Kết quả đối soát:</label>
+              <select id="drill-filter-match" onchange="renderDrillTable()" class="bg-black/30 border border-gray-700 rounded-lg p-1.5 text-xs text-gray-300 outline-none focus:border-accent">
+                <option value="all">Tất cả tình trạng</option>
+                <option value="Khớp hoàn toàn">Khớp hoàn toàn</option>
+                <option value="Lệch doanh thu">Lệch doanh thu</option>
+                <option value="Lệch số lượng">Lệch số lượng</option>
+                <option value="Chờ xử lý">Chờ xử lý</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-gray-400 uppercase text-[10px] font-bold">API Endpoint:</label>
+              <select id="drill-filter-api" onchange="renderDrillTable()" class="bg-black/30 border border-gray-700 rounded-lg p-1.5 text-xs text-gray-300 outline-none focus:border-accent">
+                <option value="all">Tất cả API</option>
+                <option value="/v1/check-status">/v1/check-status</option>
+                <option value="/v1/register">/v1/register</option>
+                <option value="/v1/balance">/v1/balance</option>
+              </select>
+            </div>
+
+            <button onclick="resetDrillFilters()" class="ml-auto border border-gray-750 text-gray-400 hover:text-white px-3 py-1.5 bg-black/45 rounded-lg flex items-center gap-1 text-xs cursor-pointer transition-all">Đặt lại bộ lọc</button>
+          </div>
+
+          <!-- Summary stats section for view-partner-txs -->
+          <div id="drill-summary-container" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-card border border-gray-800 p-4 rounded-xl flex flex-col justify-between">
+              <span class="text-gray-500 text-[10px] uppercase font-bold tracking-wider block">Tổng giao dịch</span>
+              <p class="text-xl font-black font-mono text-white mt-1" id="drill-summary-total">0 GD</p>
+            </div>
+            <div class="bg-card border border-gray-800 p-4 rounded-xl flex flex-col justify-between">
+              <span class="text-gray-500 text-[10px] uppercase font-bold tracking-wider block">Giao dịch khớp</span>
+              <p class="text-xl font-black font-mono text-green-400 mt-1" id="drill-summary-matched">0 GD</p>
+            </div>
+            <div class="bg-card border border-gray-800 p-4 rounded-xl flex flex-col justify-between">
+              <span class="text-gray-500 text-[10px] uppercase font-bold tracking-wider block">Giao dịch lệch</span>
+              <p class="text-xl font-black font-mono text-red-400 mt-1" id="drill-summary-mismatched">0 GD</p>
+            </div>
+            <div class="bg-card border border-gray-800 p-4 rounded-xl flex flex-col justify-between">
+              <span class="text-gray-500 text-[10px] uppercase font-bold tracking-wider block">Tổng giá trị chênh lệch</span>
+              <p class="text-xl font-black font-mono text-amber-500 mt-1" id="drill-summary-variance">0 ₫</p>
+            </div>
+          </div>
+
+          <!-- Detailed transactions checklist table showing partner and gw discrepancies simultaneously -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="bg-black/20 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-800 select-none">
+                    <th class="px-5 py-4">Mã Giao Dịch (TXID)</th>
+                    <th class="px-5 py-4">Request ID</th>
+                    <th class="px-5 py-4">Thời gian</th>
+                    <th class="px-5 py-4">API thực hiện</th>
+                    <th class="px-5 py-4 text-right">Số tiền GD</th>
+                    <th class="px-5 py-4 text-center">Gateway Status</th>
+                    <th class="px-5 py-4 text-center">Partner Status</th>
+                    <th class="px-5 py-4 text-right text-violet-400 font-bold">Doanh số GW</th>
+                    <th class="px-5 py-4 text-right text-cyan-400 font-bold">Doanh số Partner</th>
+                    <th class="px-5 py-4 text-right text-red-400">Chênh lệch</th>
+                    <th class="px-5 py-4 text-center">Kết quả đối soát</th>
+                    <th class="px-5 py-4 text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="drill-tbody" class="divide-y divide-gray-850/30 text-xs font-semibold text-gray-300">
+                  <!-- JS dynamic templates -->
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
 
       </main>
+
+      <!-- VIEW 4: DOCK SHEET MODAL COMPACT DIALOG -->
+      <div id="tx-drill-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-[#151a22] border border-gray-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden text-xs">
+          <!-- Modal Headers -->
+          <div class="bg-black/40 border-b border-gray-800 px-5 py-4 flex justify-between items-center select-none">
+            <h3 class="font-extrabold text-sm text-gray-100 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse"></span> Đối Chiếu Số Liệu Chi Tiết Giao Dịch
+            </h3>
+            <button onclick="closeDrillModal()" class="text-gray-500 hover:text-white cursor-pointer transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
+          </div>
+
+          <!-- Body specs -->
+          <div class="p-6 space-y-5">
+            <div class="grid grid-cols-2 gap-4 pb-4 border-b border-gray-800/40 font-semibold text-gray-300">
+              <div>
+                <span class="text-gray-500 text-[10px] uppercase font-bold block mb-1">Mã Giao dịch (System ID)</span>
+                <span class="font-mono text-gray-100 text-sm tracking-wide font-black" id="mo-tx-id">---</span>
+              </div>
+              <div>
+                <span class="text-gray-500 text-[10px] uppercase font-bold block mb-1">Thời điểm Ghi nhận log</span>
+                <span class="font-mono text-gray-200" id="mo-tx-time">---</span>
+              </div>
+            </div>
+
+            <div class="space-y-2.5 text-xs font-semibold">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500">API Gateway Endpoint:</span>
+                <span class="font-mono text-cyan-400" id="mo-tx-api">---</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500">Trạng thái ghi nhận phía cổng:</span>
+                <span class="font-sans" id="mo-tx-status">---</span>
+              </div>
+            </div>
+
+            <!-- Side-by-side double values container block -->
+            <div class="bg-black/35 p-4.5 border border-gray-800 rounded-xl space-y-3">
+              <span class="text-[9px] uppercase font-extrabold text-gray-500 block tracking-widest mb-1">Kiểm toán dòng tiền kép</span>
+              
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-400">Doanh thu ghi nhận trên Gateway:</span>
+                <span class="font-mono font-bold text-violet-400" id="mo-val-gw">0 ₫</span>
+              </div>
+
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-400">Doanh thu báo cáo đối tác (Partner):</span>
+                <span class="font-mono font-bold text-cyan-400" id="mo-val-pr">0 ₫</span>
+              </div>
+
+              <div class="border-t border-gray-850 pt-2 flex justify-between items-center text-xs font-black">
+                <span class="text-gray-350">Mức độ lệch thực tế (Variance offset):</span>
+                <span class="font-mono text-red-400 font-extrabold" id="mo-val-diff">0 ₫</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-red-950/15 border border-red-900/30 text-red-400 text-xs rounded-lg font-sans ring-0" id="mo-val-matching-warning">
+              <!-- Warnings injected by Javascript dynamically -->
+            </div>
+          </div>
+
+          <!-- Actions footer with trace transition button -->
+          <div class="bg-black/30 border-t border-gray-800 px-6 py-4 flex flex-wrap gap-4 justify-between items-center">
+            <span class="text-[10px] text-gray-500 font-mono select-none">ID: GameHub-Recon-2.1</span>
+            <div class="flex items-center gap-2">
+              <button onclick="traceTransactionToLogs()" class="bg-violet-950/40 border border-violet-800/40 hover:bg-violet-600 hover:text-white text-violet-400 font-extrabold py-2 px-3.5 rounded-lg flex items-center gap-1.5 cursor-pointer transition-all uppercase tracking-wider text-[10px]">
+                <i data-lucide="terminal" class="w-4 h-4"></i> Xem Log Giao Dịch
+              </button>
+              <button onclick="closeDrillModal()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 py-2 px-4 rounded-lg cursor-pointer transition-all text-[11px] font-bold">Đóng</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
+      // SATEFUL RECONCILIATION DATABASE
+      const reconciliationReports = [
+        {
+          id: "REC-2026-06-15",
+          date: "2026-06-15",
+          partner: "Garena VN",
+          period: "15/06/2026",
+          createDate: "2026-06-16 08:30:00",
+          gatewayTransactions: 870412,
+          partnerTransactions: 870412,
+          gatewayRevenue: 256120000,
+          partnerRevenue: 256120000,
+          varianceValue: 0,
+          varianceRate: 0.00,
+          reconcileStatus: "Khớp",
+          errorRate: 0.12,
+          varianceReason: "Tất cả giao dịch khớp hoàn hảo, đối soát dữ liệu thành công tự động.",
+          varianceType: "Khớp hoàn toàn",
+          influenceLevel: "Không",
+          processStatus: "Đã hoàn thành",
+          notes: [
+            { text: "Hệ thống tự động biên soát thành công, không phát hiện lệch pha.", author: "Khớp tự động (Bot)", time: "2026-06-16 01:00:00" }
+          ],
+          transactions: [
+            { id: "TXN-983015", time: "2026-06-15 10:20:11", api: "/v1/check-status", amount: 50000, status: "Thành công", gwAmount: 50000, prAmount: 50000, diff: 0, matchStatus: "Khớp" },
+            { id: "TXN-983016", time: "2026-06-15 11:45:00", api: "/v1/register", amount: 100000, status: "Thành công", gwAmount: 100000, prAmount: 100000, diff: 0, matchStatus: "Khớp" },
+            { id: "TXN-983017", time: "2026-06-15 14:12:35", api: "/v1/balance", amount: 20000, status: "Thành công", gwAmount: 20000, prAmount: 20000, diff: 0, matchStatus: "Khớp" }
+          ]
+        },
+        {
+          id: "REC-2026-06-16",
+          date: "2026-06-16",
+          partner: "Garena VN",
+          period: "16/06/2026",
+          createDate: "2026-06-17 09:15:00",
+          gatewayTransactions: 421045,
+          partnerTransactions: 421040,
+          gatewayRevenue: 124500000,
+          partnerRevenue: 124150000,
+          varianceValue: 350000,
+          varianceRate: 0.28,
+          reconcileStatus: "Chênh lệch",
+          errorRate: 1.84,
+          varianceReason: "Lệch 5 giao dịch gói Free Fire Diamond lúc 23:58 do sập kết nối kênh Partner.",
+          varianceType: "Thiếu giao dịch trên Partner",
+          influenceLevel: "Thấp",
+          processStatus: "Đang xử lý",
+          notes: [
+            { text: "Đã trích xuất danh sách 5 giao dịch thiếu sang định dạng CSV gửi hỗ trợ kỹ thuật Garena rà soát.", author: "Phạm Minh Thư (Kế toán)", time: "2026-06-17 10:30:00" },
+            { text: "Garena phản hồi đang kiểm tra database backup, hẹn phản hồi cuối giờ.", author: "Trần Thế Khoa (Kế toán)", time: "2026-06-17 14:20:00" }
+          ],
+          transactions: [
+            { id: "TXN-774011", time: "2026-06-16 23:58:10", api: "/v1/register", amount: 100000, status: "Thành công", gwAmount: 100000, prAmount: 0, diff: 100000, matchStatus: "Lệch dữ liệu" },
+            { id: "TXN-774012", time: "2026-06-16 23:58:19", api: "/v1/register", amount: 100000, status: "Thành công", gwAmount: 100000, prAmount: 0, diff: 100000, matchStatus: "Lệch dữ liệu" },
+            { id: "TXN-774013", time: "2026-06-16 23:58:45", api: "/v1/register", amount: 50000, status: "Thành công", gwAmount: 50000, prAmount: 0, diff: 50000, matchStatus: "Lệch dữ liệu" },
+            { id: "TXN-774014", time: "2026-06-16 23:59:01", api: "/v1/register", amount: 100000, status: "Thành công", gwAmount: 100000, prAmount: 0, diff: 100000, matchStatus: "Lệch dữ liệu" },
+            { id: "TXN-885012", time: "2026-06-16 12:30:15", api: "/v1/check-status", amount: 50000, status: "Thành công", gwAmount: 50000, prAmount: 50000, diff: 0, matchStatus: "Khớp" }
+          ]
+        },
+        {
+          id: "REC-2026-06-17",
+          date: "2026-06-17",
+          partner: "VNG Corp",
+          period: "17/06/2026",
+          createDate: "2026-06-18 08:30:00",
+          gatewayTransactions: 401920,
+          partnerTransactions: 401920,
+          gatewayRevenue: 120440000,
+          partnerRevenue: 120540000,
+          varianceValue: -100000,
+          varianceRate: 0.08,
+          reconcileStatus: "Chênh lệch",
+          errorRate: 0.45,
+          varianceReason: "Sai chiết khấu tỷ lệ ưu đãi đối với gói độc quyền Liên Quân ngày vàng.",
+          varianceType: "Lệch doanh thu/Tỷ giá chiết khấu",
+          influenceLevel: "Thấp",
+          processStatus: "Chờ duyệt",
+          notes: [
+            { text: "Xác minh lệch 100,000đ do đại lý khuyến mãi sai cổng nạp VIP của VNG.", author: "Nguyễn Văn Đạt (Kế toán)", time: "2026-06-18 09:00:00" }
+          ],
+          transactions: [
+            { id: "TXN-661023", time: "2026-06-17 11:20:14", api: "/v1/balance", amount: 200000, status: "Thành công", gwAmount: 100000, prAmount: 200000, diff: -100000, matchStatus: "Lệch dữ liệu" },
+            { id: "TXN-661024", time: "2026-06-17 15:40:02", api: "/v1/check-status", amount: 50000, status: "Thành công", gwAmount: 50000, prAmount: 50000, diff: 0, matchStatus: "Khớp" }
+          ]
+        },
+        {
+          id: "REC-2026-06-18",
+          date: "2026-06-18",
+          partner: "Krafton VN",
+          period: "18/06/2026",
+          createDate: "2026-06-19 09:05:00",
+          gatewayTransactions: 120105,
+          partnerTransactions: 120105,
+          gatewayRevenue: 25890000,
+          partnerRevenue: 25890000,
+          varianceValue: 0,
+          varianceRate: 0.00,
+          reconcileStatus: "Khớp",
+          errorRate: 0.05,
+          varianceReason: "Khớp hoàn toàn hạ tầng cổng nạp thẻ PUBG Mobile, không lệch dòng tiền.",
+          varianceType: "Khớp hoàn toàn",
+          influenceLevel: "Không",
+          processStatus: "Đã hoàn thành",
+          notes: [
+            { text: "Đối soát tự động thành công.", author: "Khớp tự động (Bot)", time: "2026-06-19 01:05:00" }
+          ],
+          transactions: [
+            { id: "TXN-554091", time: "2026-06-18 10:15:30", api: "/v1/balance", amount: 150000, status: "Thành công", gwAmount: 150000, prAmount: 150000, diff: 0, matchStatus: "Khớp" }
+          ]
+        },
+        {
+          id: "REC-2026-06-19",
+          date: "2026-06-19",
+          partner: "Moonton VN",
+          period: "19/06/2026",
+          createDate: "2026-06-20 08:00:00",
+          gatewayTransactions: 4124,
+          partnerTransactions: 4124,
+          gatewayRevenue: 900000,
+          partnerRevenue: 900000,
+          varianceValue: 0,
+          varianceRate: 0.00,
+          reconcileStatus: "Khớp",
+          errorRate: 0.15,
+          varianceReason: "Dữ liệu lượng giao dịch Mobile Legends nhỏ, khớp hoàn chỉnh tự động.",
+          varianceType: "Khớp hoàn toàn",
+          influenceLevel: "Không",
+          processStatus: "Đã hoàn thành",
+          notes: [],
+          transactions: [
+            { id: "TXN-331002", time: "2026-06-19 14:15:00", api: "/v1/check-status", amount: 20000, status: "Thành công", gwAmount: 20000, prAmount: 20000, diff: 0, matchStatus: "Khớp" }
+          ]
+        },
+        {
+          id: "REC-2026-06-20",
+          date: "2026-06-20",
+          partner: "Moonton VN",
+          period: "20/06/2026",
+          createDate: "2026-06-21 09:30:00",
+          gatewayTransactions: 5542,
+          partnerTransactions: 5540,
+          gatewayRevenue: 1250000,
+          partnerRevenue: 1220000,
+          varianceValue: 30000,
+          varianceRate: 2.40,
+          reconcileStatus: "Đang đối soát",
+          errorRate: 3.12,
+          varianceReason: "Tình nghi lệch 2 giao dịch do độ lệch múi giờ và thời gian đối soát tự động chưa kết thúc.",
+          varianceType: "Sai lệch thời điểm ghi nhận transaction",
+          influenceLevel: "Thấp",
+          processStatus: "Đang xử lý",
+          notes: [
+            { text: "Bắt đầu khởi chạy chiến dịch rà soát dòng tiền kép thủ công.", author: "Hệ thống tự động", time: "2026-06-21 02:00:00" }
+          ],
+          transactions: [
+            { id: "TXN-221011", time: "2026-06-20 23:59:58", api: "/v1/balance", amount: 20000, status: "Thành công", gwAmount: 20000, prAmount: 0, diff: 20000, matchStatus: "Lệch dữ liệu" },
+            { id: "TXN-221012", time: "2026-06-20 23:59:59", api: "/v1/balance", amount: 10000, status: "Thành công", gwAmount: 10000, prAmount: 0, diff: 10000, matchStatus: "Lệch dữ liệu" }
+          ]
+        }
+      ];
+
+      // GLOBAL APLET STATES
+      let selectedReport = null;
+      let currentPage = 1;
+      const itemsPerPage = 5;
+      let selectedDrillTx = null;
+
       function init() {
         lucide.createIcons();
-      }
-
-      function switchView(view) {
-        if (view === 'summary') {
-          document.getElementById('view-summary').classList.remove('hidden');
-          document.getElementById('view-detail').classList.add('hidden');
-        } else {
-          document.getElementById('view-summary').classList.add('hidden');
-          document.getElementById('view-detail').classList.remove('hidden');
+        renderSummaryTable();
+        // Check url search parameters (if any traceback requested by other pages)
+        const urlParams = new URLSearchParams(window.location.search);
+        const reportId = urlParams.get('reportId');
+        if (reportId) {
+          const report = reconciliationReports.find(r => r.id === reportId);
+          if (report) {
+            inspectReport(reportId);
+          }
         }
       }
 
-      // Inspect details
-      function inspectReport(partner, revenue) {
-        document.getElementById('det-title-partner').textContent = `Đối tác: ${partner}`;
-        document.getElementById('det-revenue-value').textContent = `${revenue} ₫`;
-        
-        switchView('detail');
-        switchTab('daily');
+      function switchView(view) {
+        document.getElementById('view-summary').classList.add('hidden');
+        document.getElementById('view-detail').classList.add('hidden');
+        document.getElementById('view-partner-txs').classList.add('hidden');
+
+        if (view === 'summary') {
+          document.getElementById('view-summary').classList.remove('hidden');
+        } else if (view === 'detail') {
+          document.getElementById('view-detail').classList.remove('hidden');
+        } else if (view === 'partner-txs') {
+          document.getElementById('view-partner-txs').classList.remove('hidden');
+        }
+        lucide.createIcons();
       }
 
-      // Switch Tab inside Details view
-      function switchTab(tabId) {
-        const tabs = ['daily', 'services', 'packages'];
-        tabs.forEach(t => {
-          document.getElementById(`tab-content-${t}`).classList.add('hidden');
-          const btn = document.getElementById(`tab-btn-${t}`);
-          btn.className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent";
+      // 1.5.1 TOTAL RECONCILIATIONS SUMMARY RENDERER
+      function renderSummaryTable() {
+        const partnerVal = document.getElementById('filter-partner').value;
+        const statusVal = document.getElementById('filter-status').value;
+        const startDate = document.getElementById('filter-start-date').value;
+        const endDate = document.getElementById('filter-end-date').value;
+
+        // Perform multi-filtering logic
+        const filtered = reconciliationReports.filter(item => {
+          if (partnerVal !== 'all' && item.partner !== partnerVal) return false;
+          if (statusVal !== 'all' && item.reconcileStatus !== statusVal) return false;
+          
+          if (startDate) {
+            if (item.date < startDate) return false;
+          }
+          if (endDate) {
+            if (item.date > endDate) return false;
+          }
+          return true;
         });
 
-        document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
-        document.getElementById(`tab-btn-${tabId}`).className = "px-6 py-4 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300";
-      }
+        // Compute and inject the high utility overview tiles
+        renderSummaryStats(filtered);
 
-      // Export handler
-      function triggerExport(type) {
-        showToast('success', `✅ Xuất báo cáo ${type} thành công! Tập tin đang được chuẩn bị tải xuống.`);
-      }
+        // Paginate filtered array
+        const totalItems = filtered.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
 
-      function applyFilters() {
-        showToast('info', 'Lọc và tải kết toán thông số.');
-      }
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedItems = filtered.slice(startIndex, startIndex + itemsPerPage);
 
-      // TOASTS HELPER
-      function showToast(type, text) {
-        const container = document.getElementById('toast-container');
-        const id = 'toast-' + Math.random().toString(36).substr(2, 9);
+        // Render rows
+        const tbody = document.getElementById('summary-tbody');
+        tbody.innerHTML = '';
 
-        let iconColor = type === 'success' ? 'text-green-400' : 'text-cyan-400';
-        let iconName = type === 'success' ? 'check-circle' : 'info';
+        if (paginatedItems.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="10" class="px-5 py-12 text-center text-gray-500 font-medium font-sans">
+                <p>Không tìm thấy biên bản kết toán đối soát nào phù hợp với bộ lọc hiện tại.</p>
+              </td>
+            </tr>
+          `;
+          document.getElementById('summary-pagination-status').textContent = 'Hiển thị 0 của 0 kết toán';
+          document.getElementById('summary-pagination-controls').innerHTML = '';
+          return;
+        }
 
-        const toastHtml = `
-          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
-            <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
-            <span class="text-gray-200 font-medium">${text}</span>
-          </div>
+        paginatedItems.forEach(item => {
+          // Format metrics
+          const diffVal = item.gatewayRevenue - item.partnerRevenue;
+          const absDiff = Math.abs(diffVal);
+          const diffStr = diffVal === 0 ? "0 ₫" : (diffVal > 0 ? `+${absDiff.toLocaleString('vi-VN')} ₫` : `-${absDiff.toLocaleString('vi-VN')} ₫`);
+          const diffColor = diffVal === 0 ? "text-green-400" : (diffVal > 0 ? "text-orange-400" : "text-red-400 font-extrabold");
+          
+          let statusBadge = "";
+          if (item.reconcileStatus === "Khớp") {
+            statusBadge = `
+              <span class="bg-green-500/10 text-green-400 border border-green-500/20 py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                ● Khớp
+              </span>
+            `;
+          } else if (item.reconcileStatus === "Chênh lệch") {
+            statusBadge = `
+              <span class="bg-red-500/10 text-red-400 border border-red-500/20 py-1 px-2.5 rounded-full text-[10px] font-black uppercase tracking-wider">
+                ● Lệch số
+              </span>
+            `;
+          } else {
+            statusBadge = `
+              <span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider animate-pulse">
+                ● Đang chạy
+              </span>
+            `;
+          }
+
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-gray-800/15 transition-all text-xs font-semibold";
+          tr.innerHTML = `
+            <td class="px-5 py-4 font-mono text-gray-400 select-none">${item.period}</td>
+            <td class="px-5 py-4 font-extrabold text-white font-sans">${item.partner}</td>
+            <td class="px-5 py-4 text-center font-mono text-gray-300">${item.gatewayTransactions.toLocaleString('vi-VN')}</td>
+            <td class="px-5 py-4 text-center font-mono text-gray-400">${item.partnerTransactions.toLocaleString('vi-VN')}</td>
+            <td class="px-5 py-4 text-right font-mono text-gray-200">${item.gatewayRevenue.toLocaleString('vi-VN')} ₫</td>
+            <td class="px-5 py-4 text-right font-mono text-gray-300">${item.partnerRevenue.toLocaleString('vi-VN')} ₫</td>
+            <td class="px-5 py-4 text-right font-mono ${diffColor}">${diffStr}</td>
+            <td class="px-5 py-4 text-center font-mono">${item.varianceRate > 0 ? `${item.varianceRate}%` : '0.00%'}</td>
+            <td class="px-5 py-4 text-center select-none">${statusBadge}</td>
+            <td class="px-5 py-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <button onclick="inspectReport('${item.id}')" class="bg-violet-600/15 hover:bg-violet-600 border border-violet-500/30 hover:text-white text-violet-400 font-extrabold text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-md cursor-pointer transition-all select-none">Xem chi tiết</button>
+                <button onclick="triggerExport('Đối Soát ${item.partner} ${item.period}')" class="border border-gray-700 hover:bg-gray-800 text-gray-400 hover:text-white p-1.5 rounded cursor-pointer transition-all" title="Xuất báo cáo"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Update pagination numbers
+        const lastIndex = Math.min(startIndex + itemsPerPage, totalItems);
+        document.getElementById('summary-pagination-status').textContent = `Hiển thị ${startIndex + 1} - ${lastIndex} của ${totalItems} kết toán đối soát`;
+
+        // Draw pagination controls
+        const controls = document.getElementById('summary-pagination-controls');
+        controls.innerHTML = `
+          <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-2.5 py-1.5 border border-gray-800 text-gray-400 hover:text-white rounded bg-card cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold font-sans">‹ Trước</button>
         `;
 
-        container.insertAdjacentHTML('beforeend', toastHtml);
+        for (let p = 1; p <= totalPages; p++) {
+          const isActive = p === currentPage;
+          controls.innerHTML += `
+            <button onclick="changePage(${p})" class="px-3 py-1.5 border ${isActive ? 'border-violet-500 bg-violet-600/10 text-violet-400 font-bold' : 'border-gray-800 text-gray-400 bg-card'} hover:text-white rounded text-xs cursor-pointer">${p}</button>
+          `;
+        }
+
+        controls.innerHTML += `
+          <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-2.5 py-1.5 border border-gray-800 text-gray-400 hover:text-white rounded bg-card cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold font-sans">Sau ›</button>
+        `;
         lucide.createIcons();
-
-        setTimeout(() => {
-          const el = document.getElementById(id);
-          if (el) el.classList.remove('translate-y-2', 'opacity-0');
-        }, 10);
-
-        setTimeout(() => {
-          const el = document.getElementById(id);
-          if (el) {
-            el.classList.add('opacity-0', 'translate-y-[-4px]');
-            setTimeout(() => el.remove(), 300);
-          }
-        }, 3000);
       }
 
+      function changePage(page) {
+        if (page < 1) return;
+        currentPage = page;
+        renderSummaryTable();
+      }
+
+      // CALCULATES RECONCILIATIONS OVERVIEW STATISTICS TILES (1.5.1 Requirements)
+      function renderSummaryStats(filteredArray) {
+        const statsContainer = document.getElementById('summary-stats-cards');
+        
+        let successMatches = 0;
+        let mismatchCount = 0;
+        let ongoingCount = 0;
+        
+        let totalGwTxs = 0;
+        let totalPrTxs = 0;
+
+        let totalGwRevenue = 0;
+        let totalPrRevenue = 0;
+
+        let totalErrorRate = 0;
+
+        filteredArray.forEach(item => {
+          totalGwTxs += item.gatewayTransactions;
+          totalPrTxs += item.partnerTransactions;
+          totalGwRevenue += item.gatewayRevenue;
+          totalPrRevenue += item.partnerRevenue;
+          totalErrorRate += item.errorRate;
+
+          if (item.reconcileStatus === 'Khớp') successMatches++;
+          else if (item.reconcileStatus === 'Chênh lệch') mismatchCount++;
+          else ongoingCount++;
+        });
+
+        const avgErrorRate = (filteredArray.length > 0 ? (totalErrorRate / filteredArray.length) : 0).toFixed(2);
+
+        statsContainer.innerHTML = `
+          <!-- CARD 1: RECONCILIATION OVERVIEW STATUS COUNTER -->
+          <div class="bg-card border border-gray-800 p-5 rounded-xl flex flex-col justify-between">
+            <span class="text-[9px] text-gray-500 uppercase font-black tracking-wider block mb-1">Trạng Thái Kỳ Đối Soát</span>
+            <div>
+              <div class="flex items-center gap-1.5 mt-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                <span class="text-xs text-gray-300">Khớp hoàn toàn:</span>
+                <span class="font-mono text-xs font-bold text-green-400 ml-auto">${successMatches}</span>
+              </div>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                <span class="text-xs text-gray-300">Có chênh lệch:</span>
+                <span class="font-mono text-xs font-bold text-red-400 ml-auto">${mismatchCount}</span>
+              </div>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                <span class="text-xs text-gray-300">Trong tiến trình:</span>
+                <span class="font-mono text-xs font-bold text-blue-400 ml-auto">${ongoingCount}</span>
+              </div>
+            </div>
+            <span class="text-[9px] text-gray-500 font-sans mt-3">Đóng sổ kết toán theo ngày</span>
+          </div>
+
+          <!-- CARD 2: DOUBLE-ENTRY TRANSACTION COUNT STATS -->
+          <div class="bg-card border border-gray-800 p-5 rounded-xl">
+            <span class="text-[9px] text-gray-500 uppercase font-black tracking-wider block mb-2">Thống Kê Tổng Lượng Giao Dịch</span>
+            <p class="text-2xl font-black font-mono tracking-tight text-white mb-1.5">${totalGwTxs.toLocaleString('vi-VN')}</p>
+            <div class="space-y-1.5 text-[10px] text-gray-400 border-t border-gray-800/40 pt-2 font-sans font-semibold">
+              <div class="flex justify-between">
+                <span>Tại Gateway:</span>
+                <span class="font-mono font-bold text-gray-300">${totalGwTxs.toLocaleString('vi-VN')} GD</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Từ Đối tác (Partner):</span>
+                <span class="font-mono font-bold text-gray-300">${totalPrTxs.toLocaleString('vi-VN')} GD</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 3: RECONCILIATIONS REVENUE COUNT STATS -->
+          <div class="bg-card border border-gray-800 p-5 rounded-xl">
+            <span class="text-[9px] text-gray-500 uppercase font-black tracking-wider block mb-2">Thống Kê Tổng Doanh Thu Kỳ</span>
+            <p class="text-xl font-extrabold font-mono tracking-tight text-cyan-400 mb-1.5">${totalGwRevenue.toLocaleString('vi-VN')} ₫</p>
+            <div class="space-y-1.5 text-[10px] text-gray-400 border-t border-gray-800/40 pt-2 font-sans font-semibold">
+              <div class="flex justify-between">
+                <span>Doanh Thu Gateway:</span>
+                <span class="font-mono font-bold text-gray-300">${totalGwRevenue.toLocaleString('vi-VN')} ₫</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Doanh Thu Partner:</span>
+                <span class="font-mono font-bold text-gray-300">${totalPrRevenue.toLocaleString('vi-VN')} ₫</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 4: OVERVIEW TECHNICAL INDEX -->
+          <div class="bg-card border border-gray-800 p-5 rounded-xl flex flex-col justify-between">
+            <div>
+              <span class="text-[9px] text-gray-500 uppercase font-black tracking-wider block mb-1">Chỉ Số Kỹ Thuật Hệ Thống</span>
+              <p class="text-2xl font-black font-mono text-red-500/90 tracking-tight mt-1.5">${avgErrorRate}%</p>
+            </div>
+            <div class="text-[9.5px] text-gray-400 mt-2 font-sans font-semibold">
+              Tỷ lệ lỗi API trung bình của cổng trong các kỳ đối soát hiện tại.
+            </div>
+          </div>
+        `;
+      }
+
+      // 1.5.2 AUDIT DETAILS LANDING PAGE RENDERER
+      function inspectReport(id) {
+        const report = reconciliationReports.find(r => r.id === id);
+        if (!report) return;
+
+        selectedReport = report;
+
+        // Title and dates mapping
+        document.getElementById('det-header-title').textContent = `Đối tác: ${report.partner}`;
+        document.getElementById('det-header-period').textContent = report.period;
+        document.getElementById('det-header-date').textContent = report.createDate;
+
+        // Badges mapping
+        const badgeContainer = document.getElementById('det-header-status-badge');
+        if (report.reconcileStatus === 'Khớp') {
+          badgeContainer.innerHTML = `
+            <span class="bg-green-500/10 text-green-400 border border-green-500/20 py-1.5 px-3 rounded-full text-xs font-black uppercase tracking-wider select-none">
+              ● Khớp Hoàn Toàn 
+            </span>
+          `;
+        } else if (report.reconcileStatus === 'Chênh lệch') {
+          badgeContainer.innerHTML = `
+            <span class="bg-red-500/10 text-red-400 border border-red-500/20 py-1.5 px-3 rounded-full text-xs font-black uppercase tracking-wider select-none animate-pulse">
+              ⚠️ Có Chênh Lệch Dữ Liệu
+            </span>
+          `;
+        } else {
+          badgeContainer.innerHTML = `
+            <span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 py-1.5 px-3 rounded-full text-xs font-black uppercase tracking-wider select-none">
+              ⚙️ Đang Chạy Đối Soát
+            </span>
+          `;
+        }
+
+        // Metrics mappings
+        document.getElementById('det-metrics-gw-txs').textContent = report.gatewayTransactions.toLocaleString('vi-VN');
+        document.getElementById('det-metrics-pr-txs').textContent = report.partnerTransactions.toLocaleString('vi-VN');
+        
+        const txDiff = report.gatewayTransactions - report.partnerTransactions;
+        const txDiffTxt = txDiff === 0 ? "0 GD" : (txDiff > 0 ? `+${txDiff} GD` : `${txDiff} GD`);
+        const txDiffEl = document.getElementById('det-metrics-diff-txs');
+        txDiffEl.textContent = txDiffTxt;
+        if (txDiff === 0) txDiffEl.className = "font-mono font-bold text-green-400";
+        else txDiffEl.className = "font-mono font-bold text-red-400 font-black";
+
+        document.getElementById('det-metrics-gw-rev').textContent = `${report.gatewayRevenue.toLocaleString('vi-VN')} ₫`;
+        document.getElementById('det-metrics-pr-rev').textContent = `${report.partnerRevenue.toLocaleString('vi-VN')} ₫`;
+        
+        const revDiffVal = report.gatewayRevenue - report.partnerRevenue;
+        const absRevDiff = Math.abs(revDiffVal);
+        const revDiffTxt = revDiffVal === 0 ? "0 ₫" : (revDiffVal > 0 ? `+${absRevDiff.toLocaleString('vi-VN')} ₫` : `-${absRevDiff.toLocaleString('vi-VN')} ₫`);
+        const revDiffEl = document.getElementById('det-metrics-diff-rev');
+        revDiffEl.textContent = revDiffTxt;
+        if (revDiffVal === 0) revDiffEl.className = "font-mono font-bold text-green-400";
+        else revDiffEl.className = "font-mono font-bold text-red-400 font-extrabold";
+
+        document.getElementById('det-metrics-rate').textContent = `${report.varianceRate.toFixed(2)}%`;
+        document.getElementById('det-metrics-err').textContent = `${report.errorRate.toFixed(2)}%`;
+
+        // Proportion micro scales meters
+        let totalRevCombine = report.gatewayRevenue + report.partnerRevenue;
+        let gwPercent = totalRevCombine > 0 ? (report.gatewayRevenue / totalRevCombine) * 100 : 50;
+        let prPercent = totalRevCombine > 0 ? (report.partnerRevenue / totalRevCombine) * 100 : 50;
+        document.getElementById('det-prop-gw').style.width = `${gwPercent}%`;
+        document.getElementById('det-prop-pr').style.width = `${prPercent}%`;
+
+        // 1.5.2 Variance diagnostic analysis indicators mapping
+        document.getElementById('ana-reason').textContent = report.varianceReason;
+        document.getElementById('ana-type').textContent = report.varianceType;
+        
+        const anaLevelEl = document.getElementById('ana-level');
+        anaLevelEl.textContent = report.influenceLevel;
+        if (report.influenceLevel === 'Không') {
+          anaLevelEl.className = 'text-green-400 font-bold mt-1 text-xs';
+        } else if (report.influenceLevel === 'Thấp') {
+          anaLevelEl.className = 'text-yellow-400 font-bold mt-1 text-xs';
+        } else {
+          anaLevelEl.className = 'text-red-400 font-black mt-1 text-xs';
+        }
+
+        const anaStatusEl = document.getElementById('ana-status');
+        anaStatusEl.textContent = report.processStatus;
+        if (report.processStatus === 'Đã hoàn thành') {
+          anaStatusEl.className = 'text-green-400 font-bold mt-1 text-xs';
+        } else if (report.processStatus === 'Chờ duyệt') {
+          anaStatusEl.className = 'text-amber-400 font-bold mt-1 text-xs';
+        } else {
+          anaStatusEl.className = 'text-cyan-400 font-bold mt-1 text-xs animate-pulse';
+        }
+
+        // Draw micro SVG graphical bars (Reconcile values visualization)
+        document.getElementById('chart-gw-rev-txt').textContent = `${report.gatewayRevenue.toLocaleString('vi-VN')} ₫`;
+        document.getElementById('chart-pr-rev-txt').textContent = `${report.partnerRevenue.toLocaleString('vi-VN')} ₫`;
+        
+        const maxRevenueInDatabase = 300000000;
+        let chartGwWidth = Math.min((report.gatewayRevenue / maxRevenueInDatabase) * 100, 100);
+        let chartPrWidth = Math.min((report.partnerRevenue / maxRevenueInDatabase) * 100, 100);
+        
+        let chartVarWidth = report.varianceRate > 0 ? Math.min((report.varianceRate / 5) * 100, 100) : 0;
+        document.getElementById('chart-variance-txt').textContent = `${report.varianceRate.toFixed(2)}%`;
+
+        setTimeout(() => {
+          document.getElementById('chart-gw-rev-bar').style.width = `${chartGwWidth}%`;
+          document.getElementById('chart-pr-rev-bar').style.width = `${chartPrWidth}%`;
+          document.getElementById('chart-variance-bar').style.width = `${chartVarWidth}%`;
+        }, 150);
+
+        // Timeline processing logs updates
+        renderNotesLogs();
+
+        // Switch panel smoothly
+        switchView('detail');
+      }
+
+      function renderNotesLogs() {
+        const container = document.getElementById('det-notes-container');
+        container.innerHTML = '';
+
+        if (!selectedReport.notes || selectedReport.notes.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-4 text-gray-500 font-sans italic">
+              Không ghi nhận bất kỳ lịch sử bổ túc ý kiến hay trao đổi nào trên kỳ này.
+            </div>
+          `;
+          return;
+        }
+
+        selectedReport.notes.forEach(note => {
+          container.innerHTML += `
+            <div class="bg-black/15 border border-gray-800/60 p-3 rounded-lg flex flex-col gap-1 font-sans">
+              <div class="flex items-center gap-1.5 text-[10px] text-gray-500 select-none">
+                <i data-lucide="user" class="w-3.5 h-3.5 text-violet-400"></i>
+                <span class="font-extrabold text-gray-300">${note.author}</span>
+                <span>&middot;</span>
+                <span class="font-mono">${note.time}</span>
+              </div>
+              <p class="text-[11.5px] text-gray-200 mt-1 leading-relaxed font-medium">${note.text}</p>
+            </div>
+          `;
+        });
+        lucide.createIcons();
+      }
+
+      // ACCEPTS ACTIONS TO APPEND NOTE IN METADATA TIMELINE
+      function handleAddNote() {
+        const input = document.getElementById('note-input');
+        const text = input.value.trim();
+        if (!text) {
+          showToast('error', 'Vui lòng nhập nội dung biên bản ghi chú');
+          return;
+        }
+
+        const newStatus = document.getElementById('note-process-status').value;
+        
+        // Append
+        const formattedTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
+        selectedReport.notes.push({
+          text: text,
+          author: "Admin System (You)",
+          time: formattedTime
+        });
+
+        // Set state values
+        selectedReport.processStatus = newStatus;
+        if (newStatus === "Đã hoàn thành") {
+          selectedReport.reconcileStatus = "Khớp";
+        }
+
+        // Reset
+        input.value = '';
+        
+        // Re-render Views details
+        inspectReport(selectedReport.id);
+        renderSummaryTable();
+        showToast('success', '✅ Đã lưu trữ ghi chú & cập nhật trạng thái kết toán thành công!');
+      }
+
+      // 1.5.3 DETAILED TRANSACTIONS LIST DRILLDOWN SUB-FLOW (VIEW 3)
+      function inspectPartnerTransactions() {
+        document.getElementById('drill-partner-title').textContent = `Chi tiết các Giao Dịch: ${selectedReport.partner}`;
+        document.getElementById('drill-report-subtitle').textContent = `KỲ HỒ SƠ: ${selectedReport.id}`;
+
+        resetDrillFiltersFields();
+        renderDrillTable();
+        switchView('partner-txs');
+      }
+
+      function resetDrillFiltersFields() {
+        document.getElementById('drill-filter-txid').value = '';
+        document.getElementById('drill-filter-match').value = 'all';
+        document.getElementById('drill-filter-api').value = 'all';
+      }
+
+      function getReconciliationResult(tx, report) {
+        if (tx.gwAmount === tx.prAmount) {
+          return "Khớp hoàn toàn";
+        }
+        if (report && (report.reconcileStatus === "Đang đối soát" || report.id === "REC-2026-06-20")) {
+          return "Chờ xử lý";
+        }
+        if (tx.gwAmount === 0 || tx.prAmount === 0) {
+          return "Lệch số lượng";
+        }
+        return "Lệch doanh thu";
+      }
+
+      function renderDrillTable() {
+        const txIdSearch = document.getElementById('drill-filter-txid').value.trim().toUpperCase();
+        const matchSearch = document.getElementById('drill-filter-match').value;
+        const apiSearch = document.getElementById('drill-filter-api').value;
+
+        // Render the top summary panel statistics
+        let totalCount = 0;
+        let matchedCount = 0;
+        let mismatchedCount = 0;
+        let totalVariance = 0;
+
+        if (selectedReport && selectedReport.transactions) {
+          totalCount = selectedReport.transactions.length;
+          selectedReport.transactions.forEach(tx => {
+            const isMatch = tx.gwAmount === tx.prAmount;
+            if (isMatch) {
+              matchedCount++;
+            } else {
+              mismatchedCount++;
+              totalVariance += Math.abs(tx.gwAmount - tx.prAmount);
+            }
+          });
+        }
+
+        // Output summary calculations to DOM elements
+        document.getElementById('drill-summary-total').textContent = totalCount.toLocaleString('vi-VN') + " GD";
+        document.getElementById('drill-summary-matched').textContent = matchedCount.toLocaleString('vi-VN') + " GD";
+        document.getElementById('drill-summary-mismatched').textContent = mismatchedCount.toLocaleString('vi-VN') + " GD";
+        document.getElementById('drill-summary-variance').textContent = totalVariance.toLocaleString('vi-VN') + " ₫";
+
+        const tbody = document.getElementById('drill-tbody');
+        tbody.innerHTML = '';
+
+        if (!selectedReport.transactions || selectedReport.transactions.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="12" class="px-5 py-8 text-center text-gray-500 font-sans">
+                Không ghi nhận giao dịch nạp kết cước nào trên biên bản này.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        const filteredTx = selectedReport.transactions.filter(item => {
+          if (txIdSearch && !item.id.toUpperCase().includes(txIdSearch)) return false;
+          if (apiSearch !== 'all' && item.api !== apiSearch) return false;
+          if (matchSearch !== 'all') {
+            const resStatus = getReconciliationResult(item, selectedReport);
+            if (resStatus !== matchSearch) return false;
+          }
+          return true;
+        });
+
+        if (filteredTx.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="12" class="px-5 py-8 text-center text-gray-500 font-sans">
+                Không có giao dịch đối soát trùng khớp bộ lọc tra cứu.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filteredTx.forEach(tx => {
+          const isMatch = tx.gwAmount === tx.prAmount;
+          const statusText = getReconciliationResult(tx, selectedReport);
+          
+          let statusBadge = "";
+          if (statusText === "Khớp hoàn toàn") {
+            statusBadge = `<span class="bg-green-500/10 text-green-400 py-0.5 px-2.5 rounded-full border border-green-500/20 text-[10px] uppercase font-bold">Khớp hoàn toàn</span>`;
+          } else if (statusText === "Lệch doanh thu") {
+            statusBadge = `<span class="bg-amber-500/10 text-amber-400 py-0.5 px-2.5 rounded-full border border-amber-500/20 text-[10px] uppercase font-bold">Lệch doanh thu</span>`;
+          } else if (statusText === "Lệch số lượng") {
+            statusBadge = `<span class="bg-red-500/10 text-red-500 py-0.5 px-2.5 rounded-full border border-red-500/20 text-[10px] uppercase font-bold animate-pulse">Lệch số lượng</span>`;
+          } else {
+            statusBadge = `<span class="bg-blue-500/10 text-blue-400 py-0.5 px-2.5 rounded-full border border-blue-500/20 text-[10px] uppercase font-bold">Chờ xử lý</span>`;
+          }
+
+          const diffVal = tx.gwAmount - tx.prAmount;
+          const absDiff = Math.abs(diffVal);
+          const diffStr = diffVal === 0 ? "0 ₫" : `${diffVal > 0 ? `+` : `-`}${absDiff.toLocaleString('vi-VN')} ₫`;
+          const diffColor = diffVal === 0 ? "text-green-400" : "text-red-400 font-extrabold";
+
+          // Generate a premium fake request id sequence if not explicitly set 
+          const requestId = tx.reqId || tx.id.replace('TXN', 'REQ') + 'AB9';
+
+          // Gateway Status and Partner Status columns render logic
+          const gwStatusBadge = `<span class="py-0.5 px-2 rounded-full text-[10px] font-bold bg-green-950/20 text-green-400 border border-green-900/30">SUCCESS</span>`;
+          
+          let partnerStatusBadge = "";
+          if (tx.prAmount > 0) {
+            partnerStatusBadge = `<span class="py-0.5 px-2 rounded-full text-[10px] font-bold bg-green-950/20 text-green-400 border border-green-900/30">SUCCESS</span>`;
+          } else {
+            if (selectedReport && (selectedReport.reconcileStatus === "Đang đối soát" || selectedReport.id === "REC-2026-06-20")) {
+              partnerStatusBadge = `<span class="py-0.5 px-2 rounded-full text-[10px] font-bold bg-yellow-950/20 text-yellow-400 border border-yellow-900/30">PENDING</span>`;
+            } else {
+              partnerStatusBadge = `<span class="py-0.5 px-2 rounded-full text-[10px] font-bold bg-red-950/20 text-red-400 border border-red-900/30">MISSING</span>`;
+            }
+          }
+
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-gray-800/15 transition-all text-xs border-b border-gray-850/20";
+          tr.innerHTML = `
+            <td class="px-5 py-3 font-mono font-bold text-gray-100 select-all">${tx.id}</td>
+            <td class="px-5 py-3 font-mono text-gray-400 font-semibold select-all">${requestId}</td>
+            <td class="px-5 py-3 font-mono text-gray-400">${tx.time}</td>
+            <td class="px-5 py-3 font-mono text-cyan-400">${tx.api}</td>
+            <td class="px-5 py-3 text-right font-mono text-gray-200">${tx.amount.toLocaleString('vi-VN')} ₫</td>
+            <td class="px-5 py-3 text-center select-none">${gwStatusBadge}</td>
+            <td class="px-5 py-3 text-center select-none">${partnerStatusBadge}</td>
+            <td class="px-5 py-3 text-right font-mono text-violet-400">${tx.gwAmount.toLocaleString('vi-VN')} ₫</td>
+            <td class="px-5 py-3 text-right font-mono text-cyan-400">${tx.prAmount.toLocaleString('vi-VN')} ₫</td>
+            <td class="px-5 py-3 text-right font-mono ${diffColor}">${diffStr}</td>
+            <td class="px-5 py-3 text-center select-none">${statusBadge}</td>
+            <td class="px-5 py-3 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <button onclick="traceDirectly('${tx.id}')" class="bg-violet-600/20 hover:bg-violet-600 border border-violet-500/30 hover:text-white text-violet-400 font-bold text-[11px] uppercase py-1.5 px-3 rounded transition-all cursor-pointer flex items-center gap-1">
+                  <i data-lucide="terminal" class="w-3.5 h-3.5"></i> Xem Log
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+        lucide.createIcons();
+      }
+
+      function resetFilters() {
+        document.getElementById('filter-partner').value = 'all';
+        document.getElementById('filter-status').value = 'all';
+        document.getElementById('filter-start-date').value = '2026-06-15';
+        document.getElementById('filter-end-date').value = '2026-06-25';
+        currentPage = 1;
+        renderSummaryTable();
+        showToast('info', 'Đã đặt lại bộ lọc danh mục.');
+      }
+
+      function resetDrillFilters() {
+        resetDrillFiltersFields();
+        renderDrillTable();
+        showToast('info', 'Đã đặt lại bộ lọc chi tiết giao dịch.');
+      }
+
+      // VIEW 4: DIALOG DETAIL TRIGGER
+      function viewTxInModal(txId) {
+        const tx = selectedReport.transactions.find(t => t.id === txId);
+        if (!tx) return;
+
+        selectedDrillTx = tx;
+
+        document.getElementById('mo-tx-id').textContent = tx.id;
+        document.getElementById('mo-tx-time').textContent = tx.time;
+        document.getElementById('mo-tx-api').textContent = tx.api;
+        
+        const isMatch = tx.gwAmount === tx.prAmount;
+        const statusEl = document.getElementById('mo-tx-status');
+        if (isMatch) {
+          statusEl.className = "text-green-400 bg-green-500/10 border border-green-500/20 py-0.5 px-2.5 rounded-full text-[10px] uppercase font-bold";
+          statusEl.textContent = "Khớp khớp hoàn toàn";
+        } else {
+          statusEl.className = "text-red-400 bg-red-500/10 border border-red-500/20 py-0.5 px-2.5 rounded-full text-[10px] uppercase font-black animate-pulse";
+          statusEl.textContent = "Chênh lệch dữ liệu";
+        }
+
+        document.getElementById('mo-val-gw').textContent = `${tx.gwAmount.toLocaleString('vi-VN')} ₫`;
+        document.getElementById('mo-val-pr').textContent = `${tx.prAmount.toLocaleString('vi-VN')} ₫`;
+
+        const diffVal = tx.gwAmount - tx.prAmount;
+        const absDiff = Math.abs(diffVal);
+        document.getElementById('mo-val-diff').textContent = diffVal === 0 ? "0 ₫" : (diffVal > 0 ? `+${absDiff.toLocaleString('vi-VN')} ₫` : `-${absDiff.toLocaleString('vi-VN')} ₫`);
+
+        const warningContainer = document.getElementById('mo-val-matching-warning');
+        if (isMatch) {
+          warningContainer.className = "hidden";
+        } else {
+          warningContainer.className = "p-3 bg-red-950/20 border border-red-900/30 text-red-400 text-[11.5px] rounded-lg mt-3 font-medium leading-normal";
+          warningContainer.innerHTML = `
+            <p class="font-bold flex items-center gap-1"><i data-lucide="shield-alert" class="w-4 h-4"></i> Cảnh báo chênh lệch dòng tiền:</p>
+            <p class="mt-1">Hệ thống ghi nhận Số dư cổng nạp không khớp nhau trên API ${tx.api}. Sai lệch thực tế là <strong>${absDiff.toLocaleString('vi-VN')} đ</strong>. Tình nghi nghẽn mạng lúc trả kết quả hoặc tỷ lệ chiết khấu lệch.</p>
+          `;
+        }
+
+        document.getElementById('tx-drill-modal').classList.remove('hidden');
+        lucide.createIcons();
+      }
+
+      function closeDrillModal() {
+        document.getElementById('tx-drill-modal').classList.add('hidden');
+      }
+
+      // NAVIGATES TO CORRESPONDING TRANSACTION LOG (1.5.3 REQUIREMENT)
+      function traceTransactionToLogs() {
+        if (!selectedDrillTx) return;
+        closeDrillModal();
+        const txId = selectedDrillTx.id;
+        traceDirectly(txId);
+      }
+
+      function traceDirectly(txId) {
+        showToast('success', `🔗 Chuyển hướng tiếp vận rà soát log cho Giao dịch ${txId}...`);
+        setTimeout(() => {
+          window.location.href = `logs.html?reqId=${encodeURIComponent(txId)}`;
+        }, 800);
+      }
+
+      // Window load trigger
       window.onload = init;
     </script>
   </body>

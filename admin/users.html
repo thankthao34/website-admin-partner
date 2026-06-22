@@ -208,10 +208,25 @@
                 </div>
 
                 <div class="space-y-4">
-                  <span class="text-xs font-bold text-gray-300">Tùy chỉnh danh mục Quyền hạn cụ thể (Scope matrix)</span>
+                  <div class="flex justify-between items-center pb-1">
+                    <span class="text-xs font-bold text-gray-305 flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4 text-violet-400"></i> Chi tiết cấu hình phân quyền (Scope matrix)</span>
+                    <span class="text-[10px] text-gray-500 font-mono uppercase tracking-wider">Cơ cấu tác vụ</span>
+                  </div>
                   
-                  <div class="space-y-3 pb-2" id="role-permissions-checkboxes">
-                    <!-- Permission Checkboxes -->
+                  <div class="border border-gray-800 rounded-xl overflow-hidden bg-black/15 shadow-inner">
+                    <div class="overflow-y-auto max-h-[420px]">
+                      <table class="w-full text-left text-[11px] border-collapse">
+                        <thead>
+                          <tr class="bg-[#0D1117]/95 border-b border-gray-800 text-[10px] text-gray-500 font-bold uppercase tracking-wider sticky top-0 z-10">
+                            <th class="py-2.5 px-4">Phạm vi chức năng</th>
+                            <th class="py-2.5 px-4 text-center w-20">Cho phép</th>
+                          </tr>
+                        </thead>
+                        <tbody id="role-matrix-tbody" class="divide-y divide-gray-800/40">
+                          <!-- Filled dynamically with identical matrix format of Image 2 -->
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -232,8 +247,8 @@
           
           <div class="px-6 py-4 border-b border-gray-800 bg-[#0D1117] flex justify-between items-center shrink-0">
             <div>
-              <h3 class="text-xs font-bold text-gray-100 uppercase tracking-wider">Mời thành viên mới</h3>
-              <p class="text-[11px] text-gray-500 mt-0.5">Nhập email thành viên toàn hệ thống và phân phối quyền sử dụng.</p>
+              <h3 id="drawer-title" class="text-xs font-bold text-gray-100 uppercase tracking-wider">Mời thành viên mới</h3>
+              <p id="drawer-subtitle" class="text-[11px] text-gray-500 mt-0.5">Nhập email thành viên toàn hệ thống và phân phối quyền sử dụng.</p>
             </div>
             <button onclick="toggleDrawer(false)" class="text-gray-400 hover:text-white p-2 text-xl font-bold">&times;</button>
           </div>
@@ -519,7 +534,7 @@
 
           <div class="px-6 py-4 border-t border-gray-800 bg-[#0D1117] flex justify-end gap-3 shrink-0">
             <button onclick="toggleDrawer(false)" class="border border-gray-700 hover:border-gray-550 text-gray-300 font-semibold text-xs px-4 py-2 rounded-lg cursor-pointer transition-colors">Hủy</button>
-            <button onclick="submitNewMember()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs px-5 py-2 rounded-lg cursor-pointer transition-all shadow-md shadow-accent/10">Thêm thành viên</button>
+            <button id="drawer-submit-btn" onclick="submitNewMember()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs px-5 py-2 rounded-lg cursor-pointer transition-all shadow-md shadow-accent/10">Thêm thành viên</button>
           </div>
 
         </div>
@@ -539,8 +554,8 @@
           </div>
         </div>
 
-        <p class="text-xs text-gray-300 leading-relaxed bg-black/20 border border-gray-800 p-3 rounded-xl" id="delete-modal-text">
-          Bạn có chắc chắn muốn xóa vĩnh viễn quyền truy cập...?
+        <p id="delete-modal-text" class="text-xs text-gray-300 leading-relaxed bg-black/20 border border-gray-800 p-3 rounded-xl">
+          Bạn có chắc chắn muốn xóa vĩnh viễn quyền truy cập của thành viên này?
         </p>
 
         <div class="flex justify-end gap-3 font-semibold text-xs uppercase tracking-wider pt-2">
@@ -552,55 +567,228 @@
     </div>
 
     <script>
-      // Users collection
-      let internalUsers = [
-        { id: 1, name: "Trần Minh Hoàng", email: "hoang.tm@gamehub.vn", role: "Super Admin", status: "Active", joined: "01/01/2026" },
-        { id: 2, name: "Nguyễn Thị Lan Chi", email: "chi.ntl@gamehub.vn", role: "Auditor", status: "Active", joined: "10/01/2026" },
-        { id: 3, name: "Lê Huy Khánh", email: "khanh.lh@gamehub.vn", role: "Admin", status: "Active", joined: "15/01/2026" },
-        { id: 4, name: "Phạm Tiến Dũng", email: "dung.pt@gamehub.vn", role: "Operator", status: "Inactive", joined: "20/01/2026" },
-        { id: 5, name: "Hoàng Anh Tuấn", email: "tuan.ha@gamehub.vn", role: "Operator", status: "Active", joined: "25/01/2026" }
+      // Detailed functional categories & permissions list matching Image 2
+      const permissionsSchema = [
+        {
+          category: "Quản lý đối tác",
+          color: "text-violet-400",
+          items: [
+            { id: "c-p-view", label: "Xem và xem chi tiết đối tác" },
+            { id: "c-p-create", label: "Đăng ký mới đối tác" },
+            { id: "c-p-edit", label: "Sửa thông tin Partner" },
+            { id: "c-p-process", label: "Xử lý các yêu cầu của Partner" },
+            { id: "c-p-history", label: "Xem lịch sử thay đổi cấu hình Partner" }
+          ]
+        },
+        {
+          category: "Quản lý API & Gateway",
+          color: "text-blue-400",
+          items: [
+            { id: "c-api-view", label: "Xem các API hiện tại" },
+            { id: "c-api-assign", label: "Gán đối tác sử dụng API" },
+            { id: "c-api-revoke", label: "Thu hồi quyền sử dụng API" }
+          ]
+        },
+        {
+          category: "Quản lý dịch vụ & IP Whitelist",
+          color: "text-amber-400",
+          items: [
+            { id: "c-srv-view", label: "Xem chi tiết dịch vụ & gói cước" },
+            { id: "c-srv-add", label: "Thêm Service liên kết mới" },
+            { id: "c-srv-add-pkg", label: "Thêm Package gói cước" },
+            { id: "c-srv-edit", label: "Sửa đổi Service hiện tại" },
+            { id: "c-srv-edit-pkg", label: "Sửa đổi Package cước phí" }
+          ]
+        },
+        {
+          category: "Nhật ký giao dịch (Logs)",
+          color: "text-emerald-400",
+          items: [
+            { id: "c-log-view", label: "Xem chi tiết trace log" }
+          ]
+        },
+        {
+          category: "Đối soát & Doanh thu",
+          color: "text-teal-400",
+          items: [
+            { id: "c-fin-view", label: "Xem báo cáo đối soát doanh thu" }
+          ]
+        },
+        {
+          category: "Thành viên & Quyền hạn",
+          color: "text-orange-400",
+          items: [
+            { id: "c-usr-invite", label: "Mới thành viên mới vào hệ thống" },
+            { id: "c-usr-perm", label: "Quản lý chi tiết phân quyền" }
+          ]
+        },
+        {
+          category: "Quản lý cấu hình vai trò",
+          color: "text-rose-400",
+          items: [
+            { id: "c-role-view", label: "Xem danh sách vai trò" },
+            { id: "c-role-create", label: "Tạo vai trò hệ thống mới" },
+            { id: "c-role-update", label: "Hiệu chỉnh vai trò hệ thống" }
+          ]
+        }
       ];
 
-      // Roles configurations
-      const systemRoles = [
+      // Roles configurations with direct task-level permission checks list
+      let systemRoles = [
         {
           key: "Super Admin",
-          name: "Super Admin (Tổng Quản)",
-          desc: "Sở hữu đặc quyền tối thượng của nhà phát triển, phê chuẩn kết toán, bổ nhiệm admin phụ.",
-          permissions: ["Full Access / Quản trị hệ thống", "Cấu hình Service & Gói cước", "Đăng ký dải IP Whitelist", "Đối soát & Xuất báo cáo tài chính", "Mời và phân quyền thành viên"]
+          name: "🛡️ Super Admin (Tổng quản hệ thống)",
+          desc: "Sở hữu toàn bộ tác vụ tối thượng, phê chuẩn kết toán hoàn toàn, quản trị phân quyền cho tất cả thành viên.",
+          checks: [
+            "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
+            "c-api-view", "c-api-assign", "c-api-revoke",
+            "c-srv-view", "c-srv-add", "c-srv-add-pkg", "c-srv-edit", "c-srv-edit-pkg",
+            "c-log-view", "c-fin-view", "c-usr-invite", "c-usr-perm", "c-role-view", "c-role-create", "c-role-update"
+          ]
         },
         {
           key: "Admin",
-          name: "Admin Điều Phối",
-          desc: "Phối hợp với Partner, đăng ký dịch vụ game mới, cập nhật bảng giá cước định dạng.",
-          permissions: ["Cấu hình Service & Gói cước", "Đăng ký dải IP Whitelist", "Đối soát & Xuất báo cáo tài chính"]
+          name: "⚡ Admin Điều Phối",
+          desc: "Điều lệ nghiệp vụ thông suốt. Đăng ký trò chơi mới, xử lý phản hồi của đối tác partner, cấu hình bảo mật dải mạng IP.",
+          checks: [
+            "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
+            "c-api-view", "c-api-assign",
+            "c-srv-view", "c-srv-edit",
+            "c-log-view", "c-usr-perm", "c-role-view"
+          ]
         },
         {
           key: "Auditor",
-          name: "Auditor Kiểm Toán",
-          desc: "Theo dõi dòng tiền cước nạp viễn thông, kiểm chứng dữ liệu, xem toàn quyền nhưng không được sửa cấu hình.",
-          permissions: ["Đối soát & Xuất báo cáo tài chính"]
+          name: "📊 Auditor Kiểm Toán",
+          desc: "Xem báo cáo doanh số, theo dõi lịch sử thay đổi thông tin đối tác và tra cứu log giao dịch đối soát, không sửa hạt nhân.",
+          checks: [
+            "c-p-view", "c-p-history",
+            "c-api-view", "c-srv-view",
+            "c-log-view", "c-fin-view", "c-role-view"
+          ]
         },
         {
           key: "Operator",
-          name: "Operator Vận Hành",
-          desc: "Đăng ký thông số IPs Whitelists, giám sát tình trạng lỗi HTTP kết nối.",
-          permissions: ["Đăng ký dải IP Whitelist"]
+          name: "⚙️ Operator Vận Hành",
+          desc: "Quản trị kết nối mạng gateway, kiểm tra phân lập IP white-list dải mạng, theo dõi trace log và Whitelist.",
+          checks: [
+            "c-api-view", "c-api-assign",
+            "c-srv-view", "c-log-view"
+          ]
+        }
+      ];
+
+      // Users collection with preloaded realistic metadata
+      let internalUsers = [
+        { 
+          id: 1, 
+          name: "Trần Minh Hoàng", 
+          email: "hoang.tm@gamehub.vn", 
+          role: "Super Admin", 
+          status: "Active", 
+          joined: "01/01/2026",
+          roleMode: "predefined",
+          checks: [
+            "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
+            "c-api-view", "c-api-assign", "c-api-revoke",
+            "c-srv-view", "c-srv-add", "c-srv-add-pkg", "c-srv-edit", "c-srv-edit-pkg",
+            "c-log-view", "c-fin-view", "c-usr-invite", "c-usr-perm", "c-role-view", "c-role-create", "c-role-update"
+          ],
+          notes: "Tổng thống quản lý tối cao phân hệ cổng kết nối API GameHub.",
+          expiryMode: "unlimited",
+          expiryStart: "",
+          expiryEnd: ""
+        },
+        { 
+          id: 2, 
+          name: "Nguyễn Thị Lan Chi", 
+          email: "chi.ntl@gamehub.vn", 
+          role: "Auditor", 
+          status: "Active", 
+          joined: "10/01/2026",
+          roleMode: "predefined",
+          checks: [
+            "c-p-view", "c-p-history",
+            "c-api-view", "c-srv-view",
+            "c-log-view", "c-fin-view", "c-role-view"
+          ],
+          notes: "Chuyên viên ban kiểm toán tài chính và kiểm thử kết hợp doanh thu.",
+          expiryMode: "unlimited",
+          expiryStart: "",
+          expiryEnd: ""
+        },
+        { 
+          id: 3, 
+          name: "Lê Huy Khánh", 
+          email: "khanh.lh@gamehub.vn", 
+          role: "Admin", 
+          status: "Active", 
+          joined: "15/01/2026",
+          roleMode: "predefined",
+          checks: [
+            "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
+            "c-api-view", "c-api-assign",
+            "c-srv-view", "c-srv-edit",
+            "c-log-view", "c-usr-perm", "c-role-view"
+          ],
+          notes: "Cán bộ điều hành cấu hình phân lập định chế dịch vụ cổng.",
+          expiryMode: "limited",
+          expiryStart: "2026-01-15",
+          expiryEnd: "2026-12-31"
+        },
+        { 
+          id: 4, 
+          name: "Phạm Tiến Dũng", 
+          email: "dung.pt@gamehub.vn", 
+          role: "Operator", 
+          status: "Inactive", 
+          joined: "20/01/2026",
+          roleMode: "predefined",
+          checks: [
+            "c-api-view", "c-api-assign",
+            "c-srv-view", "c-log-view"
+          ],
+          notes: "Giám sát viên hệ thống khẩn cấp, cấu hình và túc trực xử lý trace log.",
+          expiryMode: "unlimited",
+          expiryStart: "",
+          expiryEnd: ""
+        },
+        { 
+          id: 5, 
+          name: "Hoàng Anh Tuấn", 
+          email: "tuan.ha@gamehub.vn", 
+          role: "Operator", 
+          status: "Active", 
+          joined: "25/01/2026",
+          roleMode: "predefined",
+          checks: [
+            "c-api-view", "c-api-assign",
+            "c-srv-view", "c-log-view"
+          ],
+          notes: "Vận hành điều lệ kỹ thuật mạng lưới phân lập whitelist.",
+          expiryMode: "unlimited",
+          expiryStart: "",
+          expiryEnd: ""
         }
       ];
 
       let inspectedRoleKey = "Super Admin";
       let deletingUserId = null;
-
-      const permLabels = [
-        "Full Access / Quản trị hệ thống",
-        "Cấu hình Service & Gói cước",
-        "Đăng ký dải IP Whitelist",
-        "Đối soát & Xuất báo cáo tài chính",
-        "Mời và phân quyền thành viên"
-      ];
+      let currentEditingUserId = null;
 
       function init() {
+        if (localStorage.getItem("gamehub_internal_users")) {
+          internalUsers = JSON.parse(localStorage.getItem("gamehub_internal_users"));
+        } else {
+          localStorage.setItem("gamehub_internal_users", JSON.stringify(internalUsers));
+        }
+
+        if (localStorage.getItem("gamehub_system_roles")) {
+          systemRoles = JSON.parse(localStorage.getItem("gamehub_system_roles"));
+        } else {
+          localStorage.setItem("gamehub_system_roles", JSON.stringify(systemRoles));
+        }
+
         renderUsersTable();
         renderRolesGroup();
         renderRolePermissions();
@@ -634,6 +822,7 @@
           else if (u.role === 'Admin') roleBadge = "text-purple-400 bg-purple-950/40 border border-purple-800/40";
           else if (u.role === 'Auditor') roleBadge = "text-cyan-400 bg-cyan-950/40 border border-cyan-800/40";
           else if (u.role === 'Operator') roleBadge = "text-blue-400 bg-blue-950/40 border border-blue-800/40";
+          else if (u.role.startsWith('Custom')) roleBadge = "text-amber-400 bg-amber-950/45 border border-amber-800/40";
 
           tbody.insertAdjacentHTML('beforeend', `
             <tr class="hover:bg-gray-800/20 transition-colors">
@@ -648,7 +837,11 @@
                 </span>
               </td>
               <td class="px-6 py-4.5 font-mono text-gray-500">${u.joined}</td>
-              <td class="px-6 py-4.5 text-right">
+              <td class="px-6 py-4.5 text-right whitespace-nowrap">
+                <button onclick="toggleDrawer(true, ${u.id})" class="text-violet-450 hover:text-violet-300 font-bold uppercase tracking-wider text-[10px] px-2 py-1 select-none cursor-pointer inline-flex items-center gap-1">
+                  <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Chi tiết & Cấp quyền
+                </button>
+                <span class="text-gray-800 px-1">|</span>
                 <button onclick="showDeleteModal(true, ${u.id})" class="text-red-500 hover:text-red-400 font-bold uppercase tracking-wider text-[10px] px-2 py-1 select-none cursor-pointer">Xóa</button>
               </td>
             </tr>
@@ -675,6 +868,7 @@
         } else {
           document.getElementById('tab-content-roles').classList.remove('hidden');
           document.getElementById('tab-btn-roles').className = "px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent hover:text-violet-300 cursor-pointer";
+          renderRolePermissions();
         }
       }
 
@@ -716,58 +910,18 @@
         }
       }
 
-      const roleDefinitionsInfo = {
-        "Super Admin": {
-          title: "🛡️ Super Admin (Tổng quản hệ thống)",
-          desc: "Sở hữu toàn bộ tác vụ tối thượng, phê chuẩn kết toán hoàn toàn, quản trị phân quyền cho tất cả thành viên.",
-          checks: [
-            "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
-            "c-api-view", "c-api-assign", "c-api-revoke",
-            "c-srv-view", "c-srv-add", "c-srv-add-pkg", "c-srv-edit", "c-srv-edit-pkg",
-            "c-log-view", "c-fin-view", "c-usr-invite", "c-usr-perm", "c-role-view", "c-role-create", "c-role-update"
-          ]
-        },
-        "Admin": {
-          title: "⚡ Admin (Phó quản trị điều phối)",
-          desc: "Điều lệ nghiệp vụ thông suốt. Đăng ký trò chơi mới, xử lý phản hồi, cấu hình IP dải mạng.",
-          checks: [
-            "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
-            "c-api-view", "c-api-assign",
-            "c-srv-view", "c-srv-edit",
-            "c-log-view", "c-usr-perm", "c-role-view"
-          ]
-        },
-        "Auditor": {
-          title: "📊 Auditor (Kế toán kiểm toán tài vụ)",
-          desc: "Xem báo cáo doanh số, theo dõi lịch sử thay đổi thông tin đối tác và trace log, không sửa hạt nhân.",
-          checks: [
-            "c-p-view", "c-p-history",
-            "c-api-view", "c-srv-view",
-            "c-log-view", "c-fin-view", "c-role-view"
-          ]
-        },
-        "Operator": {
-          title: "⚙️ Operator (Kỹ sư vận mạng mạng lưới IP)",
-          desc: "Quản trị kết nối mạng gateway, kiểm tra lỗi HTTP, giám sát trace log và API whitelist.",
-          checks: [
-            "c-api-view", "c-api-assign",
-            "c-srv-view", "c-log-view"
-          ]
-        }
-      };
-
       function autoConfigureCheckboxesByPredefined(roleValue) {
-        const def = roleDefinitionsInfo[roleValue];
-        if (!def) return;
+        const r = systemRoles.find(role => role.key === roleValue);
+        if (!r) return;
 
         // Update layout card
-        document.getElementById('role-info-title').textContent = def.title;
-        document.getElementById('role-info-desc').textContent = def.desc;
+        document.getElementById('role-info-title').textContent = r.name;
+        document.getElementById('role-info-desc').textContent = r.desc;
 
         // Update all checkboxes
         const checkboxes = document.querySelectorAll('.matrix-chk');
         checkboxes.forEach(box => {
-          if (def.checks.includes(box.id)) {
+          if (r.checks.includes(box.id)) {
             box.checked = true;
           } else {
             box.checked = false;
@@ -782,9 +936,7 @@
           box.addEventListener('change', () => {
             if (currentRoleMode === 'predefined') {
               setRoleMode('manual');
-              if (window.showToast) {
-                showToast('Chế độ phân vai đã chuyển sang "Quyền tùy chỉnh" tự động', 'info');
-              }
+              showToast('info', 'Chế độ đã được chuyển sang "Thủ công" do có thay đổi phân quyền riêng lẻ.');
             }
           });
         });
@@ -793,11 +945,7 @@
       function searchSystemUser() {
         const email = document.getElementById('f-email').value.trim();
         if (!email) {
-          if (window.showToast) {
-            showToast('Vui lòng nhập hòm thư trước khi tra cứu', 'error');
-          } else {
-            alert('Vui lòng nhập hòm thư trước khi tra cứu');
-          }
+          showToast('error', 'Vui lòng nhập hòm thư trước khi tra cứu');
           return;
         }
 
@@ -824,29 +972,93 @@
 
         document.getElementById('search-found-name').textContent = foundName;
         document.getElementById('search-result-box').classList.remove('hidden');
-
-        if (window.showToast) {
-          showToast(`Tìm thấy hồ sơ: ${foundName}`, 'success');
-        }
+        showToast('success', `Tìm thấy cán bộ: ${foundName}`);
       }
 
-      function toggleDrawer(open) {
+      function toggleDrawer(open, userId = null) {
         const container = document.getElementById('drawer-container');
         const panel = document.getElementById('drawer-panel');
+        const titleEl = document.getElementById('drawer-title');
+        const subtitleEl = document.getElementById('drawer-subtitle');
+        const submitBtn = document.getElementById('drawer-submit-btn');
+        const emailInput = document.getElementById('f-email');
 
         if (open) {
           container.classList.remove('hidden');
           setTimeout(() => panel.classList.remove('translate-x-full'), 10);
           
-          // Apply initial configs
-          setRoleMode('predefined');
           setupMatrixCheckboxListeners();
+
+          if (userId) {
+            // Edit & Details Mode
+            currentEditingUserId = userId;
+            const u = internalUsers.find(user => user.id === userId);
+            if (!u) return;
+
+            titleEl.textContent = "Chi tiết & Sửa quyền thành viên";
+            subtitleEl.textContent = `Xem chi tiết và hiệu chỉnh trạng thái, thời gian hết hạn hoặc ma trận phân quyền của ${u.name}.`;
+            submitBtn.textContent = "Lưu cập nhật";
+            
+            // Populate form
+            emailInput.value = u.email;
+            emailInput.disabled = true; // Readonly email during edit
+            document.getElementById('search-found-name').textContent = u.name;
+            document.getElementById('search-result-box').classList.remove('hidden');
+            document.getElementById('f-notes').value = u.notes || '';
+            document.getElementById('f-status').value = u.status;
+
+            // Expiry
+            if (u.expiryMode === 'limited') {
+              document.getElementById('expiry-limited').checked = true;
+              toggleDateInputs(true);
+              document.getElementById('expiry-start').value = u.expiryStart || '';
+              document.getElementById('expiry-end').value = u.expiryEnd || '';
+            } else {
+              document.getElementById('expiry-unlimited').checked = true;
+              toggleDateInputs(false);
+            }
+
+            // Role / custom matrix
+            const mode = u.roleMode || 'predefined';
+            setRoleMode(mode);
+
+            if (mode === 'predefined') {
+              document.getElementById('f-role').value = u.role;
+              autoConfigureCheckboxesByPredefined(u.role);
+            } else {
+              // Custom checks list
+              const checkboxes = document.querySelectorAll('.matrix-chk');
+              checkboxes.forEach(box => {
+                box.checked = (u.checks || []).includes(box.id);
+              });
+            }
+
+          } else {
+            // Create Mode
+            currentEditingUserId = null;
+            titleEl.textContent = "Mời thành viên mới";
+            subtitleEl.textContent = "Nhập email thành viên toàn hệ thống và phân phối quyền sử dụng.";
+            submitBtn.textContent = "Thêm thành viên";
+
+            emailInput.value = '';
+            emailInput.disabled = false;
+            document.getElementById('search-found-name').textContent = '...';
+            document.getElementById('search-result-box').classList.add('hidden');
+            document.getElementById('f-notes').value = '';
+            document.getElementById('f-status').value = "Active";
+
+            document.getElementById('expiry-unlimited').checked = true;
+            toggleDateInputs(false);
+            setRoleMode('predefined');
+          }
+
         } else {
           panel.classList.add('translate-x-full');
           setTimeout(() => container.classList.add('hidden'), 350);
           
-          // Clear form elements when closing drawer
-          document.getElementById('f-email').value = '';
+          currentEditingUserId = null;
+          emailInput.disabled = false;
+          emailInput.value = '';
           document.getElementById('search-found-name').textContent = '...';
           document.getElementById('search-result-box').classList.add('hidden');
           document.getElementById('f-notes').value = '';
@@ -859,15 +1071,11 @@
       function submitNewMember() {
         const email = document.getElementById('f-email').value.trim();
         if (!email || !email.includes('@')) {
-          if (window.showToast) {
-            showToast('Vui lòng cung cấp hòm thư người dùng hợp lệ', 'error');
-          } else {
-            alert('Vui lòng cung cấp hòm thư người dùng hợp lệ');
-          }
+          showToast('error', 'Vui lòng cung cấp hòm thư người dùng hợp lệ');
           return;
         }
 
-        // Determine candidate name
+        // Name candidate
         let name = document.getElementById('search-found-name').textContent;
         if (!name || name === '...') {
           const prefix = email.split('@')[0];
@@ -876,45 +1084,73 @@
           if (name.length < 3) name = "Cán bộ " + prefix.toUpperCase();
         }
 
-        // Figure out final role label or custom capabilities count
         let finalRole = "Operator";
+        let finalChecks = [];
+        const checkedBoxes = document.querySelectorAll('.matrix-chk:checked');
+        checkedBoxes.forEach(box => finalChecks.push(box.id));
+
         if (currentRoleMode === 'predefined') {
           finalRole = document.getElementById('f-role').value;
         } else {
-          // Check how many checked custom scopes
-          const checkedBoxes = document.querySelectorAll('.matrix-chk:checked');
           const count = checkedBoxes.length;
           if (count === 20) {
             finalRole = "Super Admin (Custom)";
           } else if (count >= 12) {
-            finalRole = "Admin Cao cấp (Tùy chọn)";
+            finalRole = "Admin Cao cấp (Custom)";
           } else if (count > 0) {
             finalRole = `Custom (${count} scopes)`;
           } else {
-            finalRole = "Thành viên chưa cấp quyền";
+            finalRole = "Custom (0 scopes)";
           }
         }
 
         const status = document.getElementById('f-status').value;
+        const notes = document.getElementById('f-notes').value;
+        const expiryMode = document.querySelector('input[name="expiry-mode"]:checked').value;
+        const expiryStart = document.getElementById('expiry-start').value;
+        const expiryEnd = document.getElementById('expiry-end').value;
 
-        const newMem = {
-          id: internalUsers.length + 1,
-          name: name,
-          email: email,
-          role: finalRole,
-          status: status,
-          joined: new Date().toLocaleDateString('vi-VN')
-        };
-
-        internalUsers.unshift(newMem);
-        renderUsersTable();
-        toggleDrawer(false);
-
-        if (window.showToast) {
-          showToast(`✅ Đã thêm tài khoản: ${name} / ${email} thành công.`, 'success');
+        if (currentEditingUserId) {
+          // UPDATE MODE
+          const u = internalUsers.find(user => user.id === currentEditingUserId);
+          if (u) {
+            u.role = finalRole;
+            u.roleMode = currentRoleMode;
+            u.checks = finalChecks;
+            u.status = status;
+            u.notes = notes;
+            u.expiryMode = expiryMode;
+            u.expiryStart = expiryStart;
+            u.expiryEnd = expiryEnd;
+            showToast('success', `✅ Đã lưu thay đổi chi tiết cấp quyền cho tài khoản: ${u.name}`);
+          }
         } else {
-          alert(`Đã thêm tài khoản: ${name} thành công.`);
+          // CREATE MODE
+          const newMem = {
+            id: internalUsers.length + 1,
+            name: name,
+            email: email,
+            role: finalRole,
+            status: status,
+            joined: new Date().toLocaleDateString('vi-VN'),
+            roleMode: currentRoleMode,
+            checks: finalChecks,
+            notes: notes,
+            expiryMode: expiryMode,
+            expiryStart: expiryStart,
+            expiryEnd: expiryEnd
+          };
+
+          internalUsers.unshift(newMem);
+          showToast('success', `✅ Đã thêm cán bộ: ${name} thành công.`);
         }
+
+        renderUsersTable();
+        localStorage.setItem("gamehub_internal_users", JSON.stringify(internalUsers));
+        if (typeof enforceBusinessPermissions === "function") {
+          enforceBusinessPermissions();
+        }
+        toggleDrawer(false);
       }
 
       // ROLES SIDE-PANEL ASSIGNMENTS
@@ -926,12 +1162,12 @@
           const isActive = role.key === inspectedRoleKey;
           const rootClass = isActive 
             ? "border border-violet-500/50 bg-violet-600/10 text-white" 
-            : "border border-gray-800 bg-black/10 hover:border-gray-700 text-gray-400 hover:text-gray-200";
+            : "border border-gray-800 bg-black/10 hover:border-gray-700 text-gray-400 hover:text-gray-205";
 
           container.insertAdjacentHTML('beforeend', `
-            <div onclick="inspectRole('${role.key}')" class="p-3.5 rounded-xl cursor-pointer transition-all ${rootClass}">
-              <p class="font-bold text-xs uppercase tracking-wider">${role.key}</p>
-              <p class="text-[11px] text-gray-400 mt-1 leading-relaxed">${role.desc}</p>
+            <div onclick="inspectRole('${role.key}')" class="p-4 rounded-xl cursor-pointer transition-all ${rootClass}">
+              <p class="font-extrabold text-xs uppercase tracking-wider">${role.key}</p>
+              <p class="text-[11px] text-gray-400 mt-1.5 leading-relaxed">${role.desc}</p>
             </div>
           `);
         });
@@ -954,19 +1190,27 @@
         const r = systemRoles.find(role => role.key === inspectedRoleKey);
         if (!r) return;
 
-        const container = document.getElementById('role-permissions-checkboxes');
-        container.innerHTML = '';
+        const tbody = document.getElementById('role-matrix-tbody');
+        tbody.innerHTML = '';
 
-        permLabels.forEach((label, idx) => {
-          const isChecked = r.permissions.includes(label);
-          container.insertAdjacentHTML('beforeend', `
-            <label class="flex items-center gap-3 p-3 rounded-lg bg-[#0D1117] border border-gray-805 hover:border-gray-700 cursor-pointer select-none">
-              <input type="checkbox" name="role-p-checkbox" value="${label}" ${isChecked ? 'checked' : ''} class="accent-violet-500 w-4 h-4 cursor-pointer">
-              <div class="text-xs">
-                <p class="font-bold text-gray-200">${label}</p>
-              </div>
-            </label>
+        permissionsSchema.forEach(group => {
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="bg-gray-900/30 font-semibold text-gray-400 text-[10px]">
+              <td colspan="2" class="py-2.5 px-4 ${group.color} uppercase tracking-wider">${group.category}</td>
+            </tr>
           `);
+
+          group.items.forEach(item => {
+            const isChecked = r.checks.includes(item.id);
+            tbody.insertAdjacentHTML('beforeend', `
+              <tr class="hover:bg-white/5 transition-colors">
+                <td class="py-2.5 px-4 text-gray-300 font-medium">${item.label}</td>
+                <td class="py-2.5 px-4 text-center">
+                  <input type="checkbox" id="tab-${item.id}" ${isChecked ? 'checked' : ''} class="tab-p-chk w-4 h-4 rounded text-violet-600 focus:ring-0 accent-violet-600 cursor-pointer">
+                </td>
+              </tr>
+            `);
+          });
         });
       }
 
@@ -974,16 +1218,31 @@
         const r = systemRoles.find(role => role.key === inspectedRoleKey);
         if (!r) return;
 
-        const checkboxes = document.getElementsByName('role-p-checkbox');
-        const nextPermissions = [];
+        const checkboxes = document.querySelectorAll('.tab-p-chk');
+        const nextChecks = [];
         checkboxes.forEach(box => {
           if (box.checked) {
-            nextPermissions.push(box.value);
+            nextChecks.push(box.id.replace('tab-', ''));
           }
         });
 
-        r.permissions = nextPermissions;
-        showToast('success', `✅ Đã lưu cấu hình ma trận phân quyền cho vai trò "${r.key}"!`);
+        r.checks = nextChecks;
+
+        // Propagate updates to members using this predefined role to retain alignment consistency
+        internalUsers.forEach(u => {
+          if (u.role === r.key && u.roleMode === 'predefined') {
+            u.checks = [...nextChecks];
+          }
+        });
+
+        localStorage.setItem("gamehub_system_roles", JSON.stringify(systemRoles));
+        localStorage.setItem("gamehub_internal_users", JSON.stringify(internalUsers));
+
+        showToast('success', `✅ Đã lưu cấu hình ma trận phân quyền cho vai trò "${r.key}" thành công!`);
+        renderUsersTable();
+        if (typeof enforceBusinessPermissions === "function") {
+          enforceBusinessPermissions();
+        }
       }
 
       // DELETE CONFIRMATION MODAL ACTIONS
@@ -999,9 +1258,13 @@
 
           document.getElementById('delete-confirm-submit').onclick = () => {
             internalUsers = internalUsers.filter(user => user.id !== deletingUserId);
+            localStorage.setItem("gamehub_internal_users", JSON.stringify(internalUsers));
             renderUsersTable();
             showDeleteModal(false);
-            showToast('success', `🗑 Đã gỡ bỏ tài khoản thành công!`);
+            showToast('success', `🗑️ Đã thu hồi quyền và xóa tài khoản thành công!`);
+            if (typeof enforceBusinessPermissions === "function") {
+              enforceBusinessPermissions();
+            }
           };
 
         } else {
@@ -1018,9 +1281,9 @@
         let iconName = type === 'success' ? 'check-circle' : 'info';
 
         const toastHtml = `
-          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-72 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
+          <div id="${id}" class="bg-card/95 border border-gray-800 text-xs px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur flex items-center gap-3 w-80 pointer-events-auto transition-all duration-300 translate-y-2 opacity-0">
             <i class="w-5 h-5 ${iconColor}" data-lucide="${iconName}"></i>
-            <span class="text-gray-200 font-medium">${text}</span>
+            <span class="text-gray-250 font-medium">${text}</span>
           </div>
         `;
 

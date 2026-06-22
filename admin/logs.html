@@ -120,21 +120,23 @@
       <!-- MAIN CONTENT -->
       <main class="p-8 max-w-7xl mx-auto space-y-6">
         <div>
-          <h1 class="text-2xl font-black text-gray-100 tracking-tight">Nhật ký giao dịch hệ thống (Transaction Logs)</h1>
-          <p class="text-xs text-gray-500">Giám sát vết thời gian thực thi, HTTP status phản hồi, và latencies của tất cả API kết nối.</p>
+          <h1 class="text-2xl font-black text-gray-100 tracking-tight flex items-center gap-2.5">
+            <i data-lucide="terminal" class="w-7 h-7 text-violet-400"></i> Nhật ký giao dịch hệ thống (Transaction Logs)
+          </h1>
+          <p class="text-xs text-gray-500 mt-1">Giám sát vết thời gian thực thi, HTTP status phản hồi, dải IP kết nối, và latencies của các API.</p>
         </div>
 
         <!-- Filter bar (2 rows) -->
         <div class="bg-card border border-gray-800 p-5 rounded-xl space-y-4">
           <!-- Row 1 -->
-          <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-5 gap-3.5 text-xs">
             <div class="space-y-1">
               <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Từ ngày</label>
-              <input type="date" id="log-from-date" value="2026-06-15" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none">
+              <input type="date" id="log-from-date" value="2026-06-15" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none focus:border-accent">
             </div>
             <div class="space-y-1">
               <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Đến ngày</label>
-              <input type="date" id="log-to-date" value="2026-06-21" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none">
+              <input type="date" id="log-to-date" value="2026-06-25" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none focus:border-accent">
             </div>
             <div class="space-y-1">
               <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Lọc theo Partner</label>
@@ -147,7 +149,7 @@
               </select>
             </div>
             <div class="space-y-1">
-              <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Gọi API Endpoint</label>
+              <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">API Endpoint</label>
               <select id="log-api" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-300 outline-none focus:border-accent">
                 <option value="all">Tất cả API Endpoints</option>
                 <option value="/v1/check-status">/v1/check-status</option>
@@ -156,46 +158,69 @@
                 <option value="/v1/balance">/v1/balance</option>
               </select>
             </div>
+            <div class="space-y-1">
+              <label class="text-gray-400 font-semibold uppercase tracking-wider text-[10px]">Địa chỉ Client IP</label>
+              <input type="text" id="log-client-ip" placeholder="Ví dụ: 103.45.18.91" class="w-full bg-black/45 border border-gray-700 rounded-lg p-2.5 text-gray-200 outline-none focus:border-accent font-mono">
+            </div>
           </div>
 
           <!-- Row 2 -->
           <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
             <div class="flex items-center gap-2 text-xs">
-              <span class="text-gray-400 font-semibold uppercase tracking-wider text-[10px] mr-2">HTTP Status:</span>
-              <button onclick="setStatusFilter('all')" id="btn-http-all" class="bg-violet-600 text-white px-3 py-1.5 rounded-lg font-medium cursor-pointer shadow">Tất cả</button>
-              <button onclick="setStatusFilter('200')" id="btn-http-200" class="border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3 py-1.5 rounded-lg cursor-pointer">200 OK</button>
-              <button onclick="setStatusFilter('429')" id="btn-http-429" class="border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3 py-1.5 rounded-lg cursor-pointer">429 Rate Exceeded</button>
-              <button onclick="setStatusFilter('500')" id="btn-http-500" class="border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3 py-1.5 rounded-lg cursor-pointer">500 Server Error</button>
+              <span class="text-gray-400 font-semibold uppercase tracking-wider text-[10px] mr-2">Trạng thái kết quả (Result):</span>
+              <button onclick="setResultFilter('all')" id="btn-res-all" class="bg-violet-600 text-white px-3.5 py-1.5 rounded-lg font-medium cursor-pointer shadow">Tất cả</button>
+              <button onclick="setResultFilter('success')" id="btn-res-success" class="border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3.5 py-1.5 rounded-lg cursor-pointer">Thành công (Success)</button>
+              <button onclick="setResultFilter('failed')" id="btn-res-failed" class="border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3.5 py-1.5 rounded-lg cursor-pointer">Lỗi (Failed)</button>
             </div>
 
             <div class="flex items-center gap-2">
               <button onclick="applyFilters()" class="bg-accent hover:bg-accent/90 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg flex items-center gap-1.5 cursor-pointer shadow">
-                <i data-lucide="filter" class="w-4 h-4"></i> Lọc
+                <i data-lucide="filter" class="w-4 h-4"></i> Lọc dữ liệu
               </button>
-              <button onclick="resetFilters()" class="border border-gray-700 bg-black/10 hover:border-gray-500 p-2 text-gray-450 hover:text-white rounded-lg cursor-pointer" title="Làm mới">
-                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              <button onclick="resetFilters()" class="border border-gray-700 bg-black/10 hover:border-gray-500 px-3.5 py-2.5 text-gray-400 hover:text-white rounded-lg cursor-pointer flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider" title="Làm mới">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Làm mới bộ lọc
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- Compare Action Bar -->
+        <div id="compare-bar" class="hidden bg-violet-950/20 border border-violet-800/80 rounded-xl p-4 flex items-center justify-between text-xs transition-all">
+          <div class="flex items-center gap-3">
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
+            </span>
+            <span class="font-bold text-violet-300 uppercase tracking-wider text-[10px]">Đối chiếu giao dịch:</span>
+            <span class="text-gray-300">Bạn đang chọn <strong id="compare-count" class="text-yellow-400 font-mono text-sm mx-1">0</strong>/2 bản ghi để phân tích so sánh.</span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <button onclick="clearCompareSelection()" class="text-gray-450 hover:text-white font-semibold uppercase tracking-wider text-[10px] px-2 py-1">Hủy chọn</button>
+            <button id="btn-execute-compare" onclick="executeCompare()" class="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold uppercase tracking-wider px-4 py-2 rounded-lg flex items-center gap-1.5 text-[11px] shadow">
+              <i data-lucide="columns" class="w-3.5 h-3.5"></i> Đối chiếu ngay
+            </button>
           </div>
         </div>
 
         <!-- System log table -->
         <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
           <div class="overflow-x-auto">
-            <table class="w-full text-left">
+            <table class="w-full text-left font-sans">
               <thead>
-                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
-                  <th class="px-6 py-4"># Request ID</th>
-                  <th class="px-6 py-4">Thời gian</th>
-                  <th class="px-6 py-4 font-bold">Partner Code</th>
-                  <th class="px-6 py-4 font-mono">Dịch Vụ API</th>
-                  <th class="px-6 py-4 font-mono">Method</th>
-                  <th class="px-6 py-4 text-center">HTTP Status</th>
-                  <th class="px-6 py-4 text-center">Xử lý (Latency)</th>
+                <tr class="bg-black/25 text-[10px] font-bold text-gray-405 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-4 py-4 text-center w-12">Chọn</th>
+                  <th class="px-5 py-4 w-36">TXN Code / Req ID</th>
+                  <th class="px-4 py-4 w-36">Thời gian</th>
+                  <th class="px-4 py-4">Tên Partner</th>
+                  <th class="px-4 py-4 w-44 font-mono">Endpoint / Method</th>
+                  <th class="px-4 py-4 font-mono w-32">Client IP</th>
+                  <th class="px-4 py-4 text-center w-24">HTTP Code</th>
+                  <th class="px-4 py-4 text-center w-28">Latency</th>
+                  <th class="px-4 py-4 text-center w-24">Kết quả</th>
                   <th class="px-6 py-4 text-right">Chi tiết</th>
                 </tr>
               </thead>
-              <tbody id="logs-tbody" class="divide-y divide-gray-850/30 text-xs">
+              <tbody id="logs-tbody" class="divide-y divide-gray-850/30 text-xs text-gray-300">
                 <!-- Log rows dynamic -->
               </tbody>
             </table>
@@ -203,15 +228,9 @@
 
           <!-- Pagination -->
           <div class="px-6 py-4 border-t border-gray-800 flex items-center justify-between text-gray-500 text-xs font-medium">
-            <span>Hiển thị 1 - 10 trên tổng số <span class="font-mono text-gray-300">125,430</span> bản ghi</span>
-            <div class="flex items-center gap-1 font-mono">
-              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">&lt;</button>
-              <button class="bg-accent/15 border border-accent/30 text-violet-400 px-2 py-0.5 rounded">1</button>
-              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">2</button>
-              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">3</button>
-              <span class="px-1 text-gray-650">...</span>
-              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">25087</button>
-              <button class="border border-gray-800 px-2 py-0.5 rounded hover:bg-gray-800">&gt;</button>
+            <span id="pagination-status-text">Hiển thị...</span>
+            <div class="flex items-center gap-1 font-mono" id="pagination-buttons">
+              <!-- Pagination buttons -->
             </div>
           </div>
         </div>
@@ -219,303 +238,1477 @@
       </main>
     </div>
 
-    <!-- TRANSACTION DETAIL MODAL (Tabs style) -->
+    <!-- TRANSACTION DETAIL MODAL -->
     <div id="detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
       <div onclick="closeDetailModal()" class="absolute inset-0 bg-black/80 backdrop-blur-xs"></div>
-      <div class="relative bg-card border border-gray-800 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col h-[550px] overflow-hidden">
+      <div class="relative bg-card border border-gray-800 rounded-2xl w-full max-w-5xl shadow-2xl flex flex-col h-[680px] overflow-hidden">
         
         <!-- Modal Tabs Header -->
-        <div class="px-6 py-4 border-b border-gray-800 bg-[#0D1117] flex justify-between items-center shrink-0">
-          <div class="flex gap-4">
-            <button onclick="switchModalTab('summary')" id="modal-tab-btn-summary" class="text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent pb-2">Tổng quan bản tin</button>
-            <button onclick="switchModalTab('compare')" id="modal-tab-btn-compare" class="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent pb-2">So sánh hai Log (Compare)</button>
+        <div class="px-6 py-4.5 border-b border-gray-800 bg-[#0D1117] flex justify-between items-center shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-violet-600/10 border border-violet-500/20 flex items-center justify-center">
+              <i data-lucide="terminal" class="w-4 h-4 text-violet-400"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-gray-100 font-sans">Chi Tiết Bản Tin Giao Dịch</h3>
+              <p class="text-[10px] text-gray-500">Giám sát thông tin Request, Response & Hiệu năng chi tiết</p>
+            </div>
           </div>
-          <button onclick="closeDetailModal()" class="text-gray-400 hover:text-white text-xl font-bold font-sans">&times;</button>
+          <button onclick="closeDetailModal()" class="text-gray-400 hover:text-white text-xl font-bold font-sans cursor-pointer">&times;</button>
         </div>
 
-        <!-- Modal Scrollable Content -->
-        <div class="flex-1 overflow-y-auto p-6 bg-black/10">
+        <!-- Modal scroll area -->
+        <div class="flex-1 overflow-y-auto p-6 bg-black/10 flex flex-col md:flex-row gap-6">
           
-          <!-- TAB 1: SUMMARY -->
-          <div id="modal-content-summary" class="space-y-6">
-            
-            <!-- General metadata row -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs bg-[#0D1117]/80 p-4 border border-gray-850 rounded-xl">
-              <div>
-                <span class="text-gray-500 block mb-0.5">Partner</span>
-                <span class="font-bold text-gray-200" id="m-partner">Garena VN</span>
-              </div>
-              <div>
-                <span class="text-gray-500 block mb-0.5">API Endpoint</span>
-                <span class="font-mono text-cyan-400" id="m-api">/v1/check-status</span>
-              </div>
-              <div>
-                <span class="text-gray-500 block mb-0.5">HTTP Status</span>
-                <span class="inline-block" id="m-http">-</span>
-              </div>
-              <div>
-                <span class="text-gray-500 block mb-0.5">Request ID</span>
-                <span class="font-mono text-gray-300 text-[11px]" id="m-reqid">req-abc-12345</span>
+          <!-- LEFT PANEL: METADATA & PERFORMANCE -->
+          <div class="w-full md:w-5/12 space-y-5">
+            <!-- General metadata table -->
+            <div class="bg-black/25 border border-gray-800 rounded-xl p-4.5 space-y-3.5 text-xs">
+              <h4 class="text-[10px] text-gray-400 uppercase font-bold tracking-wider border-b border-gray-800 pb-1.5 flex items-center gap-1.5">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-violet-400"></i> Thông tin giao dịch
+              </h4>
+              <div class="grid grid-cols-2 gap-y-3 gap-x-2 text-xs">
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Mã Giao dịch (ID)</span>
+                  <span class="font-bold font-mono text-gray-200" id="m-tx-id">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Thời gian nhận</span>
+                  <span class="font-semibold text-gray-300 font-mono" id="m-tx-time">-</span>
+                </div>
+                <div class="col-span-2">
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Request ID</span>
+                  <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="font-mono text-cyan-400 text-xs font-bold" id="m-tx-reqid">-</span>
+                    <button onclick="copyDetailReqId()" class="p-1 hover:bg-gray-800 text-gray-500 hover:text-gray-200 rounded transition-colors" title="Sao chép Request ID">
+                      <i data-lucide="copy" class="w-3 h-3"></i>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Tên Partner</span>
+                  <span class="font-bold text-violet-300" id="m-tx-partner">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">User ID / Session ID</span>
+                  <span class="font-mono text-gray-300" id="m-tx-userid">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Client Source IP</span>
+                  <span class="font-mono text-gray-350" id="m-tx-clientip">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Method / HTTP Code</span>
+                  <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="text-[10px] px-1.5 py-0.5 bg-gray-800 text-gray-300 font-bold font-mono uppercase rounded" id="m-tx-method">-</span>
+                    <span id="m-tx-http-badge" class="inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold">-</span>
+                  </div>
+                </div>
+                <div class="col-span-2">
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Endpoint URL</span>
+                  <span class="font-mono text-gray-250 font-bold" id="m-tx-endpoint">-</span>
+                </div>
               </div>
             </div>
 
-            <!-- Monospace Technical Boxes -->
-            <div class="space-y-4">
-              <!-- HEADERS -->
+            <!-- Performance latency indicators -->
+            <div class="bg-black/25 border border-gray-800 rounded-xl p-4.5 space-y-3.5 text-xs">
+              <h4 class="text-[10px] text-gray-400 uppercase font-bold tracking-wider border-b border-gray-800 pb-1.5 flex items-center gap-1.5">
+                <i data-lucide="activity" class="w-3.5 h-3.5 text-violet-400"></i> Thông tin hiệu năng (Latencies)
+              </h4>
+              <div class="space-y-3 font-sans text-xs">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Tổng thời gian phản hồi (Latency)</span>
+                  <span class="font-mono font-bold text-gray-100 text-sm" id="p-total-time">- ms</span>
+                </div>
+                
+                <!-- Timing chart bar split -->
+                <div class="space-y-2 pt-1">
+                  <!-- Backend timing -->
+                  <div>
+                    <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                      <span>Thời gian xử lý Backend (API server)</span>
+                      <span class="font-mono font-bold text-gray-300" id="p-backend-time-txt">0 ms (0%)</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+                      <div id="p-backend-bar" class="bg-violet-500 h-1.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                  </div>
+
+                  <!-- Gateway timing -->
+                  <div>
+                    <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+                      <span>Thời gian phản hồi Gateway (Handshake & Core)</span>
+                      <span class="font-mono font-bold text-gray-300" id="p-gateway-time-txt">0 ms (0%)</span>
+                    </div>
+                    <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+                      <div id="p-gateway-bar" class="bg-cyan-500 h-1.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Processing Result details -->
+            <div class="bg-black/25 border border-gray-800 rounded-xl p-4.5 space-y-3.5 text-xs">
+              <h4 class="text-[10px] text-gray-400 uppercase font-bold tracking-wider border-b border-gray-800 pb-1.5 flex items-center gap-1.5">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-violet-400"></i> Trạng thái kết quả & Lỗi
+              </h4>
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-500">Trạng thái cuối:</span>
+                  <span id="m-result-status-badge" class="font-bold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded">-</span>
+                </div>
+                
+                <!-- Conditionally filled error state block -->
+                <div id="m-result-error-container" class="border border-red-950/40 p-3 rounded-lg bg-red-950/10 space-y-1.5 hidden font-sans">
+                  <div class="flex items-center gap-1 text-[11px] text-red-400 font-bold">
+                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                    <span id="m-result-error-code">ERROR_CODE</span>
+                  </div>
+                  <div class="text-[10px] text-gray-400 font-sans">
+                    <span class="text-gray-400 font-bold block mb-0.5">Nguyên nhân:</span>
+                    <p id="m-result-error-reason" class="text-gray-100 text-xs font-semibold">-</p>
+                  </div>
+                  <div class="text-[10px] text-gray-400 font-sans pt-1 border-t border-red-900/10">
+                    <span class="text-gray-405 font-bold block mb-0.5">Mô tả chi tiết:</span>
+                    <p id="m-result-error-desc" class="text-gray-150"></p>
+                  </div>
+                </div>
+
+                <!-- Success state block -->
+                <div id="m-result-success-container" class="border border-green-950/45 p-3 rounded-lg bg-green-950/10 text-[11px] text-green-400 font-sans hidden">
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>
+                    <span><strong>Giao dịch thành công.</strong> Không phát sinh cảnh báo hay lỗi hệ thống máy chủ.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT PANEL: INTERACTIVE CONFIG/PAYLOAD DETAILS -->
+          <div class="flex-1 flex flex-col space-y-4">
+            
+            <!-- Tab switches inside modal right panel -->
+            <div class="flex border-b border-gray-800 text-xs shrink-0 bg-black/10 rounded-t-lg p-1">
+              <button onclick="setDetailRightTab('params')" id="btn-dr-params" class="flex-1 text-center py-2 font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent transition-all cursor-pointer">Request Parameters</button>
+              <button onclick="setDetailRightTab('body')" id="btn-dr-body" class="flex-1 text-center py-2 font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent transition-all cursor-pointer">Body & Headers</button>
+            </div>
+
+            <!-- Content Panel: Parameters table -->
+            <div id="dr-panel-params" class="flex-1 overflow-y-auto space-y-3.5 bg-black/15 border border-gray-800 rounded-xl p-4">
+              <span class="text-[10px] text-gray-500 uppercase font-extrabold tracking-wider block">Tham số gọi tin (Request Inputs)</span>
+              
+              <div class="border border-gray-800 rounded-lg overflow-hidden bg-black/10">
+                <table class="w-full text-left text-xs font-sans">
+                  <thead>
+                    <tr class="bg-black/35 text-[9px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-850">
+                      <th class="px-3 py-2.5">Tên tham số</th>
+                      <th class="px-3 py-2.5">Kiểu dữ liệu</th>
+                      <th class="px-3 py-2.5">Giá trị truyền</th>
+                    </tr>
+                  </thead>
+                  <tbody id="m-tx-params-table-body" class="divide-y divide-gray-850/20 font-medium text-gray-300 font-mono text-[11px]">
+                    <!-- filled dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Content Panel: Full Body / Headers JSON block -->
+            <div id="dr-panel-body" class="flex-1 overflow-y-auto space-y-4 bg-black/15 border border-gray-800 rounded-xl p-4 hidden">
+              <!-- Req Headers -->
               <div class="space-y-1">
                 <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block">Request Headers</span>
-                <pre class="bg-black/30 border border-gray-800 p-3.5 rounded-lg text-[11px] font-mono text-gray-300 overflow-x-auto leading-relaxed">
-X-Api-Key: gar***nm1234
-Content-Type: application/json
-Accept: application/json
-User-Agent: GameHub-Gateway/2.1 (Client: GarenaApp-v4)
-Client-IP: 103.45.18.91</pre>
+                <pre id="m-tx-req-headers" class="bg-black/30 border border-gray-850 p-3 rounded-lg text-[11px] font-mono text-gray-300 overflow-x-auto leading-relaxed"></pre>
               </div>
 
-              <!-- REQUEST BODY -->
+              <!-- Req Body -->
               <div class="space-y-1">
-                <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block">Request Payload (Body)</span>
-                <pre class="bg-black/30 border border-gray-800 p-3.5 rounded-lg text-[11px] font-mono text-violet-300 overflow-x-auto leading-relaxed" id="m-request-body">
-{
-  "player_id": "lao_88201",
-  "service_code": "FF_VN_001",
-  "request_timestamp": "15/06/2024 10:30:25"
-}</pre>
+                <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block">Request Payload (JSON)</span>
+                <pre id="m-tx-req-body" class="bg-black/30 border border-gray-850 p-3 rounded-lg text-[11px] font-mono text-violet-350 overflow-x-auto leading-relaxed"></pre>
               </div>
 
-              <!-- RESPONSE BODY -->
+              <!-- Res Headers -->
               <div class="space-y-1">
-                <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block font-sans">Response Payload (Body)</span>
-                <pre class="bg-black/30 border border-gray-800 p-3.5 rounded-lg text-[11px] font-mono text-cyan-300 overflow-x-auto leading-relaxed" id="m-response-body">
-{
-  "status": "success",
-  "code": "200",
-  "data": {
-    "active": true,
-    "user_balance": 15000
-  }
-}</pre>
+                <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block">Response Headers</span>
+                <pre id="m-tx-res-headers" class="bg-black/30 border border-gray-850 p-3 rounded-lg text-[11px] font-mono text-gray-300 overflow-x-auto leading-relaxed"></pre>
               </div>
-            </div>
 
-            <!-- Footer Compare shortcut -->
-            <div class="flex justify-end pt-2 border-t border-gray-805">
-              <button onclick="switchModalTab('compare')" class="border border-violet-850 hover:bg-violet-950/20 hover:border-violet-500 text-violet-300 text-xs font-bold uppercase tracking-wider py-2.5 px-4 rounded-xl flex items-center gap-1.5 transition-colors">
-                <i data-lucide="columns" class="w-4 h-4"></i> So sánh Log
-              </button>
+              <!-- Res Body -->
+              <div class="space-y-1">
+                <span class="text-[10px] text-gray-500 uppercase font-black tracking-widest block">Response Payload (JSON)</span>
+                <pre id="m-tx-res-body" class="bg-black/30 border border-gray-850 p-3 rounded-lg text-[11px] font-mono text-cyan-300 overflow-x-auto leading-relaxed"></pre>
+              </div>
             </div>
 
           </div>
-
-          <!-- TAB 2: COMPARATOR -->
-          <div id="modal-content-compare" class="hidden h-full flex flex-col justify-between">
-            <div class="space-y-4">
-              <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Bảng so sánh đối chiếu dải mã bản tin</h3>
-              
-              <div class="grid grid-cols-2 gap-4 h-[350px]">
-                
-                <!-- Present log body -->
-                <div class="flex flex-col border border-gray-800 rounded-xl bg-black/30 overflow-hidden">
-                  <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between items-center text-xs">
-                    <span class="font-bold text-violet-400" id="comp-label-left">Bản ghi hiện tại (200 OK)</span>
-                    <span class="font-mono text-[10px] text-gray-500">TXN00001</span>
-                  </div>
-                  <pre class="p-3 text-[11px] font-mono text-violet-300/80 overflow-y-auto leading-relaxed flex-1 leading-relaxed">
-{
-  "status": "success",
-  "code": "200",
-  "data": {
-    "active": true,
-    "user_balance": 15000,
-    "latency_ns": 145000
-  }
-}</pre>
-                </div>
-
-                <!-- Contrast log body -->
-                <div class="flex flex-col border border-gray-800 rounded-xl bg-black/30 overflow-hidden">
-                  <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between items-center text-xs">
-                    <span class="font-bold text-yellow-500" id="comp-label-right">Bản ghi đối chứng (Error 429)</span>
-                    <span class="font-mono text-[10px] text-gray-500">TXN00002</span>
-                  </div>
-                  <pre class="p-3 text-[11px] font-mono text-yellow-300/80 overflow-y-auto leading-relaxed flex-1 leading-relaxed">
-{
-  "status": "failed",
-  "code": "429",
-  "error": {
-    "reason": "TPS limits exceeded (100 req/s)",
-    "recommend_delay_ms": 1000
-  }
-}</pre>
-                </div>
-
-              </div>
-            </div>
-          </div>
-
         </div>
+
+        <!-- Modal Action Footer -->
+        <div class="px-6 py-4 border-t border-gray-800 bg-[#0D1117]/85 shrink-0 flex items-center justify-between">
+          <div class="flex gap-2 text-xs">
+            <button onclick="exportSingleLogJson()" class="bg-black/30 hover:bg-black/60 border border-gray-750 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-lg flex items-center gap-1.5 font-bold text-[10px] uppercase tracking-wider cursor-pointer transition-colors">
+              <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-400"></i> Xuất dữ liệu Log
+            </button>
+            <button onclick="navigateToRelatedLogs()" class="bg-black/30 hover:bg-black/60 border border-gray-750 text-gray-300 hover:text-white px-3.5 py-2.5 rounded-lg flex items-center gap-1.5 font-bold text-[10px] uppercase tracking-wider cursor-pointer transition-colors">
+              <i data-lucide="link" class="w-3.5 h-3.5 text-violet-400"></i> Giao dịch liên quan
+            </button>
+          </div>
+          <button onclick="closeDetailModal()" class="bg-violet-650 hover:bg-violet-550 text-white font-bold uppercase tracking-wider px-6 py-2.5 text-xs rounded-xl cursor-pointer shadow transition-colors"> Đóng </button>
+        </div>
+
       </div>
     </div>
 
+    <!-- COMPARISON MODAL -->
+    <div id="compare-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="closeCompareModal()" class="absolute inset-0 bg-black/85 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 rounded-2xl w-full max-w-7xl shadow-2xl flex flex-col h-[85vh] overflow-hidden">
+        
+        <!-- Header -->
+        <div class="px-6 py-4.5 border-b border-gray-800 bg-[#0D1117] flex justify-between items-center shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-violet-600/10 border border-violet-500/20 flex items-center justify-center">
+              <i data-lucide="columns" class="w-4 h-4 text-violet-400"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-gray-100 font-sans">Bảng Phân Tích Đối Chiếu Các Bản Tin Giao Dịch</h3>
+              <p class="text-[10px] text-gray-500">Phân tích chéo dải tham số, cấu trúc kết quả, và tốc độ phản hồi của hai giao dịch</p>
+            </div>
+          </div>
+          <button onclick="closeCompareModal()" class="text-gray-400 hover:text-white text-xl font-bold font-sans cursor-pointer">&times;</button>
+        </div>
+
+        <!-- Comparative Layout grid area -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-black/10">
+          
+          <!-- Metas Side by Side structured compare row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 font-sans">
+            
+            <!-- Log Entity A (Left) -->
+            <div class="bg-violet-950/10 border border-violet-500/20 rounded-xl p-4.5 space-y-3 relative overflow-hidden">
+              <div class="absolute right-3 top-3 px-2 py-0.5 rounded text-[8px] font-bold tracking-widest uppercase bg-violet-600/30 text-violet-300">Bản Tin A</div>
+              <h4 class="text-xs font-black text-violet-400 font-mono" id="comp-a-id">TXNxxxxx</h4>
+              
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Thời gian</span>
+                  <span id="comp-a-time" class="text-gray-300 font-mono">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Partner</span>
+                  <span id="comp-a-partner" class="text-gray-200 font-sans font-bold">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">User ID</span>
+                  <span id="comp-a-userid" class="text-cyan-400 font-mono">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Client IP</span>
+                  <span id="comp-a-clientip" class="text-gray-300 font-mono">-</span>
+                </div>
+                <div class="col-span-2 pt-2 border-t border-gray-800/80 mt-1 max-w-full truncate">
+                  <span class="text-gray-400 font-mono font-bold text-[10px] bg-black/20 p-1 rounded" id="comp-a-endpoint">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Log Entity B (Right) -->
+            <div class="bg-cyan-950/10 border border-cyan-500/20 rounded-xl p-4.5 space-y-3 relative overflow-hidden">
+              <div class="absolute right-3 top-3 px-2 py-0.5 rounded text-[8px] font-bold tracking-widest uppercase bg-cyan-600/30 text-cyan-300">Bản Tin B</div>
+              <h4 class="text-xs font-black text-cyan-400 font-mono" id="comp-b-id">TXNxxxxx</h4>
+              
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Thời gian</span>
+                  <span id="comp-b-time" class="text-gray-300 font-mono">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Partner</span>
+                  <span id="comp-b-partner" class="text-gray-200 font-sans font-bold">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">User ID</span>
+                  <span id="comp-b-userid" class="text-cyan-400 font-mono">-</span>
+                </div>
+                <div>
+                  <span class="text-gray-500 text-[10px] uppercase font-bold block">Client IP</span>
+                  <span id="comp-b-clientip" class="text-gray-300 font-mono">-</span>
+                </div>
+                <div class="col-span-2 pt-2 border-t border-gray-800/80 mt-1 max-w-full truncate">
+                  <span class="text-gray-400 font-mono font-bold text-[10px] bg-black/20 p-1 rounded" id="comp-b-endpoint">-</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Technical parameters comparisons block -->
+          <div class="border border-gray-800 rounded-xl overflow-hidden bg-[#0D1117]/60">
+            <div class="bg-gray-900 px-4 py-2.5 border-b border-gray-800 text-[10px] font-bold text-gray-400 uppercase tracking-wider font-sans">
+              So Sánh Cấu Hình Code, Thời Gian, & Kết Quả Xử Lý (Status Comparison Study)
+            </div>
+            <div class="divide-y divide-gray-850/30 text-xs">
+              
+              <!-- Result Stat Row -->
+              <div class="grid grid-cols-12 gap-4 px-6 py-3.5 items-center">
+                <div class="col-span-2 text-gray-400 font-bold">HTTP Code & Kết quả</div>
+                <div class="col-span-5 flex items-center gap-2">
+                  <span id="comp-code-a" class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold">-</span>
+                  <span id="comp-status-a" class="font-bold text-gray-200">-</span>
+                </div>
+                <div class="col-span-5 flex items-center gap-2">
+                  <span id="comp-code-b" class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold">-</span>
+                  <span id="comp-status-b" class="font-bold text-gray-200">-</span>
+                </div>
+              </div>
+
+              <!-- Latency comparison -->
+              <div class="grid grid-cols-12 gap-4 px-6 py-3.5 items-center">
+                <div class="col-span-2 text-gray-400 font-bold">Latency Phản hồi</div>
+                <div class="col-span-5 space-y-1">
+                  <span id="comp-lat-a" class="font-mono font-bold text-base text-gray-150">- ms</span>
+                  <div class="text-[10px] text-gray-500 font-mono">Backend: <span id="comp-lat-a-be">- ms</span> | Gateway: <span id="comp-lat-a-gw">- ms</span></div>
+                </div>
+                <div class="col-span-5 space-y-1">
+                  <span id="comp-lat-b" class="font-mono font-bold text-base text-gray-150">- ms</span>
+                  <div class="text-[10px] text-gray-500 font-mono">Backend: <span id="comp-lat-b-be">- ms</span> | Gateway: <span id="comp-lat-b-gw">- ms</span></div>
+                </div>
+              </div>
+
+              <!-- Speed analysis recommendation -->
+              <div class="bg-black/25 px-6 py-3 flex items-center gap-2 border-b border-gray-800 text-xs text-yellow-450 font-medium">
+                <i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i>
+                <span id="comp-perf-recommendation-txt">Thống kê chênh lệch tốc độ tải phản hồi API giữa hai bản ghi...</span>
+              </div>
+
+              <!-- System Codes / Error detail comparisons -->
+              <div class="grid grid-cols-12 gap-4 px-6 py-4 items-start font-sans">
+                <div class="col-span-2 text-gray-400 font-bold pt-1">Chi tiết kết quả & Lỗi</div>
+                <div class="col-span-10 md:col-span-5 text-gray-300" id="comp-err-a-box">
+                  <span class="text-xs font-bold font-mono text-red-400" id="comp-err-a-code">-</span>
+                  <p class="text-[11px] text-gray-400 mt-1 italic leading-relaxed" id="comp-err-a-desc">-</p>
+                </div>
+                <div class="col-span-10 md:col-span-5 text-gray-300" id="comp-err-b-box">
+                  <span class="text-xs font-bold font-mono text-red-400" id="comp-err-b-code">-</span>
+                  <p class="text-[11px] text-gray-400 mt-1 italic leading-relaxed" id="comp-err-b-desc">-</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Parameters comparison block side-by-side grids -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Params Side A -->
+            <div class="border border-gray-800 rounded-xl overflow-hidden bg-[#0D1117]/40 p-4 space-y-2">
+              <span class="text-[10px] text-violet-400 uppercase font-black tracking-wider block">Request Parameters (Bản Tin A)</span>
+              <div class="border border-gray-800 rounded-lg overflow-hidden bg-black/15">
+                <table class="w-full text-left text-[11px] font-sans">
+                  <thead>
+                    <tr class="bg-black/25 text-[9px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
+                      <th class="px-3 py-2">Tham số</th>
+                      <th class="px-3 py-2">Loại</th>
+                      <th class="px-3 py-2">Giá trị</th>
+                    </tr>
+                  </thead>
+                  <tbody id="comp-params-a-body" class="divide-y divide-gray-850/20 text-gray-300 font-mono">
+                    <!-- dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Params Side B -->
+            <div class="border border-gray-800 rounded-xl overflow-hidden bg-[#0D1117]/40 p-4 space-y-2">
+              <span class="text-[10px] text-cyan-400 uppercase font-black tracking-wider block">Request Parameters (Bản Tin B)</span>
+              <div class="border border-gray-800 rounded-lg overflow-hidden bg-black/15">
+                <table class="w-full text-left text-[11px] font-sans">
+                  <thead>
+                    <tr class="bg-black/25 text-[9px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
+                      <th class="px-3 py-2">Tham số</th>
+                      <th class="px-3 py-2">Loại</th>
+                      <th class="px-3 py-2">Giá trị</th>
+                    </tr>
+                  </thead>
+                  <tbody id="comp-params-b-body" class="divide-y divide-gray-850/20 text-gray-300 font-mono">
+                    <!-- dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- JSON Bodies side-by-side payload comparison -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- JSON Cargo A -->
+            <div class="space-y-2 flex flex-col h-[280px]">
+              <span class="text-[10px] text-violet-400 uppercase font-bold tracking-widest block">Response Payload (Bản Tin A)</span>
+              <pre id="comp-payload-a" class="bg-black/35 border border-gray-800 p-4 rounded-xl text-[11px] font-mono text-violet-300 leading-relaxed flex-1 overflow-auto"></pre>
+            </div>
+
+            <!-- JSON Cargo B -->
+            <div class="space-y-2 flex flex-col h-[280px]">
+              <span class="text-[10px] text-cyan-400 uppercase font-bold tracking-widest block">Response Payload (Bản Tin B)</span>
+              <pre id="comp-payload-b" class="bg-black/35 border border-gray-800 p-4 rounded-xl text-[11px] font-mono text-cyan-300 leading-relaxed flex-1 overflow-auto"></pre>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4.5 border-t border-gray-800 bg-[#0D1117]/90 flex justify-end shrink-0">
+          <button onclick="closeCompareModal()" class="bg-violet-600 hover:bg-violet-550 text-white font-bold uppercase tracking-wider px-6 py-2.5 text-xs rounded-xl cursor-pointer transition-colors shadow-lg"> Đóng đối chiếu </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FLOATING TOASTS NOTIFICATION -->
+    <div id="toast-wrapper" class="fixed bottom-5 right-5 space-y-2 z-50"></div>
+
     <script>
-      // Global Logs array
+      // Global Logs array with extremely rich and detailed dataset
       const initialLogs = [
-        { id: "TXN00001", time: "15/06/2024 10:30:25", partner:"Garena VN", api:"/v1/check-status", reqid:"req-ab-12345", http:200, latency:"145ms", reqBody: '{\n  "player_id": "lao_88201",\n  "service_code": "FF_VN_001",\n  "request_timestamp": "15/06/2024 10:30:25"\n}', resBody: '{\n  "status": "success",\n  "code": "200",\n  "data": {\n    "active": true,\n    "user_balance": 15000\n  }\n}' },
-        { id: "TXN00002", time: "15/06/2024 10:30:50", partner:"Garena VN", api:"/v1/check-status", reqid:"req-ab-12346", http:429, latency:"12ms", reqBody: '{\n  "player_id": "lao_88201",\n  "service_code": "FF_VN_001"\n}', resBody: '{\n  "status": "failed",\n  "code": "429",\n  "error": {\n    "reason": "TPS limit exceeded (100 req/s)",\n    "wait_ms": 500\n  }\n}' },
-        { id: "TXN00003", time: "15/06/2024 11:15:02", partner:"VNG Corp", api:"/v1/register", reqid:"req-xy-45671", http:200, latency:"202ms", reqBody: '{\n  "lao_id": "lao_vng_442",\n  "package_code": "AOV_7D",\n  "register_ip": "103.45.18.2"\n}', resBody: '{\n  "status": "success",\n  "code": "200",\n  "transaction_id": "vng_reg_abc44123"\n}' },
-        { id: "TXN00004", time: "15/06/2024 12:44:11", partner:"Krafton VN", api:"/v1/unregister", reqid:"req-kr-90123", http:500, latency:"2005ms", reqBody: '{\n  "player_id": "kr_pubg_002"\n}', resBody: '{\n  "status": "failed",\n  "code": "500",\n  "error": {\n    "message": "Uniservices database timeout connection (Gateway 504)"\n  }\n}' },
-        { id: "TXN00005", time: "15/06/2024 14:02:18", partner:"Moonton VN", api:"/v1/check-status", reqid:"req-mn-77881", http:200, latency:"80ms", reqBody: '{\n  "player_id": "mn_9910"\n}', resBody: '{\n  "status": "success",\n  "data": {\n    "exists": true\n  }\n}' },
-        { id: "TXN00006", time: "15/06/2024 15:30:11", partner:"Garena VN", api:"/v1/register", reqid:"req-ab-99321", http:200, latency:"190ms", reqBody: '{\n  "player_id": "lao_3321"\n}', resBody: '{\n  "status": "success"\n}' },
-        { id: "TXN00007", time: "15/06/2024 16:50:22", partner:"VNG Corp", api:"/v1/check-status", reqid:"req-xy-10023", http:429, latency:"8ms", reqBody: '{\n  "player_id": "lao_vng_91"\n}', resBody: '{\n  "error": "Too Many Requests (Burst policy triggered)"\n}' },
-        { id: "TXN00008", time: "16/06/2024 09:12:05", partner:"Krafton VN", api:"/v1/check-status", reqid:"req-kr-88221", http:200, latency:"112ms", reqBody: '{\n  "player_id": "kr_005"\n}', resBody: '{\n  "status": "success"\n}' },
-        { id: "TXN00009", time: "16/06/2024 10:15:33", partner:"Moonton VN", api:"/v1/unregister", reqid:"req-mn-44331", http:200, latency:"250ms", reqBody: '{\n  "player_id": "mn_112"\n}', resBody: '{\n  "status": "unregistered_ok"\n}' },
-        { id: "TXN00010", time: "16/06/2024 11:20:18", partner:"Garena VN", api:"/v1/check-status", reqid:"req-ab-50505", http:200, latency:"95ms", reqBody: '{\n  "player_id": "lao_990"\n}', resBody: '{\n  "status": "success"\n}' }
+        {
+          id: "TXN00001",
+          time: "2026-06-15 10:30:25",
+          partner: "Garena VN",
+          api: "Kiểm tra trạng thái",
+          method: "POST",
+          endpoint: "/v1/check-status",
+          clientIp: "103.45.18.91",
+          httpCode: 200,
+          reqId: "req-ab-12345678",
+          userId: "usr_garena_801",
+          latency: 145,
+          backendTime: 115,
+          gatewayTime: 30,
+          status: "Success",
+          errCode: null,
+          errReason: null,
+          errDesc: null,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer gar***nm1234",
+            "X-Gateway-Route": "gw-01",
+            "Accept": "application/json",
+            "User-Agent": "GameHub-Gateway/2.1"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "lao_88201" },
+            { name: "service_code", type: "string", value: "FF_VN_001" },
+            { name: "request_timestamp", type: "string", value: "15/06/2026 10:30:25" }
+          ],
+          reqBody: '{\n  "player_id": "lao_88201",\n  "service_code": "FF_VN_001",\n  "request_timestamp": "2026-06-15 10:30:25"\n}',
+          resHeaders: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+            "X-Runtime-Ms": "145",
+            "Server": "Kestrel"
+          },
+          resBody: '{\n  "status": "success",\n  "code": "200",\n  "data": {\n    "active": true,\n    "user_balance": 15000\n  }\n}'
+        },
+        {
+          id: "TXN00002",
+          time: "2026-06-15 10:30:50",
+          partner: "Garena VN",
+          api: "Kiểm tra trạng thái",
+          method: "POST",
+          endpoint: "/v1/check-status",
+          clientIp: "103.45.18.91",
+          httpCode: 429,
+          reqId: "req-ab-12345679",
+          userId: "usr_garena_801",
+          latency: 12,
+          backendTime: 4,
+          gatewayTime: 8,
+          status: "Failed",
+          errCode: "TPS_LIMIT_EXCEEDED",
+          errReason: "TPS rate limits exceeded (100 req/s)",
+          errDesc: "Tần suất gửi yêu cầu API vượt quá hạn mức tối đa quy định của gói dịch vụ cam kết (SLA - Blocked tại 100 req/s). Vui lòng điều tiết lưu lượng gửi tin.",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer gar***nm1234",
+            "X-Gateway-Route": "gw-01",
+            "Accept": "application/json"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "lao_88201" },
+            { name: "service_code", type: "string", value: "FF_VN_001" }
+          ],
+          reqBody: '{\n  "player_id": "lao_88201",\n  "service_code": "FF_VN_001"\n}',
+          resHeaders: {
+            "Content-Type": "application/json",
+            "X-Runtime-Ms": "12",
+            "Retry-After": "1"
+          },
+          resBody: '{\n  "status": "failed",\n  "code": "429",\n  "error": {\n    "reason": "TPS limits exceeded. Max 100 requests per second.",\n    "wait_ms": 1000\n  }\n}'
+        },
+        {
+          id: "TXN00003",
+          time: "2026-06-15 11:15:02",
+          partner: "VNG Corp",
+          api: "Đăng ký dịch vụ",
+          method: "POST",
+          endpoint: "/v1/register",
+          clientIp: "103.45.18.2",
+          httpCode: 200,
+          reqId: "req-xy-45671000",
+          userId: "usr_vng_01",
+          latency: 202,
+          backendTime: 172,
+          gatewayTime: 30,
+          status: "Success",
+          errCode: null,
+          errReason: null,
+          errDesc: null,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer vng***auth999"
+          },
+          params: [
+            { name: "lao_id", type: "string", value: "lao_vng_442" },
+            { name: "package_code", type: "string", value: "AOV_7D" },
+            { name: "register_ip", type: "string", value: "103.45.18.2" }
+          ],
+          reqBody: '{\n  "lao_id": "lao_vng_442",\n  "package_code": "AOV_7D",\n  "register_ip": "103.45.18.2"\n}',
+          resHeaders: {
+            "Content-Type": "application/json",
+            "X-Runtime-Ms": "202"
+          },
+          resBody: '{\n  "status": "success",\n  "code": "200",\n  "transaction_id": "vng_reg_abc44123",\n  "expires_at": "2026-06-22 11:15:02"\n}'
+        },
+        {
+          id: "TXN00004",
+          time: "2026-06-15 12:44:11",
+          partner: "Krafton VN",
+          api: "Hủy đăng ký dịch vụ",
+          method: "POST",
+          endpoint: "/v1/unregister",
+          clientIp: "118.70.125.40",
+          httpCode: 500,
+          reqId: "req-kr-90123777",
+          userId: "usr_pubg_99",
+          latency: 2005,
+          backendTime: 1980,
+          gatewayTime: 25,
+          status: "Failed",
+          errCode: "UNISERVICE_DB_TIMEOUT",
+          errReason: "Uniservices database timeout connection (Gateway 504)",
+          errDesc: "Thời gian kết nối đến máy chủ cơ sở dữ liệu phân tán Uniservices vượt quá ngưỡng quy định cho phép (Timeout 2000ms), trả về lỗi nghẽn cổng kết nối phía đối tác.",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer krf***pub009"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "kr_pubg_002" }
+          ],
+          reqBody: '{\n  "player_id": "kr_pubg_002"\n}',
+          resHeaders: {
+            "Content-Type": "application/json",
+            "X-Runtime-Ms": "2005"
+          },
+          resBody: '{\n  "status": "failed",\n  "code": "500",\n  "error": {\n    "message": "Uniservices database connection timeout (Internal Server Error 504)"\n  }\n}'
+        },
+        {
+          id: "TXN00005",
+          time: "2026-06-16 14:02:18",
+          partner: "Moonton VN",
+          api: "Kiểm tra trạng thái",
+          method: "POST",
+          endpoint: "/v1/check-status",
+          clientIp: "115.79.130.201",
+          httpCode: 200,
+          reqId: "req-mn-77881999",
+          userId: "usr_mn_88",
+          latency: 80,
+          backendTime: 60,
+          gatewayTime: 20,
+          status: "Success",
+          errCode: null,
+          errReason: null,
+          errDesc: null,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer mnt***9910"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "mn_9910" }
+          ],
+          reqBody: '{\n  "player_id": "mn_9910"\n}',
+          resHeaders: {
+            "Content-Type": "application/json"
+          },
+          resBody: '{\n  "status": "success",\n  "data": {\n    "exists": true,\n    "account_level": 30,\n    "is_banned": false\n  }\n}'
+        },
+        {
+          id: "TXN00006",
+          time: "2026-06-16 15:30:11",
+          partner: "Garena VN",
+          api: "Đăng ký dịch vụ",
+          method: "POST",
+          endpoint: "/v1/register",
+          clientIp: "103.45.18.95",
+          httpCode: 200,
+          reqId: "req-ab-99321555",
+          userId: "usr_9901",
+          latency: 190,
+          backendTime: 155,
+          gatewayTime: 35,
+          status: "Success",
+          errCode: null,
+          errReason: null,
+          errDesc: null,
+          headers: {
+            "Content-Type": "application/json"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "lao_3321" },
+            { name: "service_code", type: "string", value: "FF_VN_002" }
+          ],
+          reqBody: '{\n  "player_id": "lao_3321",\n  "service_code": "FF_VN_002"\n}',
+          resHeaders: {
+            "Content-Type": "application/json"
+          },
+          resBody: '{\n  "status": "success",\n  "transaction_id": "gar_reg_99321555"\n}'
+        },
+        {
+          id: "TXN00007",
+          time: "2026-06-17 16:50:22",
+          partner: "VNG Corp",
+          api: "Kiểm tra trạng thái",
+          method: "POST",
+          endpoint: "/v1/check-status",
+          clientIp: "103.45.18.2",
+          httpCode: 429,
+          reqId: "req-xy-10023111",
+          userId: "usr_vng_02",
+          latency: 8,
+          backendTime: 2,
+          gatewayTime: 6,
+          status: "Failed",
+          errCode: "BURST_LIMIT_EXCEEDED",
+          errReason: "Too Many Requests (Burst policy triggered)",
+          errDesc: "Lưu lượng truy cập vượt ngưỡng lượng burst đột biến cho phép của phân đoạn IP nguồn. Vui lòng thử lại sau 1 phút.",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "lao_vng_91" }
+          ],
+          reqBody: '{\n  "player_id": "lao_vng_91"\n}',
+          resHeaders: {
+            "Content-Type": "application/json"
+          },
+          resBody: '{\n  "status": "failed",\n  "code": "429",\n  "error": {\n    "message": "Too Many Requests (Burst policy triggered)"\n  }\n}'
+        },
+        {
+          id: "TXN00008",
+          time: "2026-06-18 09:12:05",
+          partner: "Krafton VN",
+          api: "Kiểm tra trạng thái",
+          method: "POST",
+          endpoint: "/v1/check-status",
+          clientIp: "118.70.125.40",
+          httpCode: 200,
+          reqId: "req-kr-88221000",
+          userId: "usr_pubg_01",
+          latency: 112,
+          backendTime: 90,
+          gatewayTime: 22,
+          status: "Success",
+          errCode: null,
+          errReason: null,
+          errDesc: null,
+          headers: {
+            "Content-Type": "application/json"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "kr_005" }
+          ],
+          reqBody: '{\n  "player_id": "kr_005"\n}',
+          resHeaders: {
+            "Content-Type": "application/json"
+          },
+          resBody: '{\n  "status": "success",\n  "exists": true\n}'
+        },
+        {
+          id: "TXN00009",
+          time: "2026-06-19 10:15:33",
+          partner: "Moonton VN",
+          api: "Hủy đăng ký dịch vụ",
+          method: "POST",
+          endpoint: "/v1/unregister",
+          clientIp: "115.79.130.201",
+          httpCode: 200,
+          reqId: "req-mn-44331000",
+          userId: "usr_mn_12",
+          latency: 250,
+          backendTime: 210,
+          gatewayTime: 40,
+          status: "Success",
+          errCode: null,
+          errReason: null,
+          errDesc: null,
+          headers: {
+            "Content-Type": "application/json"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "mn_112" }
+          ],
+          reqBody: '{\n  "player_id": "mn_112"\n}',
+          resHeaders: {
+            "Content-Type": "application/json"
+          },
+          resBody: '{\n  "status": "unregistered_ok",\n  "message": "Dịch vụ đã hủy đăng ký và ngắt kết nối thuê bao thành công."\n}'
+        },
+        {
+          id: "TXN00010",
+          time: "2026-06-20 11:20:18",
+          partner: "Garena VN",
+          api: "Kiểm tra trạng thái",
+          method: "POST",
+          endpoint: "/v1/check-status",
+          clientIp: "103.45.18.91",
+          httpCode: 200,
+          reqId: "req-ab-50505111",
+          userId: "usr_9905",
+          latency: 95,
+          backendTime: 75,
+          gatewayTime: 20,
+          status: "Success",
+          errCode: null,
+          errReason: null,
+          errDesc: null,
+          headers: {
+            "Content-Type": "application/json"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "lao_990" }
+          ],
+          reqBody: '{\n  "player_id": "lao_990"\n}',
+          resHeaders: {
+            "Content-Type": "application/json"
+          },
+          resBody: '{\n  "status": "success",\n  "active": true\n}'
+        },
+        {
+          id: "TXN00011",
+          time: "2026-06-20 14:10:05",
+          partner: "VNG Corp",
+          api: "Đăng ký dịch vụ",
+          method: "POST",
+          endpoint: "/v1/register",
+          clientIp: "103.45.18.3",
+          httpCode: 400,
+          reqId: "req-xy-34019283",
+          userId: "usr_vng_03",
+          latency: 15,
+          backendTime: 5,
+          gatewayTime: 10,
+          status: "Failed",
+          errCode: "INVALID_PARAMETER",
+          errReason: "Missing required parameter: player_id",
+          errDesc: "Phần phân giải tin phát hiện thiếu tham số bắt buộc 'player_id' trong phần thân yêu cầu (Request Body Payload). Vui lòng cấu hình lại API client.",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          params: [
+            { name: "package_code", type: "string", value: "AOV_30D" }
+          ],
+          reqBody: '{\n  "package_code": "AOV_30D"\n}',
+          resHeaders: {
+            "Content-Type": "application/json"
+          },
+          resBody: '{\n  "status": "failed",\n  "code": "400",\n  "error": "Missing required parameter: player_id"\n}'
+        },
+        {
+          id: "TXN00012",
+          time: "2026-06-21 15:45:00",
+          partner: "Krafton VN",
+          api: "Kiểm tra số dư gói",
+          method: "POST",
+          endpoint: "/v1/balance",
+          clientIp: "118.70.125.42",
+          httpCode: 200,
+          reqId: "req-kr-12390123",
+          userId: "usr_pubg_10",
+          latency: 310,
+          backendTime: 275,
+          gatewayTime: 35,
+          status: "Success",
+          errCode: null,
+          errReason: null,
+          errDesc: null,
+          headers: {
+            "Content-Type": "application/json"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "kr_pubg_800" }
+          ],
+          reqBody: '{\n  "player_id": "kr_pubg_800"\n}',
+          resHeaders: {
+            "Content-Type": "application/json"
+          },
+          resBody: '{\n  "status": "success",\n  "balance": 450,\n  "unit": "UC"\n}'
+        },
+        {
+          id: "TXN00013",
+          time: "2026-06-21 16:30:10",
+          partner: "Moonton VN",
+          api: "Kiểm tra số dư gói",
+          method: "POST",
+          endpoint: "/v1/balance",
+          clientIp: "115.79.130.50",
+          httpCode: 403,
+          reqId: "req-mn-99201928",
+          userId: "usr_mn_99",
+          latency: 20,
+          backendTime: 6,
+          gatewayTime: 14,
+          status: "Failed",
+          errCode: "IP_BLOCKED_UNAUTHORIZED",
+          errReason: "Client source IP is not whitelisted",
+          errDesc: "Địa chỉ IP nguồn gửi tin không thuộc dải IP Trắng (Whitelisted IPs) đã được đăng ký và ủy quyền trên cổng đối tác GameHub.",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          params: [
+            { name: "player_id", type: "string", value: "mn_forbidden_01" }
+          ],
+          reqBody: '{\n  "player_id": "mn_forbidden_01"\n}',
+          resHeaders: {
+            "Content-Type": "application/json"
+          },
+          resBody: '{\n  "status": "failed",\n  "code": "403",\n  "error": "IP Blocked. Source IP is unauthorized."\n}'
+        }
       ];
 
-      let selectedHttpStatusFilter = 'all';
+      // Configuration state
+      let activeResultFilter = 'all'; // 'all', 'success', 'failed'
       let activeInspectedLogId = null;
+      let selectedCompareIds = [];
+      let currentPage = 1;
+      const itemsPerPage = 8;
+      let activeDetailRightTab = 'params'; // 'params', 'body'
 
       function init() {
-        renderLogsTable();
-        lucide.createIcons();
+         renderLogsTable();
+         lucide.createIcons();
       }
 
+      // Dynamic table render with searches, pagination and checkboxes logic
       function renderLogsTable() {
-        const tbody = document.getElementById('logs-tbody');
-        tbody.innerHTML = '';
+         const tbody = document.getElementById('logs-tbody');
+         tbody.innerHTML = '';
 
-        const partnerFilter = document.getElementById('log-partner').value;
-        const apiFilter = document.getElementById('log-api').value;
+         const partnerFilter = document.getElementById('log-partner').value;
+         const apiFilter = document.getElementById('log-api').value;
+         const clientIpFilter = document.getElementById('log-client-ip').value.trim();
+         const fromDateVal = document.getElementById('log-from-date').value;
+         const toDateVal = document.getElementById('log-to-date').value;
 
-        let filtered = initialLogs.filter(log => {
-          const mPartner = partnerFilter === 'all' || log.partner === partnerFilter;
-          const mApi = apiFilter === 'all' || log.api === apiFilter;
-          
-          let mHttp = true;
-          if (selectedHttpStatusFilter !== 'all') {
-            if (selectedHttpStatusFilter === '200') mHttp = log.http === 200;
-            else if (selectedHttpStatusFilter === '429') mHttp = log.http === 429;
-            else if (selectedHttpStatusFilter === '500') mHttp = log.http === 500;
+         // Filter logic
+         let filtered = initialLogs.filter(log => {
+           // Partner filter
+           const mPartner = partnerFilter === 'all' || log.partner === partnerFilter;
+           
+           // API endpoint filter
+           const mApi = apiFilter === 'all' || log.endpoint === apiFilter;
+           
+           // Result status filter (success vs failure)
+           let mResult = true;
+           if (activeResultFilter === 'success') {
+             mResult = log.httpCode === 200;
+           } else if (activeResultFilter === 'failed') {
+             mResult = log.httpCode !== 200;
+           }
+
+           // Client IP partial input match
+           let mClientIp = true;
+           if (clientIpFilter !== '') {
+             mClientIp = log.clientIp.toLowerCase().includes(clientIpFilter.toLowerCase());
+           }
+
+           // Filter by transaction date (From - To date inputs comparison)
+           let mDateRange = true;
+           if (fromDateVal && toDateVal) {
+             const logDateOnly = log.time.split(' ')[0]; // extracts '2026-06-15'
+             mDateRange = logDateOnly >= fromDateVal && logDateOnly <= toDateVal;
+           }
+
+           return mPartner && mApi && mResult && mClientIp && mDateRange;
+         });
+
+         const totalItems = filtered.length;
+         const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+         
+         // Clamp current page
+         if (currentPage > totalPages) currentPage = totalPages;
+         if (currentPage < 1) currentPage = 1;
+
+         // Slice current page data
+         const startIndex = (currentPage - 1) * itemsPerPage;
+         const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+         const pageData = filtered.slice(startIndex, endIndex);
+
+         // Display status text
+         const statusText = document.getElementById('pagination-status-text');
+         if (totalItems > 0) {
+           statusText.innerHTML = `Hiển thị <span class="font-bold text-gray-300 font-mono">${startIndex + 1} - ${endIndex}</span> trên tổng số <span class="font-sans font-bold text-violet-400 font-mono">${totalItems}</span> bản ghi giao dịch tìm thấy`;
+         } else {
+           statusText.textContent = "Không tìm thấy bất kỳ giao dịch nào phù hợp với bộ lọc.";
+         }
+
+         // Render rows
+         if (pageData.length === 0) {
+           tbody.innerHTML = `
+             <tr>
+               <td colspan="10" class="px-6 py-12 text-center text-gray-500 italic font-sans">
+                 Không tìm thấy bản ghi log nào khớp với các điều kiện lọc tìm kiếm của bạn. 
+                 Hãy thử thay đổi hoặc làm mới bộ lọc phía trên.
+               </td>
+             </tr>`;
+         } else {
+           pageData.forEach(log => {
+             const isChecked = selectedCompareIds.includes(log.id) ? 'checked' : '';
+             
+             // Badges and styles mapping
+             let httpBadge = "bg-green-500/10 text-green-400 border border-green-500/25";
+             let statusBadge = "bg-green-500/15 text-green-400 text-[10px]";
+             let statusTxt = "SUCCESS";
+
+             if (log.httpCode === 400 || log.httpCode === 403) {
+               httpBadge = "bg-orange-500/10 text-orange-400 border border-orange-500/25";
+               statusBadge = "bg-orange-500/15 text-orange-400 text-[10px]";
+               statusTxt = "WARNING";
+             } else if (log.httpCode === 429) {
+               httpBadge = "bg-yellow-500/10 text-yellow-450 border border-yellow-500/25";
+               statusBadge = "bg-yellow-500/15 text-yellow-405 text-[10px]";
+               statusTxt = "LIMITED";
+             } else if (log.httpCode === 500) {
+               httpBadge = "bg-red-500/10 text-red-500 border border-red-500/25 font-bold";
+               statusBadge = "bg-red-505/15 text-red-500 text-[10px]";
+               statusTxt = "FAILED";
+             }
+
+             tbody.insertAdjacentHTML('beforeend', `
+               <tr class="hover:bg-gray-800/25 transition-all">
+                 <td class="px-4 py-3.5 text-center">
+                   <input type="checkbox" onchange="toggleCompareSelection('${log.id}')" ${isChecked} id="chk-${log.id}" class="w-4 h-4 rounded accent-violet-600 bg-black/40 border-gray-750 cursor-pointer">
+                 </td>
+                 <td class="px-5 py-3.5">
+                   <div class="flex flex-col">
+                     <span class="font-mono font-bold text-gray-200 text-xs">${log.id}</span>
+                     <span class="font-mono text-[9px] text-gray-505 select-all truncate max-w-[120px]" title="${log.reqId}">${log.reqId}</span>
+                   </div>
+                 </td>
+                 <td class="px-4 py-3.5 font-mono text-gray-500 text-[11px]">${log.time}</td>
+                 <td class="px-4 py-3.5 text-gray-200 font-bold">${log.partner}</td>
+                 <td class="px-4 py-3.5">
+                   <div class="flex flex-col">
+                     <span class="font-mono text-cyan-400 text-xs font-bold truncate max-w-[170px]" title="${log.endpoint}">${log.endpoint}</span>
+                     <span class="text-[9px] font-sans font-bold text-gray-550">${log.method} &middot; ${log.api}</span>
+                   </div>
+                 </td>
+                 <td class="px-4 py-3.5 font-mono text-gray-400 text-[11px]">${log.clientIp}</td>
+                 <td class="px-4 py-3.5 text-center">
+                   <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold font-mono ${httpBadge}">${log.httpCode}</span>
+                 </td>
+                 <td class="px-4 py-3.5 text-center font-mono text-gray-300 font-bold">${log.latency} ms</td>
+                 <td class="px-4 py-3.5 text-center">
+                   <span class="inline-flex px-1.5 py-0.5 rounded text-[9px] font-black tracking-widest ${statusBadge}">${statusTxt}</span>
+                 </td>
+                 <td class="px-6 py-3.5 text-right">
+                   <button onclick="inspectLog('${log.id}')" class="border border-gray-800 hover:bg-violet-950/20 hover:border-violet-600/50 hover:text-white text-gray-400 font-bold text-[10px] py-1 px-3 rounded-lg cursor-pointer transition-all uppercase tracking-wider">Xem</button>
+                 </td>
+               </tr>
+             `);
+           });
+         }
+
+         // Render Pagination controls
+         renderPaginationControls(totalPages);
+         lucide.createIcons();
+      }
+
+      function renderPaginationControls(totalPages) {
+        const pagWrapper = document.getElementById('pagination-buttons');
+        pagWrapper.innerHTML = '';
+
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.innerHTML = '&larr;';
+        prevBtn.className = `border border-gray-800 px-2.5 py-1 rounded hover:bg-gray-850 cursor-pointer ${currentPage === 1 ? 'opacity-30 cursor-not-allowed pointer-events-none' : ''}`;
+        prevBtn.onclick = () => {
+          if (currentPage > 1) {
+            currentPage--;
+            renderLogsTable();
           }
+        };
+        pagWrapper.appendChild(prevBtn);
 
-          return mPartner && mApi && mHttp;
-        });
-
-        if (filtered.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500 italic">Không tìm thấy bản ghi log nào khớp với điều kiện lọc.</td></tr>';
-          return;
+        // Individual pages
+        for (let i = 1; i <= totalPages; i++) {
+          const pageBtn = document.createElement('button');
+          pageBtn.textContent = i;
+          if (i === currentPage) {
+            pageBtn.className = "bg-accent/15 border border-accent/40 text-violet-400 font-bold px-2.5 py-1 rounded cursor-pointer";
+          } else {
+            pageBtn.className = "border border-gray-800 px-2.5 py-1 rounded hover:bg-gray-850 text-gray-400 cursor-pointer";
+          }
+          pageBtn.onclick = () => {
+            currentPage = i;
+            renderLogsTable();
+          };
+          pagWrapper.appendChild(pageBtn);
         }
 
-        filtered.forEach(log => {
-          let httpBadge = "bg-green-500/10 text-green-400 border border-green-500/20";
-          if (log.http === 429) {
-            httpBadge = "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20";
-          } else if (log.http === 500) {
-            httpBadge = "bg-red-500/10 text-red-500 border border-red-500/20 font-bold";
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.innerHTML = '&rarr;';
+        nextBtn.className = `border border-gray-800 px-2.5 py-1 rounded hover:bg-gray-850 cursor-pointer ${currentPage === totalPages ? 'opacity-30 cursor-not-allowed pointer-events-none' : ''}`;
+        nextBtn.onclick = () => {
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderLogsTable();
           }
-
-          tbody.insertAdjacentHTML('beforeend', `
-            <tr class="hover:bg-gray-800/20 transition-colors">
-              <td class="px-6 py-4 font-mono font-medium text-gray-400 font-bold">${log.id}</td>
-              <td class="px-6 py-4 font-mono text-gray-500 tracking-tight">${log.time}</td>
-              <td class="px-6 py-4 text-gray-300 font-bold">${log.partner}</td>
-              <td class="px-6 py-4 font-mono text-cyan-400 text-xs">${log.api}</td>
-              <td class="px-6 py-4 font-mono text-gray-500 text-[10px] tracking-wide select-all">${log.reqid}</td>
-              <td class="px-6 py-4 text-center">
-                <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${httpBadge}">${log.http}</span>
-              </td>
-              <td class="px-6 py-4 text-center font-mono text-gray-400">${log.latency}</td>
-              <td class="px-6 py-4 text-right">
-                <button onclick="inspectLog('${log.id}')" class="border border-gray-850 hover:bg-gray-800 hover:border-gray-650 bg-[#0D1117] text-gray-400 hover:text-white font-bold text-[10px] py-1 px-2.5 rounded-lg cursor-pointer">Xem</button>
-              </td>
-            </tr>
-          `);
-        });
-
-        lucide.createIcons();
+        };
+        pagWrapper.appendChild(nextBtn);
       }
 
-      function setStatusFilter(value) {
-        selectedHttpStatusFilter = value;
-        const buttons = ['all', '200', '429', '500'];
-        buttons.forEach(btn => {
-          const el = document.getElementById(`btn-http-${btn}`);
-          if (btn === value) {
-            el.className = "bg-violet-600 text-white px-3 py-1.5 rounded-lg font-medium cursor-pointer shadow";
-          } else {
-            el.className = "border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3 py-1.5 rounded-lg cursor-pointer";
-          }
-        });
-
-        renderLogsTable();
+      // Result tab switches (Tất cả, Thành công, Lỗi)
+      function setResultFilter(value) {
+         activeResultFilter = value;
+         const buttons = ['all', 'success', 'failed'];
+         buttons.forEach(btn => {
+           const el = document.getElementById(`btn-res-${btn}`);
+           if (btn === value) {
+             el.className = "bg-violet-600 text-white px-3.5 py-1.5 rounded-lg font-bold cursor-pointer shadow-lg";
+           } else {
+             el.className = "border border-gray-700 hover:border-gray-500 bg-black/20 text-gray-300 px-3.5 py-1.5 rounded-lg cursor-pointer";
+           }
+         });
+         currentPage = 1;
+         renderLogsTable();
       }
 
       function applyFilters() {
-        renderLogsTable();
+         currentPage = 1;
+         renderLogsTable();
+         showToast('success', 'Bộ lọc tìm kiếm đã được áp dụng và đồng bộ hóa thành công!');
       }
 
       function resetFilters() {
-        document.getElementById('log-partner').value = 'all';
-        document.getElementById('log-api').value = 'all';
-        setStatusFilter('all');
+         document.getElementById('log-partner').value = 'all';
+         document.getElementById('log-api').value = 'all';
+         document.getElementById('log-client-ip').value = '';
+         document.getElementById('log-from-date').value = '2026-06-15';
+         document.getElementById('log-to-date').value = '2026-06-25';
+         setResultFilter('all');
+         showToast('info', 'Đã đặt lại dữ liệu bộ lọc tìm kiếm gốc.');
       }
 
-      // INSPECT LOG MODAL
+      // SINGLE REGISTRY INSPECTION MODAL
       function inspectLog(logId) {
-        activeInspectedLogId = logId;
-        const log = initialLogs.find(l => l.id === logId);
-        if (!log) return;
+         activeInspectedLogId = logId;
+         const log = initialLogs.find(l => l.id === logId);
+         if (!log) return;
 
-        // Apply metadata to summary
-        document.getElementById('m-partner').textContent = log.partner;
-        document.getElementById('m-api').textContent = log.api;
-        document.getElementById('m-reqid').textContent = log.reqid;
-        document.getElementById('m-request-body').textContent = log.reqBody;
-        document.getElementById('m-response-body').textContent = log.resBody;
+         // Fill LEFT metadata
+         document.getElementById('m-tx-id').textContent = log.id;
+         document.getElementById('m-tx-time').textContent = log.time;
+         document.getElementById('m-tx-reqid').textContent = log.reqId;
+         document.getElementById('m-tx-partner').textContent = log.partner;
+         document.getElementById('m-tx-userid').textContent = log.userId;
+         document.getElementById('m-tx-clientip').textContent = log.clientIp;
+         document.getElementById('m-tx-method').textContent = log.method;
+         document.getElementById('m-tx-endpoint').textContent = log.endpoint;
 
-        let badge = document.getElementById('m-http');
-        badge.textContent = log.http;
-        if (log.http === 200) {
-          badge.className = "bg-green-500/10 text-green-400 border border-green-500/20 px-2 py-0.5 rounded font-bold font-sans";
-        } else if (log.http === 429) {
-          badge.className = "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-2 py-0.5 rounded font-bold font-sans";
-        } else {
-          badge.className = "bg-red-500/10 text-red-500 border border-red-500/20 px-2 py-0.5 rounded font-bold font-sans";
-        }
+         // Fill latency breakdowns
+         document.getElementById('p-total-time').textContent = `${log.latency} ms`;
+         document.getElementById('p-backend-time-txt').textContent = `${log.backendTime} ms`;
+         document.getElementById('p-gateway-time-txt').textContent = `${log.gatewayTime} ms`;
+         
+         const backendPct = Math.round((log.backendTime / log.latency) * 100);
+         const gatewayPct = 100 - backendPct;
+         document.getElementById('p-backend-bar').style.width = `${backendPct}%`;
+         document.getElementById('p-gateway-bar').style.width = `${gatewayPct}%`;
+         document.getElementById('p-backend-time-txt').textContent = `${log.backendTime} ms (${backendPct}%)`;
+         document.getElementById('p-gateway-time-txt').textContent = `${log.gatewayTime} ms (${gatewayPct}%)`;
 
-        // Apply companion comparator left text
-        document.getElementById('comp-label-left').textContent = `Bản ghi hiện tại (${log.id} - HTTP ${log.http})`;
-        document.querySelector('#modal-content-compare div:first-child pre').textContent = log.resBody;
+         // Setup badge HTTP Codes
+         const hBadge = document.getElementById('m-tx-http-badge');
+         hBadge.textContent = log.httpCode;
+         if (log.httpCode === 200) {
+           hBadge.className = "inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20";
+         } else if (log.httpCode === 400 || log.httpCode === 403) {
+           hBadge.className = "inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20";
+         } else if (log.httpCode === 429) {
+           hBadge.className = "inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20";
+         } else {
+           hBadge.className = "inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-500 border border-red-500/20";
+         }
 
-        // If current log is TXN00001, configure second comparison item as TXN00002. Otherwise use TXN00001
-        let altLog = logId === "TXN00001" ? initialLogs[1] : initialLogs[0];
-        document.getElementById('comp-label-right').textContent = `Bản ghi đối chứng (${altLog.id} - HTTP ${altLog.http})`;
-        document.querySelector('#modal-content-compare div:last-child pre').textContent = altLog.resBody;
+         // Setup Success/Failure error indicators
+         const resStatusBadge = document.getElementById('m-result-status-badge');
+         const errContainer = document.getElementById('m-result-error-container');
+         const succContainer = document.getElementById('m-m-result-success-container') || document.getElementById('m-result-success-container');
 
-        // Open modal
-        document.getElementById('detail-modal').classList.remove('hidden');
-        switchModalTab('summary');
-        lucide.createIcons();
-      }
+         if (log.status === 'Success') {
+           resStatusBadge.textContent = "SUCCESS";
+           resStatusBadge.className = "font-bold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-green-500/10 text-green-400";
+           errContainer.classList.add('hidden');
+           succContainer.classList.remove('hidden');
+         } else {
+           resStatusBadge.textContent = "FAILED";
+           resStatusBadge.className = "font-bold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-red-500/10 text-red-400";
+           succContainer.classList.add('hidden');
+           errContainer.classList.remove('hidden');
 
-      function switchModalTab(tabId) {
-        document.getElementById('modal-content-summary').classList.add('hidden');
-        document.getElementById('modal-content-compare').classList.add('hidden');
-        
-        document.getElementById('modal-tab-btn-summary').className = "text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent pb-2";
-        document.getElementById('modal-tab-btn-compare').className = "text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent pb-2";
+           document.getElementById('m-result-error-code').textContent = log.errCode || "API_ERROR";
+           document.getElementById('m-result-error-reason').textContent = log.errReason || "Cổng nối lỗi hoặc phản hồi chậm máy chủ";
+           document.getElementById('m-result-error-desc').textContent = log.errDesc || "Lỗi tham chiếu dữ liệu đầu vào. Vui lòng kiểm tra lại thiết lập log API.";
+         }
 
-        if (tabId === 'summary') {
-          document.getElementById('modal-content-summary').classList.remove('hidden');
-          document.getElementById('modal-tab-btn-summary').className = "text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent pb-2";
-        } else {
-          document.getElementById('modal-content-compare').classList.remove('hidden');
-          document.getElementById('modal-tab-btn-compare').className = "text-xs font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent pb-2";
-        }
+         // Populate parameters list table
+         const paramTbody = document.getElementById('m-tx-params-table-body');
+         paramTbody.innerHTML = '';
+         if (log.params && log.params.length > 0) {
+           log.params.forEach(p => {
+             paramTbody.insertAdjacentHTML('beforeend', `
+               <tr>
+                 <td class="px-3 py-2 border-b border-gray-800/40 text-gray-300 font-sans">${p.name}</td>
+                 <td class="px-3 py-2 border-b border-gray-800/40 text-violet-400 font-bold">${p.type}</td>
+                 <td class="px-3 py-2 border-b border-gray-800/40 text-cyan-400 font-semibold">${p.value}</td>
+               </tr>
+             `);
+           });
+         } else {
+           paramTbody.innerHTML = `<tr><td colspan="3" class="px-3 py-4 text-center text-gray-500 italic">Không tìm thấy tham số gọi tin</td></tr>`;
+         }
+
+         // Populate Request / Response body JSON payloads
+         const headersFormatted = `Content-Type: application/json\nAuthorization: Bearer ${log.partner.substring(0,3).toLowerCase()}***auth\nX-Gateway-Session: ${log.id}`;
+         const responseHeadersFormatted = `Content-Type: application/json\nX-Response-Time-Ms: ${log.latency}\nConnection: keep-alive`;
+         
+         document.getElementById('m-tx-req-headers').textContent = headersFormatted;
+         document.getElementById('m-tx-req-body').textContent = log.reqBody;
+         document.getElementById('m-tx-res-headers').textContent = responseHeadersFormatted;
+         document.getElementById('m-tx-res-body').textContent = log.resBody;
+
+         // Reset detail right panel tab to parameters default first
+         setDetailRightTab('params');
+
+         // Unhide modal
+         document.getElementById('detail-modal').classList.remove('hidden');
+         lucide.createIcons();
       }
 
       function closeDetailModal() {
-        document.getElementById('detail-modal').classList.add('hidden');
+         document.getElementById('detail-modal').classList.add('hidden');
+      }
+
+      function setDetailRightTab(tab) {
+         activeDetailRightTab = tab;
+         const btnParams = document.getElementById('btn-dr-params');
+         const btnBody = document.getElementById('btn-dr-body');
+         const panelParams = document.getElementById('dr-panel-params');
+         const panelBody = document.getElementById('dr-panel-body');
+
+         if (tab === 'params') {
+           btnParams.className = "flex-1 text-center py-2 font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent transition-all cursor-pointer";
+           btnBody.className = "flex-1 text-center py-2 font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent transition-all cursor-pointer";
+           panelParams.classList.remove('hidden');
+           panelBody.classList.add('hidden');
+         } else {
+           btnParams.className = "flex-1 text-center py-2 font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border-b-2 border-transparent transition-all cursor-pointer";
+           btnBody.className = "flex-1 text-center py-2 font-bold uppercase tracking-wider text-violet-400 border-b-2 border-accent transition-all cursor-pointer";
+           panelParams.classList.add('hidden');
+           panelBody.classList.remove('hidden');
+         }
+      }
+
+      function copyDetailReqId() {
+        const reqId = document.getElementById('m-tx-reqid').textContent;
+        navigator.clipboard.writeText(reqId).then(() => {
+          showToast('success', 'Đã sao chép thành công Request ID của giao dịch!');
+        }).catch(() => {
+          showToast('error', 'Không thể sao chép tự động.');
+        });
+      }
+
+      function exportSingleLogJson() {
+         const id = document.getElementById('m-tx-id').textContent;
+         const log = initialLogs.find(l => l.id === id);
+         if (!log) return;
+
+         const fileData = JSON.stringify(log, null, 2);
+         const blob = new Blob([fileData], { type: 'application/json' });
+         const url = URL.createObjectURL(blob);
+         const anchor = document.createElement('a');
+         anchor.href = url;
+         anchor.download = `log_${log.id}_export.json`;
+         document.body.appendChild(anchor);
+         anchor.click();
+         document.body.removeChild(anchor);
+         URL.revokeObjectURL(url);
+         showToast('success', `Đã xuất và tải về thành công tệp tin log_${log.id}.json`);
+      }
+
+      function navigateToRelatedLogs() {
+         const id = document.getElementById('m-tx-id').textContent;
+         const log = initialLogs.find(l => l.id === id);
+         if (!log) return;
+
+         closeDetailModal();
+         // Pre-fill search by clientIp
+         document.getElementById('log-client-ip').value = log.clientIp;
+         applyFilters();
+         showToast('info', `Hệ thống vừa tự động áp dụng bộ lọc IP nguồn: ${log.clientIp}`);
+      }
+
+
+      // MULTI COMPARATOR LOGIC & METHODS
+      function toggleCompareSelection(logId) {
+         const chk = document.getElementById(`chk-${logId}`);
+         
+         if (selectedCompareIds.includes(logId)) {
+           selectedCompareIds = selectedCompareIds.filter(id => id !== logId);
+         } else {
+           if (selectedCompareIds.length >= 2) {
+             showToast('error', 'Chỉ được phép chọn tối đa 2 bản ghi giao dịch để thực hiện đối chiếu đồng thời!');
+             if (chk) chk.checked = false;
+             return;
+           }
+           selectedCompareIds.push(logId);
+         }
+         updateCompareBar();
+      }
+
+      function updateCompareBar() {
+         const bar = document.getElementById('compare-bar');
+         const countLabel = document.getElementById('compare-count');
+         const btnCompare = document.getElementById('btn-execute-compare');
+
+         if (selectedCompareIds.length > 0) {
+           bar.classList.remove('hidden');
+           countLabel.textContent = selectedCompareIds.length;
+           
+           if (selectedCompareIds.length === 2) {
+             btnCompare.removeAttribute('disabled');
+             btnCompare.className = "bg-violet-600 hover:bg-violet-500 text-white font-bold uppercase tracking-wider px-4 py-2 rounded-lg flex items-center gap-1.5 text-[11px] shadow cursor-pointer transition-all";
+           } else {
+             btnCompare.setAttribute('disabled', 'true');
+             btnCompare.className = "bg-violet-650/30 text-gray-500 cursor-not-allowed font-bold uppercase tracking-wider px-4 py-2 rounded-lg flex items-center gap-1.5 text-[11px]";
+           }
+         } else {
+           bar.classList.add('hidden');
+         }
+      }
+
+      function clearCompareSelection() {
+         selectedCompareIds = [];
+         updateCompareBar();
+         renderLogsTable();
+         showToast('info', 'Đã hủy bỏ toàn bộ lựa chọn đối xứng.');
+      }
+
+      // EXECUTE SIDE BY SIDE COMPARATOR Modal
+      function executeCompare() {
+         if (selectedCompareIds.length !== 2) {
+           showToast('error', 'Vui lòng chọn chính xác 2 giao dịch để kích hoạt!');
+           return;
+         }
+
+         const logA = initialLogs.find(l => l.id === selectedCompareIds[0]);
+         const logB = initialLogs.find(l => l.id === selectedCompareIds[1]);
+
+         if (!logA || !logB) {
+           showToast('error', 'Thất bại khi nạp cấu hình log so sánh.');
+           return;
+         }
+
+         // Populate Entity A (Left violet)
+         document.getElementById('comp-a-id').textContent = logA.id;
+         document.getElementById('comp-a-time').textContent = logA.time;
+         document.getElementById('comp-a-partner').textContent = logA.partner;
+         document.getElementById('comp-a-userid').textContent = logA.userId;
+         document.getElementById('comp-a-clientip').textContent = logA.clientIp;
+         document.getElementById('comp-a-endpoint').textContent = `[${logA.method}] ${logA.endpoint}`;
+
+         // Populate Entity B (Right cyan)
+         document.getElementById('comp-b-id').textContent = logB.id;
+         document.getElementById('comp-b-time').textContent = logB.time;
+         document.getElementById('comp-b-partner').textContent = logB.partner;
+         document.getElementById('comp-b-userid').textContent = logB.userId;
+         document.getElementById('comp-b-clientip').textContent = logB.clientIp;
+         document.getElementById('comp-b-endpoint').textContent = `[${logB.method}] ${logB.endpoint}`;
+
+         // Populate general results codes
+         const codeA = document.getElementById('comp-code-a');
+         codeA.textContent = logA.httpCode;
+         if (logA.httpCode === 200) {
+           codeA.className = "inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20";
+         } else {
+           codeA.className = "inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-450 border border-red-500/20";
+         }
+         document.getElementById('comp-status-a').textContent = logA.status;
+
+         const codeB = document.getElementById('comp-code-b');
+         codeB.textContent = logB.httpCode;
+         if (logB.httpCode === 200) {
+           codeB.className = "inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20";
+         } else {
+           codeB.className = "inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-450 border border-red-500/20";
+         }
+         document.getElementById('comp-status-b').textContent = logB.status;
+
+         // Populate latency durations
+         document.getElementById('comp-lat-a').textContent = `${logA.latency} ms`;
+         document.getElementById('comp-lat-a-be').textContent = `${logA.backendTime} ms`;
+         document.getElementById('comp-lat-a-gw').textContent = `${logA.gatewayTime} ms`;
+
+         document.getElementById('comp-lat-b').textContent = `${logB.latency} ms`;
+         document.getElementById('comp-lat-b-be').textContent = `${logB.backendTime} ms`;
+         document.getElementById('comp-lat-b-gw').textContent = `${logB.gatewayTime} ms`;
+
+         // Output beautiful Speed comparative study recommendations description
+         const diffVal = Math.abs(logA.latency - logB.latency);
+         const recTextEl = document.getElementById('comp-perf-recommendation-txt');
+         if (logA.latency < logB.latency) {
+           const factor = Math.round((logB.latency / logA.latency) * 10) / 10;
+           recTextEl.innerHTML = `Bản ghi <strong>Giao dịch A (${logA.id})</strong> phản hồi nhanh hơn Bản ghi <strong>Giao dịch B (${logB.id})</strong> là <strong>${diffVal} ms</strong> (Tốc độ tối ưu hơn gấp <strong class="text-green-400 font-sans font-extrabold">${factor}x</strong> lần).`;
+         } else if (logB.latency < logA.latency) {
+           const factor = Math.round((logA.latency / logB.latency) * 10) / 10;
+           recTextEl.innerHTML = `Bản ghi <strong>Giao dịch B (${logB.id})</strong> phản hồi nhanh hơn Bản ghi <strong>Giao dịch A (${logA.id})</strong> là <strong>${diffVal} ms</strong> (Tốc độ tối ưu hơn gấp <strong class="text-green-400 font-sans font-extrabold">${factor}x</strong> lần).`;
+         } else {
+           recTextEl.textContent = `Cả hai bản ghi giao dịch điện tử đạt được độ trễ phản hồi đồng tốc như nhau (${logA.latency} ms).`;
+         }
+
+         // Populate error statuses details
+         const boxA = document.getElementById('comp-err-a-box');
+         const errCodeA = document.getElementById('comp-err-a-code');
+         const errDescA = document.getElementById('comp-err-a-desc');
+
+         if (logA.status === 'Success') {
+           errCodeA.textContent = "SUCCESS (Không phát sinh lỗi)";
+           errCodeA.className = "text-xs font-bold font-mono text-green-400";
+           errDescA.textContent = "Hệ thống đáp ứng hoàn hảo dải tin 200 OK. Không xuất hiện mã cảnh báo lỗi.";
+         } else {
+           errCodeA.textContent = logA.errCode;
+           errCodeA.className = "text-xs font-bold font-mono text-red-400";
+           errDescA.textContent = `${logA.errReason} - ${logA.errDesc}`;
+         }
+
+         const boxB = document.getElementById('comp-err-b-box');
+         const errCodeB = document.getElementById('comp-err-b-code');
+         const errDescB = document.getElementById('comp-err-b-desc');
+
+         if (logB.status === 'Success') {
+           errCodeB.textContent = "SUCCESS (Không phát sinh lỗi)";
+           errCodeB.className = "text-xs font-bold font-mono text-green-400";
+           errDescB.textContent = "Hệ thống đáp ứng hoàn hảo dải tin 200 OK. Không xuất hiện mã cảnh báo lỗi.";
+         } else {
+           errCodeB.textContent = logB.errCode;
+           errCodeB.className = "text-xs font-bold font-mono text-red-400";
+           errDescB.textContent = `${logB.errReason} - ${logB.errDesc}`;
+         }
+
+         // Populate dual parameters side tables
+         const pBodyA = document.getElementById('comp-params-a-body');
+         pBodyA.innerHTML = '';
+         if (logA.params && logA.params.length > 0) {
+           logA.params.forEach(p => {
+             pBodyA.insertAdjacentHTML('beforeend', `
+               <tr>
+                 <td class="px-3 py-2 border-b border-gray-800/25">${p.name}</td>
+                 <td class="px-3 py-2 border-b border-gray-800/25 text-violet-400 text-[10px] font-bold">${p.type}</td>
+                 <td class="px-3 py-2 border-b border-gray-800/25 text-gray-100">${p.value}</td>
+               </tr>
+             `);
+           });
+         } else {
+           pBodyA.innerHTML = `<tr><td colspan="3" class="px-3 py-4 text-center text-gray-500 italic">Không tìm thấy tham số</td></tr>`;
+         }
+
+         const pBodyB = document.getElementById('comp-params-b-body');
+         pBodyB.innerHTML = '';
+         if (logB.params && logB.params.length > 0) {
+           logB.params.forEach(p => {
+             pBodyB.insertAdjacentHTML('beforeend', `
+               <tr>
+                 <td class="px-3 py-2 border-b border-gray-800/25">${p.name}</td>
+                 <td class="px-3 py-2 border-b border-gray-800/25 text-cyan-400 text-[10px] font-bold">${p.type}</td>
+                 <td class="px-3 py-2 border-b border-gray-800/25 text-gray-100">${p.value}</td>
+               </tr>
+             `);
+           });
+         } else {
+           pBodyB.innerHTML = `<tr><td colspan="3" class="px-3 py-4 text-center text-gray-500 italic">Không tìm thấy tham số</td></tr>`;
+         }
+
+         // Populate dual response body format previews
+         document.getElementById('comp-payload-a').textContent = logA.resBody;
+         document.getElementById('comp-payload-b').textContent = logB.resBody;
+
+         // Open Compare Modal
+         document.getElementById('compare-modal').classList.remove('hidden');
+         lucide.createIcons();
+         showToast('success', `Đã phân tích đối chiếu thành công giữa ${logA.id} và ${logB.id}!`);
+      }
+
+      function closeCompareModal() {
+        document.getElementById('compare-modal').classList.add('hidden');
+      }
+
+      // Show floating notification toast function
+      function showToast(type, message) {
+        const wrapper = document.getElementById('toast-wrapper');
+        const id = 'toast-' + Date.now();
+        
+        let bg = "bg-card border-gray-850 text-gray-200 shadow-violet-950/20";
+        let icon = '<i data-lucide="info" class="w-4 h-4 text-violet-400"></i>';
+        
+        if (type === 'success') {
+          bg = "bg-green-950/90 border-green-800/80 text-green-300 shadow-green-950/10";
+          icon = '<i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>';
+        } else if (type === 'error') {
+          bg = "bg-red-950/90 border-red-800/80 text-red-350 shadow-red-950/10";
+          icon = '<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400"></i>';
+        } else if (type === 'info') {
+          bg = "bg-violet-950/90 border-violet-800/80 text-violet-300 shadow-violet-950/10";
+          icon = '<i data-lucide="info" class="w-4 h-4 text-violet-400"></i>';
+        }
+
+        const html = `
+          <div id="${id}" class="flex items-center gap-2.5 px-4.5 py-3 rounded-xl border ${bg} shadow-2xl text-xs font-bold transition-all duration-300 transform translate-y-3 opacity-0">
+            ${icon}
+            <span>${message}</span>
+          </div>
+        `;
+        wrapper.insertAdjacentHTML('beforeend', html);
+        lucide.createIcons();
+
+        // Fade-in animation
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.remove('translate-y-3', 'opacity-0');
+          }
+        }, 50);
+        
+        // Auto remove from DOM
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.add('opacity-0', 'translate-y-2');
+            setTimeout(() => el.remove(), 350);
+          }
+        }, 3800);
       }
 
       window.onload = init;

@@ -125,12 +125,22 @@
 
       <!-- MAIN CONTENT -->
       <main class="p-8 max-w-7xl mx-auto">
+
+        <!-- MAIN NAVIGATION TABS -->
+        <div class="flex gap-4 border-b border-gray-800 mb-6 pb-px">
+          <button id="main-tab-services" onclick="setMainTab('services')" class="flex items-center gap-2 px-6 py-3 rounded-t-lg text-xs font-bold uppercase tracking-wider text-violet-400 bg-accent/10 border-t border-x border-accent/20 transition-all cursor-pointer">
+            <i data-lucide="server" class="w-4.5 h-4.5"></i> Quản lý Service
+          </button>
+          <button id="main-tab-packages" onclick="setMainTab('packages')" class="flex items-center gap-2 px-6 py-3 rounded-t-lg text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border border-transparent transition-all cursor-pointer">
+            <i data-lucide="package" class="w-4.5 h-4.5"></i> Quản lý Package Chung
+          </button>
+        </div>
         
         <!-- VIEW 1: SERVICE LIST -->
         <div id="view-list" class="space-y-6">
           <div class="flex justify-between items-center">
             <div>
-              <h1 class="text-2xl font-black text-gray-100 tracking-tight">Kênh Dịch Vụ & Gói Cước Game</h1>
+              <h1 class="text-2xl font-black text-gray-100 tracking-tight">Kênh Dịch Vụ Game & IP Whitelist</h1>
               <p class="text-xs text-gray-500">Quản lý dải IP kết nối, cấu hình IP Whitelist bảo mật, và biểu phí gói cước theo tuần/tháng.</p>
             </div>
             <button onclick="toggleDrawer(true)" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg shadow flex items-center gap-2 cursor-pointer">
@@ -173,13 +183,11 @@
                 </tr>
               </thead>
               <tbody id="services-table-body" class="divide-y divide-gray-850/30 text-xs">
-                <!-- Data rendered by JS -->
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- VIEW 2: PACKAGE LIST OF A SERVICE -->
         <div id="view-packages" class="hidden space-y-6">
           <!-- Breadcrumbs and back -->
           <div class="flex items-center justify-between">
@@ -190,8 +198,28 @@
               <span class="text-gray-600 font-bold">&gt;</span>
               <span class="text-gray-500">Gói Gói Cước (Packages)</span>
             </div>
-            <button onclick="showToast('info', '✏️ Thêm Package mới')" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg flex items-center gap-1 cursor-pointer">
+            <button onclick="openAddPackageModalForCurrentService()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-lg flex items-center gap-1 cursor-pointer">
               <i data-lucide="plus" class="w-4 h-4"></i> Thêm Package
+            </button>
+          </div>
+
+          <!-- Filters for Service Packages -->
+          <div class="bg-card border border-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
+            <div class="flex-1 max-w-lg flex items-center gap-3">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="svc-pkg-search" placeholder="Tìm theo Tên hoặc Mã Package..." onkeyup="filterServicePackages()" class="w-full bg-black/30 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-xs text-gray-200 focus:border-accent outline-none">
+              </div>
+              <select id="svc-pkg-status" onchange="filterServicePackages()" class="bg-black/30 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 outline-none focus:border-accent font-sans">
+                <option value="all">Trạng thái (Tất cả)</option>
+                <option value="Active">Active</option>
+                <option value="Pilot">Pilot</option>
+                <option value="Pending Approval">Pending Approval</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <button onclick="resetServicePkgFilters()" class="border border-gray-700 bg-gray-905 p-2 rounded-lg text-gray-450 hover:text-gray-100 text-xs flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Làm mới
             </button>
           </div>
 
@@ -202,18 +230,81 @@
               <p class="text-xs text-gray-500 mt-1">Gói cước viễn thông tích hợp được nhà mạng kích hoạt từ xa.</p>
             </div>
 
-            <table class="w-full text-left">
+            <table class="w-full text-left font-sans">
               <thead>
                 <tr class="bg-black/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800">
                   <th class="px-6 py-4">Tên Gói</th>
+                  <th class="px-6 py-4">Mã Package</th>
                   <th class="px-6 py-4">Giá bán (VND)</th>
-                  <th class="px-6 py-4 font-mono">Chu kỳ thời hạn</th>
-                  <th class="px-6 py-4">Trạng thái cấu hình</th>
-                  <th class="px-6 py-4 text-right">Danh mục hành động</th>
+                  <th class="px-6 py-4 font-sans">Chu kỳ thời hạn</th>
+                  <th class="px-6 py-4">Ngày tạo</th>
+                  <th class="px-6 py-4 font-mono">Trạng thái</th>
+                  <th class="px-6 py-4 text-right font-sans">Danh mục hành động</th>
                 </tr>
               </thead>
               <tbody id="package-table-rows" class="divide-y divide-gray-850/30 text-xs font-medium">
-                <!-- Package rows -->
+                <!-- Package rows dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 4: GLOBAL PACKAGES LIST -->
+        <div id="view-global-packages" class="hidden space-y-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <h1 class="text-2xl font-black text-gray-100 tracking-tight">Quản lý Gói Cước Toàn Hệ Thống</h1>
+              <p class="text-xs text-gray-500">Xem danh sách, lọc, tìm kiếm và cấu hình các gói cước viễn thông cho tất cả các dịch vụ game trong hệ thống.</p>
+            </div>
+            <button onclick="openAddPackageModalGlobally()" class="bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg shadow flex items-center gap-2 cursor-pointer">
+              <i data-lucide="plus" class="w-4 h-4"></i> Thêm Package Mới
+            </button>
+          </div>
+
+          <!-- Filters for Global Packages -->
+          <div class="bg-card border border-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
+            <div class="flex-1 max-w-2xl flex items-center gap-3">
+              <!-- Search bar -->
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="pkg-global-search" placeholder="Tìm theo Tên hoặc Mã Gói (Package Code)..." onkeyup="filterGlobalPackages()" class="w-full bg-black/30 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-xs text-gray-200 focus:border-accent outline-none">
+              </div>
+              <!-- Service filter -->
+              <select id="pkg-global-svc-filter" onchange="filterGlobalPackages()" class="bg-black/30 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 outline-none focus:border-accent max-w-[180px]">
+                <option value="all">Tất cả Service</option>
+                <!-- Dynamically filled by JS -->
+              </select>
+              <!-- Status filter -->
+              <select id="pkg-global-status-filter" onchange="filterGlobalPackages()" class="bg-black/30 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300 outline-none focus:border-accent font-sans">
+                <option value="all">Trạng thái (Tất cả)</option>
+                <option value="Active">Active</option>
+                <option value="Pilot">Pilot</option>
+                <option value="Pending Approval">Pending Approval</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <button onclick="resetGlobalPkgFilters()" class="border border-gray-700 bg-gray-905 p-2 rounded-lg text-gray-450 hover:text-gray-100 text-xs flex items-center gap-1.5 cursor-pointer font-sans">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Làm mới
+            </button>
+          </div>
+
+          <!-- Global Package Table -->
+          <div class="bg-card border border-gray-800 rounded-xl overflow-hidden shadow">
+            <table class="w-full text-left font-sans">
+              <thead>
+                <tr class="bg-black/20 text-[11px] font-semibold text-gray-400 uppercase tracking-widest border-b border-gray-800">
+                  <th class="px-6 py-4">Tên Gói (Package)</th>
+                  <th class="px-6 py-4 font-mono">Mã Package</th>
+                  <th class="px-6 py-4 font-semibold">Dịch vụ (Service)</th>
+                  <th class="px-6 py-4">Giá bán (VND)</th>
+                  <th class="px-6 py-4">Chu kỳ sử dụng</th>
+                  <th class="px-6 py-4 uppercase">Trạng thái</th>
+                  <th class="px-6 py-4 font-mono">Ngày tạo</th>
+                  <th class="px-6 py-4 text-right font-sans">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="global-packages-table-body" class="divide-y divide-gray-850/30 text-xs">
+                <!-- Dynamically filled by JS -->
               </tbody>
             </table>
           </div>
@@ -307,25 +398,21 @@
 
               <!-- Tab Packages -->
               <div id="tab-content-pks" class="hidden">
-                <p class="text-xs text-gray-400 mb-4">Danh sách các gói cước được Partner gán bán cho game này. Để cập nhật chi tiết, vui lòng nhấp "Packages" từ màn hình danh sách chính.</p>
-                <div class="border border-gray-800 rounded-xl overflow-hidden">
-                  <table id="associated-packages-mini" class="w-full text-left text-xs">
-                    <tr class="bg-black/20 text-[10px] font-bold text-gray-500 uppercase tracking-wider border-b border-gray-800">
-                      <th class="px-4 py-2.5">Tên Gói</th>
-                      <th class="px-4 py-2.5">Chu kỳ</th>
-                      <th class="px-4 py-2.5">Trạng thái</th>
-                    </tr>
-                    <tbody class="divide-y divide-gray-850/30 font-medium">
-                      <tr>
-                        <td class="px-4 py-2.5">Gói 7 ngày (15,000₫)</td>
-                        <td class="px-4 py-2.5 font-mono">7 ngày</td>
-                        <td class="px-4 py-2.5 text-green-400">Active</td>
+                <p class="text-xs text-gray-400 mb-4">Danh sách các gói cước được Partner gán bán cho game này. Bạn có thể xem chi tiết hoặc cấu hình trực tiếp.</p>
+                <div class="border border-gray-800 rounded-xl overflow-hidden bg-black/10">
+                  <table class="w-full text-left text-xs font-sans">
+                    <thead>
+                      <tr class="bg-black/25 text-[10px] font-bold text-gray-500 uppercase tracking-wider border-b border-gray-800">
+                        <th class="px-4 py-3">Tên Gói</th>
+                        <th class="px-4 py-3">Mã Gói</th>
+                        <th class="px-4 py-3">Giá bán (VND)</th>
+                        <th class="px-4 py-3">Chu kỳ</th>
+                        <th class="px-4 py-3">Trạng thái</th>
+                        <th class="px-4 py-3 text-right">Hành động</th>
                       </tr>
-                      <tr>
-                        <td class="px-4 py-2.5">Gói 30 ngày (45,000₫)</td>
-                        <td class="px-4 py-2.5 font-mono">30 ngày</td>
-                        <td class="px-4 py-2.5 text-green-400">Active</td>
-                      </tr>
+                    </thead>
+                    <tbody id="associated-packages-mini-body" class="divide-y divide-gray-850/30 font-medium text-gray-300">
+                      <!-- Filled dynamically -->
                     </tbody>
                   </table>
                 </div>
@@ -452,6 +539,115 @@
       </div>
     </div>
 
+    <!-- MODAL 4: DETAILED ADD/EDIT PACKAGE -->
+    <div id="package-editor-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+      <div onclick="showPackageEditorModal(false)" class="absolute inset-0 bg-black/75 backdrop-blur-xs"></div>
+      <div class="relative bg-card border border-gray-800 p-6 rounded-2xl w-full max-w-lg shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+        
+        <div class="flex justify-between items-start pb-2 border-b border-gray-800">
+          <div>
+            <h3 id="package-modal-title" class="text-base font-bold text-gray-100 flex items-center gap-2">
+              <i data-lucide="package" class="w-5 h-5 text-violet-400"></i> Cấu hình Chi tiết Package
+            </h3>
+            <p class="text-[11px] text-gray-400 font-sans">Khai báo và điều chỉnh biểu phí gói cước cho game dịch vụ</p>
+          </div>
+          <button onclick="showPackageEditorModal(false)" class="text-gray-400 hover:text-white text-lg font-bold">&times;</button>
+        </div>
+
+        <form onsubmit="event.preventDefault(); savePackageForm();" class="space-y-4 text-xs font-sans">
+          <input type="hidden" id="p-edit-id">
+
+          <div class="grid grid-cols-2 gap-4">
+            <div id="p-service-select-container" class="space-y-1.5 col-span-2">
+              <label class="block text-[11px] font-semibold text-gray-400 uppercase">Service liên kết (Game) *</label>
+              <select id="p-service-id" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2 text-xs text-gray-150 outline-none focus:border-accent">
+                <!-- Filled dynamically -->
+              </select>
+            </div>
+
+            <div class="space-y-1.5 col-span-2">
+              <label class="block text-[11px] font-semibold text-gray-400 uppercase">Tên Package *</label>
+              <input type="text" id="p-name" placeholder="Ví dụ: Gói Free Fire Tuần" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-150 focus:border-accent outline-none font-bold" required>
+            </div>
+
+            <div class="space-y-1.5 font-mono">
+              <label class="block text-[11px] font-sans font-semibold text-gray-400 uppercase">Mã Package *</label>
+              <input type="text" id="p-code" placeholder="FF_WEEK_15" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-cyan-400 focus:border-accent outline-none font-bold uppercase" required>
+            </div>
+
+            <div class="space-y-1.5 font-mono">
+              <label class="block text-[11px] font-sans font-semibold text-gray-400 uppercase">Ngày tạo</label>
+              <input type="text" id="p-created" readonly class="w-full bg-black/50 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-400 outline-none cursor-not-allowed">
+            </div>
+
+            <div class="space-y-1.5 font-sans">
+              <label class="block text-[11px] font-sans font-semibold text-gray-400 uppercase">Giá bán (VND) *</label>
+              <input type="number" id="p-price" placeholder="15000" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-yellow-500 focus:border-accent outline-none font-bold font-mono" required>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-[11px] font-semibold text-gray-400 uppercase">Thời lượng sử dụng *</label>
+              <select id="p-cycle" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-200 focus:border-accent outline-none font-semibold">
+                <option value="1 ngày">1 ngày</option>
+                <option value="7 ngày">7 ngày</option>
+                <option value="30 ngày">30 ngày</option>
+                <option value="90 ngày">90 ngày</option>
+              </select>
+            </div>
+
+            <div class="space-y-1.5 col-span-2">
+              <label class="block text-[11px] font-semibold text-gray-400 uppercase">Trạng thái Package</label>
+              <select id="p-status" class="w-full bg-black/30 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-200 focus:border-accent outline-none font-semibold">
+                <option value="Active">Active</option>
+                <option value="Pilot">Pilot</option>
+                <option value="Pending Approval">Pending Approval</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Quick Toggle Status Actions inside Details Modal -->
+          <div id="p-action-status-container" class="border border-gray-800 p-3 rounded-xl bg-black/10 space-y-2">
+            <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Hành động trạng thái nhanh</span>
+            <div class="flex gap-2">
+              <button type="button" onclick="changeSelectedPackageStatus('Active')" class="flex-1 bg-green-950/20 hover:bg-green-950/50 text-green-400 border border-green-800/80 hover:border-green-500 py-1.5 rounded font-bold text-[10px] uppercase tracking-wider transition-colors cursor-pointer font-sans">
+                Kích hoạt (Active)
+              </button>
+              <button type="button" onclick="changeSelectedPackageStatus('Inactive')" class="flex-1 bg-red-950/20 hover:bg-red-950/50 text-red-400 border border-red-950/80 hover:border-red-500 py-1.5 rounded font-bold text-[10px] uppercase tracking-wider transition-colors cursor-pointer font-sans">
+                Khóa (Inactive)
+              </button>
+            </div>
+          </div>
+
+          <!-- Lịch sử thay đổi cho package -->
+          <div class="space-y-2">
+            <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider block">Lịch sử thay đổi</span>
+            <div class="border border-gray-800 rounded-lg overflow-hidden bg-black/15 max-h-36 overflow-y-auto">
+              <table class="w-full text-left font-serif text-[10px]">
+                <thead>
+                  <tr class="bg-black/30 text-[9px] font-sans font-semibold text-gray-500 uppercase tracking-widest border-b border-gray-800">
+                    <th class="px-3 py-2 font-sans">Thời gian</th>
+                    <th class="px-3 py-2 font-sans">Người thực hiện</th>
+                    <th class="px-3 py-2 font-sans">Hành động</th>
+                    <th class="px-3 py-2 font-sans">Nội dung thay đổi</th>
+                  </tr>
+                </thead>
+                <tbody id="package-history-log-body" class="divide-y divide-gray-850/30 text-gray-400 font-mono">
+                  <!-- Filled dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Footer/Submit Buttons -->
+          <div class="flex justify-end gap-3 font-semibold text-[11px] tracking-wide uppercase pt-3 border-t border-gray-800">
+            <button type="button" onclick="showPackageEditorModal(false)" class="border border-gray-700 text-gray-400 hover:text-white px-4 py-2.5 rounded-lg cursor-pointer">Hủy</button>
+            <button type="submit" class="bg-accent hover:bg-accent/90 text-white px-5 py-2.5 rounded-lg cursor-pointer">Lưu cấu hình</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script>
       // Global Services Mock array
       let servicesCollection = [
@@ -462,25 +658,154 @@
         { id: 5, name: "Valorant", subcode: "VAL_VN_001", partner: "Riot VN", status: "Inactive", ips: 0, created: "01/03/2024", desc: "Kênh game bắn súng chiến thuật trên PC.", ipList: [] }
       ];
 
-      // Packages under Free Fire
-      let ffPackages = [
-        { name: "Gói 7 ngày", price: "15,000", cycle: "7 ngày", status: "Active" },
-        { name: "Gói 30 ngày", price: "45,000", cycle: "30 ngày", status: "Active" },
-        { name: "Gói VIP 30 ngày", price: "99,000", cycle: "30 ngày", status: "Pending Approval" }
+      // Global Packages Mock Array with detailed history logs
+      let packagesCollection = [
+        { id: 1, serviceId: 1, name: "Gói Tuần Free Fire", code: "FF_WEEK_15", price: "15000", cycle: "7 ngày", status: "Active", created: "10/01/2024", history: [
+          { time: "10/01/2024 10:15", user: "Admin System", action: "Khởi tạo", details: "Tạo gói cước biểu phí Free Fire Viettel 7 ngày." }
+        ] },
+        { id: 2, serviceId: 1, name: "Gói Tháng Free Fire", code: "FF_MONTH_45", price: "45000", cycle: "30 ngày", status: "Active", created: "11/01/2024", history: [
+          { time: "11/01/2024 14:00", user: "Admin System", action: "Khởi tạo", details: "Tạo gói tháng nạp 45k." }
+        ] },
+        { id: 3, serviceId: 1, name: "Gói Siêu Cấp 90 ngày", code: "FF_VIP_90", price: "99000", cycle: "90 ngày", status: "Pending Approval", created: "20/01/2024", history: [] },
+        { id: 4, serviceId: 2, name: "Gói Tuần Liên Quân VIP", code: "LQ_WEEK_10", price: "10000", cycle: "7 ngày", status: "Active", created: "15/01/2024", history: [] },
+        { id: 5, serviceId: 2, name: "Gói Tháng Liên Quân Cực Đỉnh", code: "LQ_MONTH_30", price: "30000", cycle: "30 ngày", status: "Pilot", created: "16/01/2024", history: [] },
+        { id: 6, serviceId: 3, name: "Gói Tuần PUBG Mobile", code: "PUBG_WEEK_20", price: "20000", cycle: "7 ngày", status: "Pending Approval", created: "20/01/2024", history: [] },
+        { id: 7, serviceId: 4, name: "Gói Ngày Mobile Legends", code: "ML_DAY_2", price: "2000", cycle: "1 ngày", status: "Inactive", created: "25/01/2024", history: [
+          { time: "25/01/2024 16:30", user: "Partner Owner", action: "Cập nhật", details: "Chuyển sang Inactive để chuẩn bị khuyến mãi mới." }
+        ] }
       ];
 
       let inspectedServiceId = null;
       let activeDrawerIps = [];
+      let currentServiceContextId = null; // tracking which service list view packages
+      let currentMainTab = 'services'; // 'services' or 'packages'
+      let editingPackageId = null;
 
       function init() {
         renderServicesTable();
+        populateGlobalSvcFilter();
         lucide.createIcons();
       }
 
+      function setMainTab(tab) {
+        currentMainTab = tab;
+        const btnServices = document.getElementById('main-tab-services');
+        const btnPackages = document.getElementById('main-tab-packages');
+
+        if (tab === 'services') {
+          // Activate tab styles
+          btnServices.className = "flex items-center gap-2 px-6 py-3 rounded-t-lg text-xs font-bold uppercase tracking-wider text-violet-400 bg-accent/10 border-t border-x border-accent/20 transition-all cursor-pointer";
+          btnPackages.className = "flex items-center gap-2 px-6 py-3 rounded-t-lg text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border border-transparent transition-all cursor-pointer";
+          
+          document.getElementById('view-global-packages').classList.add('hidden');
+          // Restore whichever services sub-view is current
+          switchView('list');
+        } else {
+          btnServices.className = "flex items-center gap-2 px-6 py-3 rounded-t-lg text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-300 border border-transparent transition-all cursor-pointer";
+          btnPackages.className = "flex items-center gap-2 px-6 py-3 rounded-t-lg text-xs font-bold uppercase tracking-wider text-violet-400 bg-accent/10 border-t border-x border-accent/20 transition-all cursor-pointer";
+
+          // Hide services layout screens
+          document.getElementById('view-list').classList.add('hidden');
+          document.getElementById('view-packages').classList.add('hidden');
+          document.getElementById('view-detail').classList.add('hidden');
+          
+          document.getElementById('view-global-packages').classList.remove('hidden');
+          populateGlobalSvcFilter();
+          renderGlobalPackagesTable();
+        }
+        lucide.createIcons();
+      }
+
+      // Populate service filter dynamically inside the global packages view
+      function populateGlobalSvcFilter() {
+        const select = document.getElementById('pkg-global-svc-filter');
+        if (!select) return;
+        select.innerHTML = '<option value="all">Tất cả Service</option>';
+        servicesCollection.forEach(s => {
+          select.insertAdjacentHTML('beforeend', `<option value="${s.id}">${s.name}</option>`);
+        });
+      }
+
+      // RENDER GLOBAL PACKAGES TABLE
+      function renderGlobalPackagesTable() {
+        const searchInput = document.getElementById('pkg-global-search').value.toLowerCase();
+        const svcFilter = document.getElementById('pkg-global-svc-filter').value;
+        const statusFilter = document.getElementById('pkg-global-status-filter').value;
+        const tbody = document.getElementById('global-packages-table-body');
+        tbody.innerHTML = '';
+
+        let filtered = packagesCollection.filter(p => {
+          const service = servicesCollection.find(s => s.id === p.serviceId);
+          const svcName = service ? service.name : "";
+          
+          const matchSearch = p.name.toLowerCase().includes(searchInput) || 
+                              p.code.toLowerCase().includes(searchInput) || 
+                              svcName.toLowerCase().includes(searchInput);
+          const matchSvc = svcFilter === 'all' || p.serviceId.toString() === svcFilter;
+          const matchStatus = statusFilter === 'all' || p.status === statusFilter;
+
+          return matchSearch && matchSvc && matchStatus;
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500 italic font-sans text-xs">Không tìm thấy gói cước nào khớp với bộ lọc của bạn.</td></tr>';
+          return;
+        }
+
+        filtered.forEach(p => {
+          const service = servicesCollection.find(s => s.id === p.serviceId);
+          const serviceName = service ? service.name : "N/A";
+          
+          let badgeColor = "bg-gray-500/10 text-gray-400";
+          if (p.status === 'Active') badgeColor = "bg-green-500/10 text-green-400 border border-green-500/20";
+          else if (p.status === 'Pilot') badgeColor = "bg-violet-500/10 text-violet-400 border border-violet-500/20";
+          else if (p.status === 'Pending Approval') badgeColor = "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20";
+
+          const formattedPrice = Number(p.price).toLocaleString('vi-VN');
+
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/20 transition-colors">
+              <td class="px-6 py-4 font-bold text-gray-200">${p.name}</td>
+              <td class="px-6 py-4 font-mono text-cyan-400 uppercase tracking-wider font-bold">${p.code}</td>
+              <td class="px-6 py-4 font-semibold text-violet-300">${serviceName}</td>
+              <td class="px-6 py-4 font-mono font-bold text-yellow-500">${formattedPrice} ₫</td>
+              <td class="px-6 py-4 text-gray-300 font-medium font-mono">${p.cycle}</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${badgeColor}">${p.status}</span>
+              </td>
+              <td class="px-6 py-4 text-gray-500 font-mono">${p.created || '20/06/2026'}</td>
+              <td class="px-6 py-4 text-right space-x-2">
+                <button onclick="showPackageEditorModal(true, ${p.id})" class="text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Chi Tiết</button>
+                ${p.status !== 'Active' ? `
+                  <button onclick="changePackageStatusQuickly(${p.id}, 'Active')" class="text-green-400 hover:text-green-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Kích hoạt</button>
+                ` : `
+                  <button onclick="changePackageStatusQuickly(${p.id}, 'Inactive')" class="text-red-400 hover:text-red-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Khóa</button>
+                `}
+              </td>
+            </tr>
+          `);
+        });
+        lucide.createIcons();
+      }
+
+      function filterGlobalPackages() {
+        renderGlobalPackagesTable();
+      }
+
+      function resetGlobalPkgFilters() {
+        document.getElementById('pkg-global-search').value = '';
+        document.getElementById('pkg-global-svc-filter').value = 'all';
+        document.getElementById('pkg-global-status-filter').value = 'all';
+        renderGlobalPackagesTable();
+        showToast('info', '🔄 Biểu mẫu lọc gói cước đã được xóa.');
+      }
+
+      // SERVICES MANAGEMENT TABLE (View 1)
       function renderServicesTable() {
         const search = document.getElementById('svc-search').value.toLowerCase();
         const status = document.getElementById('svc-status').value;
         const tbody = document.getElementById('services-table-body');
+        if (!tbody) return;
         tbody.innerHTML = '';
 
         let filtered = servicesCollection.filter(s => {
@@ -517,8 +842,8 @@
               <td class="px-6 py-4.5 font-mono text-gray-400">${s.ips} IPs</td>
               <td class="px-6 py-4.5 text-gray-500 font-mono">${s.created}</td>
               <td class="px-6 py-4.5 text-right space-x-2">
-                <button onclick="inspectService(${s.id})" class="border border-gray-800 hover:border-gray-550 hover:bg-gray-850 bg-[#0D1117] text-gray-300 font-bold uppercase tracking-wider text-[10px] py-1.5 px-2.5 rounded-lg cursor-pointer">Xem</button>
-                <button onclick="viewPackagesList(${s.id})" class="text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider text-[10px] py-1 px-1.5 cursor-pointer">Packages</button>
+                <button onclick="inspectService(${s.id})" class="border border-gray-800 hover:border-gray-550 hover:bg-gray-850 bg-[#0D1117] text-gray-300 font-bold uppercase tracking-wider text-[10px] py-1.5 px-2.5 rounded-lg cursor-pointer font-sans">Xem</button>
+                <button onclick="viewPackagesList(${s.id})" class="text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider text-[10px] py-1 px-1.5 cursor-pointer font-sans">Packages</button>
               </td>
             </tr>
           `);
@@ -552,36 +877,88 @@
         }
       }
 
-      // PACKAGES MANAGEMENT LIST (View 2)
+      // PACKAGES MANAGEMENT FOR A SPECIFIC SERVICE (View 2)
       function viewPackagesList(serviceId) {
+        currentServiceContextId = serviceId;
         const s = servicesCollection.find(svc => svc.id === serviceId);
         if (!s) return;
 
         document.getElementById('pkg-breadcrumb-game-name').textContent = s.name;
         document.getElementById('pkg-title-game').textContent = `Danh sách biểu phí: ${s.name} (${s.partner})`;
         
+        renderServiceSpecificPackagesTable();
+        switchView('packages');
+      }
+
+      function renderServiceSpecificPackagesTable() {
+        const searchInput = document.getElementById('svc-pkg-search').value.toLowerCase();
+        const statusSelect = document.getElementById('svc-pkg-status').value;
         const tbody = document.getElementById('package-table-rows');
         tbody.innerHTML = '';
 
-        ffPackages.forEach(pkg => {
-          let badge = pkg.status === 'Active' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20';
+        let filtered = packagesCollection.filter(p => p.serviceId === currentServiceContextId);
+        
+        filtered = filtered.filter(p => {
+          const matchSearch = p.name.toLowerCase().includes(searchInput) || p.code.toLowerCase().includes(searchInput);
+          const matchStatus = statusSelect === 'all' || p.status === statusSelect;
+          return matchSearch && matchStatus;
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-6 text-center text-gray-500 italic font-sans text-xs">Không tìm thấy gói cước nào khớp cho dịch vụ này.</td></tr>';
+          return;
+        }
+
+        filtered.forEach(p => {
+          let badge = "bg-gray-500/10 text-gray-400";
+          if (p.status === 'Active') badge = 'bg-green-500/10 text-green-400 border border-green-500/20';
+          else if (p.status === 'Pilot') badge = 'bg-violet-500/10 text-violet-400 border border-violet-500/20';
+          else if (p.status === 'Pending Approval') badge = 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20';
+
+          const formattedPrice = Number(p.price).toLocaleString('vi-VN');
+
           tbody.insertAdjacentHTML('beforeend', `
             <tr class="hover:bg-gray-800/10 transition-colors">
-              <td class="px-6 py-4 font-bold text-gray-200">${pkg.name}</td>
-              <td class="px-6 py-4 font-mono text-cyan-400 font-bold text-right pr-24">${pkg.price} ₫</td>
-              <td class="px-6 py-4 font-mono font-medium text-gray-400">${pkg.cycle}</td>
+              <td class="px-6 py-4 font-bold text-gray-200">${p.name}</td>
+              <td class="px-6 py-4 font-mono text-cyan-400 font-bold uppercase">${p.code}</td>
+              <td class="px-6 py-4 font-mono font-bold text-yellow-500">${formattedPrice} ₫</td>
+              <td class="px-6 py-4 font-mono font-semibold text-gray-300">${p.cycle}</td>
+              <td class="px-6 py-4 text-gray-400 font-mono">${p.created || '20/06/2026'}</td>
               <td class="px-6 py-4">
-                <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${badge}">${pkg.status}</span>
+                <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${badge}">${p.status}</span>
               </td>
-              <td class="px-6 py-4 text-right">
-                <button onclick="showToast('info', '✏️ Chi tiết cấu hình Gói')" class="text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Sửa</button>
+              <td class="px-6 py-4 text-right space-x-2 font-sans">
+                <button onclick="showPackageEditorModal(true, ${p.id})" class="text-violet-400 hover:text-violet-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Sửa</button>
+                ${p.status !== 'Active' ? `
+                  <button onclick="changePackageStatusQuickly(${p.id}, 'Active')" class="text-green-400 hover:text-green-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Mở</button>
+                ` : `
+                  <button onclick="changePackageStatusQuickly(${p.id}, 'Inactive')" class="text-red-400 hover:text-red-300 font-bold uppercase tracking-wider text-[10px] hover:underline cursor-pointer">Khóa</button>
+                `}
               </td>
             </tr>
           `);
         });
 
-        switchView('packages');
         lucide.createIcons();
+      }
+
+      function filterServicePackages() {
+        renderServiceSpecificPackagesTable();
+      }
+
+      function resetServicePkgFilters() {
+        document.getElementById('svc-pkg-search').value = '';
+        document.getElementById('svc-pkg-status').value = 'all';
+        renderServiceSpecificPackagesTable();
+        showToast('info', '🔄 Bộ lọc gói cước dịch vụ đã được dọn sạch.');
+      }
+
+      function openAddPackageModalForCurrentService() {
+        showPackageEditorModal(true, null, currentServiceContextId);
+      }
+
+      function openAddPackageModalGlobally() {
+        showPackageEditorModal(true, null);
       }
 
       // SERVICE DETAILS (View 3)
@@ -617,8 +994,43 @@
         }
 
         renderIpsList();
+        renderAssociatedPackagesMini(serviceId);
         switchView('detail');
         switchTab('info');
+      }
+
+      // Render the packages list dynamic tab in details view
+      function renderAssociatedPackagesMini(serviceId) {
+        const tbody = document.getElementById('associated-packages-mini-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        let filtered = packagesCollection.filter(p => p.serviceId === serviceId);
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-4 text-center text-gray-500 italic font-sans font-medium text-xs">Chưa có gói cước nào được đăng cho dịch vụ này.</td></tr>';
+          return;
+        }
+
+        filtered.forEach(p => {
+          let badge = "text-gray-400";
+          if (p.status === 'Active') badge = 'text-green-400';
+          else if (p.status === 'Pilot') badge = 'text-violet-400';
+          else if (p.status === 'Pending Approval') badge = 'text-yellow-400';
+
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr class="hover:bg-gray-800/10">
+              <td class="px-4 py-2.5 font-bold text-gray-250">${p.name}</td>
+              <td class="px-4 py-2.5 font-mono text-cyan-400 font-bold uppercase">${p.code}</td>
+              <td class="px-4 py-2.5 font-mono font-bold text-yellow-500">${Number(p.price).toLocaleString('vi-VN')} ₫</td>
+              <td class="px-4 py-2.5 font-mono text-gray-300">${p.cycle}</td>
+              <td class="px-4 py-2.5 ${badge} font-bold">${p.status}</td>
+              <td class="px-4 py-2.5 text-right font-sans">
+                <button onclick="showPackageEditorModal(true, ${p.id})" class="text-violet-400 hover:text-violet-300 font-bold uppercase text-[10px] hover:underline cursor-pointer">Sửa</button>
+              </td>
+            </tr>
+          `);
+        });
       }
 
       function switchTab(tabId) {
@@ -642,7 +1054,7 @@
         tbody.innerHTML = '';
 
         if (svc.ipList.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 italic font-sans">Chưa gán địa chỉ IP nào cho game này. IP Gateway sẽ từ chối kết nối.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 italic font-sans text-xs">Chưa gán địa chỉ IP nào cho game này. IP Gateway sẽ từ chối kết nối.</td></tr>';
           return;
         }
 
@@ -686,7 +1098,234 @@
 
         renderIpsList();
         renderServicesTable();
-        showToast('info', `🗑 Đã xóa IP: ${removedIp}`);
+        showToast('info', '🗑 Đã xóa dải Whitelist IP: ' + removedIp);
+      }
+
+      // DETAILED PACKAGE CREATOR / EDITOR MODAL CONTROL
+      function showPackageEditorModal(open, packageId = null, forcedServiceId = null) {
+        const modal = document.getElementById('package-editor-modal');
+        if (!open) {
+          modal.classList.add('hidden');
+          editingPackageId = null;
+          return;
+        }
+
+        editingPackageId = packageId;
+
+        // Populate Services dropdown in Package form
+        const selectSve = document.getElementById('p-service-id');
+        selectSve.innerHTML = '';
+        servicesCollection.forEach(s => {
+          selectSve.insertAdjacentHTML('beforeend', `<option value="${s.id}">${s.name} (${s.partner})</option>`);
+        });
+
+        // History logs element
+        const histBody = document.getElementById('package-history-log-body');
+        histBody.innerHTML = '';
+
+        if (packageId === null) {
+          // Add mode
+          document.getElementById('package-modal-title').innerHTML = `<i data-lucide="plus-circle" class="w-5 h-5 text-violet-400"></i> Thiết lập Gói Mới`;
+          document.getElementById('p-edit-id').value = '';
+          document.getElementById('p-name').value = '';
+          document.getElementById('p-code').value = '';
+          document.getElementById('p-price').value = '';
+          document.getElementById('p-cycle').value = '7 ngày';
+          document.getElementById('p-status').value = 'Pilot';
+          document.getElementById('p-created').value = new Date().toLocaleDateString('vi-VN');
+          
+          document.getElementById('p-action-status-container').classList.add('hidden');
+
+          if (forcedServiceId) {
+            selectSve.value = forcedServiceId;
+          } else if (currentServiceContextId) {
+            selectSve.value = currentServiceContextId;
+          } else if (inspectedServiceId) {
+            selectSve.value = inspectedServiceId;
+          }
+
+          histBody.innerHTML = '<tr><td colspan="4" class="px-3 py-3 text-center text-gray-500 italic">Thêm gói cước mới để kích hoạt luồng thanh toán viễn thông qua các cổng.</td></tr>';
+        } else {
+          // Edit/Detail mode
+          const p = packagesCollection.find(pkg => pkg.id === packageId);
+          if (!p) return;
+
+          document.getElementById('package-modal-title').innerHTML = `<i data-lucide="package" class="w-5 h-5 text-violet-400"></i> Xem Chi Tiết & Chỉnh Sửa Package`;
+          document.getElementById('p-edit-id').value = p.id;
+          document.getElementById('p-name').value = p.name;
+          document.getElementById('p-code').value = p.code;
+          document.getElementById('p-price').value = p.price;
+          document.getElementById('p-cycle').value = p.cycle;
+          document.getElementById('p-status').value = p.status;
+          document.getElementById('p-created').value = p.created || '20/06/2026';
+
+          selectSve.value = p.serviceId;
+
+          document.getElementById('p-action-status-container').classList.remove('hidden');
+
+          // Render package history
+          if (!p.history || p.history.length === 0) {
+            histBody.innerHTML = '<tr><td colspan="4" class="px-3 py-3 text-center text-gray-500 italic">Chưa phát sinh thay đổi cấu hình ghi nhận.</td></tr>';
+          } else {
+            p.history.forEach(log => {
+              histBody.insertAdjacentHTML('beforeend', `
+                <tr class="hover:bg-slate-900/60 font-sans">
+                  <td class="px-3 py-1.5 text-gray-500 font-mono text-[9px] whitespace-nowrap">${log.time}</td>
+                  <td class="px-3 py-1.5 font-semibold text-violet-400 whitespace-nowrap">${log.user}</td>
+                  <td class="px-3 py-1.5 font-bold text-gray-250">${log.action}</td>
+                  <td class="px-3 py-1.5 text-gray-300 font-mono text-[9px] max-w-[150px] truncate" title="${log.details}">${log.details}</td>
+                </tr>
+              `);
+            });
+          }
+        }
+
+        modal.classList.remove('hidden');
+        lucide.createIcons();
+      }
+
+      // SAVE PACKAGE FORM
+      function savePackageForm() {
+        const idVal = document.getElementById('p-edit-id').value;
+        const name = document.getElementById('p-name').value.trim();
+        const code = document.getElementById('p-code').value.trim().toUpperCase();
+        const price = document.getElementById('p-price').value.toString().trim();
+        const cycle = document.getElementById('p-cycle').value;
+        const status = document.getElementById('p-status').value;
+        const serviceIdSelected = parseInt(document.getElementById('p-service-id').value);
+
+        if (!name || !code || !price) {
+          showToast('error', 'Vui lòng điền đủ tất cả thông tin có dấu sao (*)!');
+          return;
+        }
+
+        const dateStr = new Date().toLocaleString('vi-VN');
+
+        if (idVal === '') {
+          // Create new package
+          const newId = packagesCollection.length > 0 ? Math.max(...packagesCollection.map(p => p.id)) + 1 : 1;
+          const newPkg = {
+            id: newId,
+            serviceId: serviceIdSelected,
+            name: name,
+            code: code,
+            price: price,
+            cycle: cycle,
+            status: status,
+            created: new Date().toLocaleDateString('vi-VN'),
+            history: [
+              { time: dateStr, user: "Admin System", action: "Khởi tạo", details: `Khởi tạo gói cước: ${name} (${code})` }
+            ]
+          };
+
+          packagesCollection.unshift(newPkg);
+          showToast('success', `✅ Thiết lập gói "${name}" thành công!`);
+        } else {
+          // Update package
+          const p = packagesCollection.find(pkg => pkg.id === parseInt(idVal));
+          if (!p) return;
+
+          let diffDetails = [];
+          if (p.name !== name) diffDetails.push(`Đổi tên (${p.name} ➔ ${name})`);
+          if (p.code !== code) diffDetails.push(`Đổi mã (${p.code} ➔ ${code})`);
+          if (p.price !== price) diffDetails.push(`Sửa giá (${p.price} ₫ ➔ ${price} ₫)`);
+          if (p.cycle !== cycle) diffDetails.push(`Đổi chu kỳ (${p.cycle} ➔ ${cycle})`);
+          if (p.status !== status) diffDetails.push(`Đổi trạng thái (${p.status} ➔ ${status})`);
+          if (p.serviceId !== serviceIdSelected) {
+            const oldSvc = servicesCollection.find(s => s.id === p.serviceId);
+            const newSvc = servicesCollection.find(s => s.id === serviceIdSelected);
+            diffDetails.push(`Đổi game (${oldSvc ? oldSvc.name : p.serviceId} ➔ ${newSvc ? newSvc.name : serviceIdSelected})`);
+          }
+
+          p.name = name;
+          p.code = code;
+          p.price = price;
+          p.cycle = cycle;
+          p.status = status;
+          p.serviceId = serviceIdSelected;
+
+          if (diffDetails.length > 0) {
+            if (!p.history) p.history = [];
+            p.history.unshift({
+              time: dateStr,
+              user: "Admin System",
+              action: "Cấu hình chỉnh sửa",
+              details: diffDetails.join(", ")
+            });
+          }
+
+          showToast('success', `✅ Cập nhật thay đổi cấu hình package "${name}" thành công!`);
+        }
+
+        showPackageEditorModal(false);
+        refreshCurrentlyVisiblePageData();
+      }
+
+      // QUICK CHANGE STATUS BUTTON
+      function changePackageStatusQuickly(packageId, newStatus) {
+        const p = packagesCollection.find(pkg => pkg.id === packageId);
+        if (!p) return;
+
+        const dateStr = new Date().toLocaleString('vi-VN');
+        const oldStat = p.status;
+        p.status = newStatus;
+
+        if (!p.history) p.history = [];
+        p.history.unshift({
+          time: dateStr,
+          user: "Admin System",
+          action: "Quick Toggle",
+          details: `Thay đổi nhanh trạng thái: ${oldStat} ➔ ${newStatus}`
+        });
+
+        showToast('success', `✅ Đã cập nhật nhanh trạng thái: ${newStatus}`);
+        refreshCurrentlyVisiblePageData();
+      }
+
+      // STATE REFESHER BASED ON VIEW SELECTION
+      function refreshCurrentlyVisiblePageData() {
+        if (currentMainTab === 'services') {
+          // Refers services lists
+          renderServicesTable();
+          if (inspectedServiceId !== null) {
+            renderAssociatedPackagesMini(inspectedServiceId);
+          }
+          if (currentServiceContextId !== null) {
+            renderServiceSpecificPackagesTable();
+          }
+        } else {
+          // Refers global packages
+          renderGlobalPackagesTable();
+        }
+      }
+
+      // CHANGE DETAILED STATUS FROM ACTIVE/INACTIVE ACTION
+      function changeSelectedPackageStatus(newStatus) {
+        const idVal = document.getElementById('p-edit-id').value;
+        if (idVal === '') {
+          document.getElementById('p-status').value = newStatus;
+          showToast('info', 'Trạng thái khởi tạo được gán: ' + newStatus);
+        } else {
+          const pId = parseInt(idVal);
+          const p = packagesCollection.find(pkg => pkg.id === pId);
+          if (!p) return;
+
+          const oldStat = p.status;
+          p.status = newStatus;
+          document.getElementById('p-status').value = newStatus;
+
+          const dateStr = new Date().toLocaleString('vi-VN');
+          if (!p.history) p.history = [];
+          p.history.unshift({
+            time: dateStr,
+            user: "Admin System",
+            action: "Action Click",
+            details: `Kích hoạt lệnh trạng thái: ${oldStat} ➔ ${newStatus}`
+          });
+
+          showToast('success', `✅ Gửi yêu cập thay đổi trạng thái và áp dụng ${newStatus}`);
+          showPackageEditorModal(true, pId); // Reload details dialog
+        }
       }
 
       // DRAWER INTERACTION
@@ -731,9 +1370,9 @@
         activeDrawerIps.forEach((ip, idx) => {
           list.insertAdjacentHTML('beforeend', `
             <tr class="hover:bg-gray-800/10">
-              <td class="p-2 text-cyan-400">${ip}</td>
+              <td class="p-2 text-cyan-400 font-mono text-xs">${ip}</td>
               <td class="p-2 text-right">
-                <button type="button" onclick="deleteDrawerIp(${idx})" class="text-red-500 hover:text-red-400 p-0.5 font-sans">🗑</button>
+                <button type="button" onclick="deleteDrawerIp(${idx})" class="text-red-500 hover:text-red-400 p-0.5 font-sans cursor-pointer text-xs">🗑</button>
               </td>
             </tr>
           `);
@@ -767,7 +1406,7 @@
         renderServicesTable();
         toggleDrawer(false);
 
-        // Reset
+        // Reset inputs
         document.getElementById('f-game').value = '';
         document.getElementById('f-subcode').value = '';
         document.getElementById('f-desc').value = '';

@@ -349,6 +349,7 @@ function autoConfigurePortalUI() {
 
   // Inject the advanced interactive avatar dropdown multi-site & multi-tenant switcher
   injectInteractiveAvatarMenu(user, partner, isPartnerPortal);
+  injectMailboxIcon(user, isPartnerPortal);
 }
 
 // Inject advanced identity management & space switcher drop menu directly when user clicks their avatar
@@ -500,6 +501,199 @@ function injectInteractiveAvatarMenu(user, currentPartner, isPartnerPortal) {
     });
   }
 }
+
+// Inject interactive custom inbox/mailbox icon on the header
+function injectMailboxIcon(user, isPartnerPortal) {
+  const header = document.querySelector("header");
+  if (!header) return;
+
+  const actionsBlock = header.querySelector(".flex.items-center.gap-4") || header;
+  if (!actionsBlock) return;
+
+  // Find avatar dropdown container as the attachment mark
+  const avatarDropdown = document.getElementById("gamehub-avatar-dropdown-container") || actionsBlock.lastElementChild;
+  if (!avatarDropdown) return;
+
+  if (document.getElementById("gamehub-mailbox-container")) return;
+
+  // Create mailbox container
+  const mailboxContainer = document.createElement("div");
+  mailboxContainer.id = "gamehub-mailbox-container";
+  mailboxContainer.className = "relative inline-block text-left mr-1 shrink-0";
+
+  const inboxData = isPartnerPortal ? [
+    {
+      id: 1,
+      tag: "Biến động",
+      title: "ADMIN phê duyệt yêu cầu đổi pháp nhân",
+      desc: "Thay đổi thông tin Garena VN đã được đồng bộ hóa thành công trên hạ tầng Core.",
+      time: "3 giờ trước",
+      unread: true,
+      target: "info.html"
+    },
+    {
+      id: 2,
+      tag: "Dịch vụ",
+      title: "API 'Topup Card' đã kích hoạt",
+      desc: "API nạp game chuyên dụng mới được kích hoạt trên hệ thống cổng GameHub.",
+      time: "1 ngày trước",
+      unread: true,
+      target: "services.html"
+    },
+    {
+      id: 3,
+      tag: "Đối soát",
+      title: "Biên bản đối soát kỳ mới nhất",
+      desc: "Bản đối soát quyết toán hoa hồng đã sẵn sàng trên kênh xuất báo cáo.",
+      time: "3 ngày trước",
+      unread: false,
+      target: "reports.html"
+    }
+  ] : [
+    {
+      id: 1,
+      tag: "Đầu mối B2B",
+      title: "Yêu cầu thay đổi thông tin Garena VN",
+      desc: "CEO Trần Hồng Nam đề xuất cập nhật đại diện pháp luật & ĐKKD điện tử.",
+      time: "2 giờ trước",
+      unread: true,
+      target: "partners.html"
+    },
+    {
+      id: 2,
+      tag: "Cổng API",
+      title: "VNG đề xuất gán thêm băng thông API",
+      desc: "Phân bổ whitelist IP bổ sung cho cụm kết nối game mới 'Đại Chiến Thần thoại'.",
+      time: "1 ngày trước",
+      unread: true,
+      target: "apis.html"
+    },
+    {
+      id: 3,
+      tag: "Bảo mật",
+      title: "Báo cáo lỗi tích hợp Core Gateway",
+      desc: "Đối tác Garena gửi mã lỗi 502 liên tiếp trên kênh nạp game thẻ Sò.",
+      time: "2 ngày trước",
+      unread: false,
+      target: "logs.html"
+    }
+  ];
+
+  const unreadCount = inboxData.filter(x => x.unread).length;
+  const badgeMarkup = unreadCount > 0 
+    ? `<span id="mailbox-unread-badge" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 font-bold text-[8px] text-white flex items-center justify-center border border-[#0D1117] animate-bounce">${unreadCount}</span>`
+    : '';
+
+  let itemsMarkup = '';
+  inboxData.forEach(item => {
+    const unreadBg = item.unread ? 'bg-violet-950/15 border-violet-500/15' : 'bg-[#0D1117]/40 border-gray-800/40';
+    const unreadCircle = item.unread ? '<span class="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0"></span>' : '';
+    itemsMarkup += `
+      <div onclick="window.location.href='${item.target}'" class="p-2.5 rounded-lg border text-left cursor-pointer transition-all hover:bg-gray-800/40 hover:border-gray-700/65 flex flex-col gap-1 ${unreadBg}">
+        <div class="flex items-center justify-between font-medium text-[10px]">
+          <span class="text-[9px] uppercase font-bold tracking-wider text-violet-400 pl-1 border-l-2 border-violet-500">${item.tag}</span>
+          <div class="flex items-center gap-1.5 text-gray-500 font-mono text-[9px]">
+            <span>${item.time}</span>
+            ${unreadCircle}
+          </div>
+        </div>
+        <p class="font-bold text-[11px] text-gray-200 truncate pr-2 mt-0.5">${item.title}</p>
+        <p class="text-[10px] text-gray-400 line-clamp-2 leading-relaxed font-sans">${item.desc}</p>
+      </div>
+    `;
+  });
+
+  mailboxContainer.innerHTML = `
+    <!-- Trigger Button -->
+    <button id="gamehub-mailbox-trigger" class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-900/40 hover:bg-slate-800/60 border border-gray-800 hover:border-gray-700 transition-all cursor-pointer relative" title="Hòm thư thông báo">
+      <i data-lucide="mail" class="w-4 h-4 text-violet-400"></i>
+      ${badgeMarkup}
+    </button>
+
+    <!-- Dropdown Content -->
+    <div id="gamehub-mailbox-menu" class="absolute right-0 top-full mt-2 w-80 bg-[#161B22] border border-gray-800 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] p-3 space-y-3 hidden z-50 transform scale-95 opacity-0 transition-all duration-150 origin-top-right">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-violet-400 flex items-center gap-1.5 font-mono">
+          <i data-lucide="inbox" class="w-3.5 h-3.5"></i> HÒM THƯ B2B ONLINE
+        </span>
+        <button onclick="window.clearAllMailNotifications(event)" class="text-[9px] text-gray-400 hover:text-cyan-400 font-medium transition-colors cursor-pointer">Đọc tất cả</button>
+      </div>
+      <div class="space-y-2 max-h-[280px] overflow-y-auto">
+        ${itemsMarkup}
+      </div>
+      <div class="border-t border-gray-800 pt-2 text-center">
+        <span class="text-[9px] text-gray-500 font-sans tracking-wide">Thời gian phản hồi SLA tiêu chuẩn &lt; 24h</span>
+      </div>
+    </div>
+  `;
+
+  // Insert before the avatar dropdown in actions block
+  actionsBlock.insertBefore(mailboxContainer, avatarDropdown);
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+
+  // Bind dropdown interaction
+  const triggerBtn = document.getElementById("gamehub-mailbox-trigger");
+  const mailboxMenu = document.getElementById("gamehub-mailbox-menu");
+  
+  if (triggerBtn && mailboxMenu) {
+    triggerBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isHidden = mailboxMenu.classList.contains("hidden");
+      
+      closeOtherPortalsMenus();
+
+      if (isHidden) {
+        mailboxMenu.classList.remove("hidden");
+        mailboxMenu.offsetHeight;
+        mailboxMenu.classList.remove("scale-95", "opacity-0");
+        mailboxMenu.classList.add("scale-100", "opacity-100");
+        triggerBtn.classList.add("bg-slate-800/80", "border-gray-700");
+      } else {
+        closeMailboxMenu();
+      }
+    });
+
+    function closeMailboxMenu() {
+      mailboxMenu.classList.remove("scale-100", "opacity-100");
+      mailboxMenu.classList.add("scale-95", "opacity-0");
+      triggerBtn.classList.remove("bg-slate-800/80", "border-gray-700");
+      setTimeout(() => {
+        mailboxMenu.classList.add("hidden");
+      }, 150);
+    }
+
+    function closeOtherPortalsMenus() {
+      const avatarMenu = document.getElementById("gamehub-avatar-menu");
+      if (avatarMenu && !avatarMenu.classList.contains("hidden")) {
+        const btn = document.getElementById("gamehub-avatar-trigger");
+        const arrow = document.getElementById("gamehub-avatar-arrow");
+        avatarMenu.classList.remove("scale-100", "opacity-100");
+        avatarMenu.classList.add("scale-95", "opacity-0");
+        if (arrow) arrow.classList.remove("rotate-180");
+        if (btn) btn.classList.remove("bg-slate-800/80", "border-gray-700");
+        setTimeout(() => avatarMenu.classList.add("hidden"), 150);
+      }
+    }
+
+    document.addEventListener("click", (event) => {
+      if (!mailboxMenu.classList.contains("hidden") && !mailboxContainer.contains(event.target)) {
+        closeMailboxMenu();
+      }
+    });
+  }
+}
+
+window.clearAllMailNotifications = function(e) {
+  if (e) e.stopPropagation();
+  const badge = document.getElementById("mailbox-unread-badge");
+  if (badge) badge.remove();
+  const dots = document.querySelectorAll("#gamehub-mailbox-menu .bg-violet-400");
+  dots.forEach(dot => dot.remove());
+  showToast("Đã đánh dấu đọc toàn bộ thông báo", "success");
+};
 
 // Global scope bindings for direct buttons click trigger
 window.switchPortalDirectly = function(targetPortal) {
@@ -676,9 +870,294 @@ function tailorPartnerDashboardData(partner) {
   }
 }
 
+// Get computed permissions for the current logged-in user
+function getLoggedInUserPermissions() {
+  const user = getLoggedInUser();
+  if (!user) return [];
+  
+  // If Super Master or role is "master", they automatically get all administrative scopes
+  if (user.role === "master" || user.email === "master@gamehub.vn") {
+    return [
+      "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
+      "c-api-view", "c-api-assign", "c-api-revoke",
+      "c-srv-view", "c-srv-add", "c-srv-add-pkg", "c-srv-edit", "c-srv-edit-pkg",
+      "c-log-view", "c-fin-view", "c-usr-invite", "c-usr-perm", "c-role-view", "c-role-create", "c-role-update"
+    ];
+  }
+  
+  // Try retrieving user customization matrix from localStorage (synced with users.html)
+  const storedUsers = localStorage.getItem("gamehub_internal_users");
+  if (storedUsers) {
+    try {
+      const internalUsers = JSON.parse(storedUsers);
+      // Try to find matching user inside local users list
+      const matched = internalUsers.find(u => u.email.toLowerCase() === user.email.toLowerCase());
+      if (matched) {
+        if (matched.roleMode === 'manual') {
+          return matched.checks || [];
+        } else {
+          // pre-defined role mapping
+          const storedRoles = localStorage.getItem("gamehub_system_roles");
+          if (storedRoles) {
+            const systemRoles = JSON.parse(storedRoles);
+            const roleObj = systemRoles.find(r => r.key === matched.role);
+            if (roleObj) return roleObj.checks || [];
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to parse internal users storage in auth helper:", e);
+    }
+  }
+  
+  // Fallback to demo defaults mapped out based on current identity / roleLabel / active role
+  let roles = [];
+  const storedRoles = localStorage.getItem("gamehub_system_roles");
+  if (storedRoles) {
+    try { roles = JSON.parse(storedRoles); } catch (e) {}
+  }
+  if (!roles || roles.length === 0) {
+    roles = [
+      {
+        key: "Super Admin",
+        checks: [
+          "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
+          "c-api-view", "c-api-assign", "c-api-revoke",
+          "c-srv-view", "c-srv-add", "c-srv-add-pkg", "c-srv-edit", "c-srv-edit-pkg",
+          "c-log-view", "c-fin-view", "c-usr-invite", "c-usr-perm", "c-role-view", "c-role-create", "c-role-update"
+        ]
+      },
+      {
+        key: "Admin",
+        checks: [
+          "c-p-view", "c-p-create", "c-p-edit", "c-p-process", "c-p-history",
+          "c-api-view", "c-api-assign",
+          "c-srv-view", "c-srv-edit",
+          "c-log-view", "c-usr-perm", "c-role-view"
+        ]
+      },
+      {
+        key: "Auditor",
+        checks: [
+          "c-p-view", "c-p-history",
+          "c-api-view", "c-srv-view",
+          "c-log-view", "c-fin-view", "c-role-view"
+        ]
+      },
+      {
+        key: "Operator",
+        checks: [
+          "c-api-view", "c-api-assign",
+          "c-srv-view", "c-log-view"
+        ]
+      }
+    ];
+  }
+
+  // Map session attributes of the simulated active persona to a system role template
+  const lowerLabel = (user.roleLabel || "").toLowerCase();
+  const lowerRole = (user.role || "").toLowerCase();
+  
+  if (lowerLabel.includes("super admin") || lowerLabel.includes("tối cao") || lowerRole === "master") {
+    const r = roles.find(o => o.key === "Super Admin");
+    return r ? r.checks : [];
+  } else if (lowerLabel.includes("phó") || lowerLabel.includes("assistant admin") || lowerLabel.includes("hệ thống") || lowerRole === "admin") {
+    const r = roles.find(o => o.key === "Admin");
+    return r ? r.checks : [];
+  } else if (lowerLabel.includes("auditor") || lowerLabel.includes("kiểm toán") || lowerRole === "auditor") {
+    const r = roles.find(o => o.key === "Auditor");
+    return r ? r.checks : [];
+  } else if (lowerLabel.includes("operator") || lowerLabel.includes("vận hành") || lowerRole === "operator") {
+    const r = roles.find(o => o.key === "Operator");
+    return r ? r.checks : [];
+  }
+
+  // Safe default base privileges
+  return ["c-p-view", "c-api-view", "c-srv-view", "c-log-view"];
+}
+
+// Dynamically filter sidebar items, block direct violations, and disable page interactions
+function enforceBusinessPermissions() {
+  const isAdminPortal = window.location.pathname.includes('/admin/');
+  if (!isAdminPortal) return;
+
+  const perms = getLoggedInUserPermissions();
+
+  // 1. Sidebar Navigation Elements Visibility Check
+  const sidebarLinks = document.querySelectorAll('aside nav a');
+  sidebarLinks.forEach(link => {
+    const href = link.getAttribute('href') || '';
+    
+    // Hide components if the user lacks basic view permission
+    if (href.includes('partners.html') && !perms.includes('c-p-view')) {
+      link.remove();
+    }
+    if (href.includes('apis.html') && !perms.includes('c-api-view')) {
+      link.remove();
+    }
+    if (href.includes('services.html') && !perms.includes('c-srv-view')) {
+      link.remove();
+    }
+    if (href.includes('logs.html') && !perms.includes('c-log-view')) {
+      link.remove();
+    }
+    if (href.includes('reports.html') && !perms.includes('c-fin-view')) {
+      link.remove();
+    }
+    if (href.includes('users.html') && !perms.includes('c-usr-perm') && !perms.includes('c-role-view')) {
+      link.remove();
+    }
+  });
+
+  // 2. Page-level Navigation Guard (Access Denied View)
+  const currentPath = window.location.pathname;
+  let hasAccess = true;
+  let requiredPermission = "";
+
+  if (currentPath.includes('partners.html')) {
+    hasAccess = perms.includes('c-p-view');
+    requiredPermission = "Cung cấp & Xem định danh liên thông Partner (c-p-view)";
+  } else if (currentPath.includes('apis.html')) {
+    hasAccess = perms.includes('c-api-view');
+    requiredPermission = "Tra cứu danh mục APIs cổng trung chuyển (c-api-view)";
+  } else if (currentPath.includes('services.html')) {
+    hasAccess = perms.includes('c-srv-view');
+    requiredPermission = "Khảo sát cấu hình phân hệ Service (c-srv-view)";
+  } else if (currentPath.includes('logs.html')) {
+    hasAccess = perms.includes('c-log-view');
+    requiredPermission = "Truy vết trace log thanh toán tích hợp (c-log-view)";
+  } else if (currentPath.includes('reports.html')) {
+    hasAccess = perms.includes('c-fin-view');
+    requiredPermission = "Xem báo cáo thống kê đối soát tài chính (c-fin-view)";
+  } else if (currentPath.includes('users.html')) {
+    hasAccess = perms.includes('c-usr-perm') || perms.includes('c-role-view');
+    requiredPermission = "Quản lý ủy quyền nhân sự & Vai trò Admin (c-usr-perm)";
+  }
+
+  if (!hasAccess) {
+    const wrapper = document.querySelector('main') || document.body;
+    
+    // Inject polished Access Denied board with alternative operations
+    wrapper.innerHTML = `
+      <div id="access-denied-block" class="flex flex-col items-center justify-center min-h-[65vh] text-center p-8 bg-[#161B22] border border-gray-800 rounded-2xl max-w-2xl mx-auto my-12 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-orange-500 to-red-600"></div>
+        <div class="w-16 h-16 rounded-full bg-red-950/40 border border-red-500/30 flex items-center justify-center text-red-500 mb-6 shadow-lg shadow-red-950/20">
+          <i data-lucide="shield-alert" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-xl font-extrabold text-gray-100 tracking-tight leading-none uppercase">QUYỀN TRUY CẬP ĐÃ BỊ TƯỚC BỎ HOẶC CHƯA CẤP PHÉP</h2>
+        <p class="text-[10px] text-gray-500 mt-2 font-mono uppercase tracking-widest font-semibold">Security Alert — B2B Authorization Guard</p>
+        
+        <p class="text-xs text-gray-300 max-w-lg mt-5 leading-relaxed bg-black/40 border border-gray-800 p-4 rounded-xl text-left font-sans">
+          Tài khoản hiện hành: <strong class="text-cyan-400 font-mono font-medium">${getLoggedInUser().email || "admin@gamehub.vn"}</strong><br>
+          Chức danh nghiệp vụ: <strong class="text-violet-400 font-medium">${getLoggedInUser().roleLabel || "Thành viên ban điều hành"}</strong><br>
+          Yêu cầu quyền hạn tối thiểu: <span class="bg-red-500/15 border border-red-500/20 px-1.5 py-0.5 rounded text-red-400 uppercase font-mono font-bold text-[9px] tracking-wider ml-1">${requiredPermission}</span>
+        </p>
+
+        <p class="text-xs text-gray-400 max-w-md mt-4 leading-relaxed italic">
+          Nếu bạn vừa được thu hồi quyền hoặc thay đổi cấu hình tính năng mảng này trong tab "Người dùng & Phân quyền", hệ thống đã tức thì áp dụng lệnh bảo mật để phân tách nghiệp vụ.
+        </p>
+
+        <div class="flex gap-3 mt-8">
+          <a href="dashboard.html" class="bg-[#0D1117] hover:bg-gray-800 text-gray-300 hover:text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg border border-gray-700 transition-all flex items-center gap-2 cursor-pointer select-none">
+            <i data-lucide="home" class="w-3.5 h-3.5"></i> Về trang Dashboard
+          </a>
+          <button onclick="document.getElementById('gamehub-avatar-trigger').click()" class="bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-lg transition-all flex items-center gap-2 cursor-pointer select-none shadow">
+            Chuyển nhanh vai trò khác <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    `;
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+    return;
+  }
+
+  // 3. Page-Level Actions Filtering for Read-Only roles (lock creation/editing)
+  // Disable create partner button
+  if (currentPath.includes('partners.html') && !perms.includes('c-p-create')) {
+    const btnCreate = document.querySelector('button[onclick*="toggleDrawer(true)"]');
+    if (btnCreate) {
+      btnCreate.classList.add('opacity-40', 'pointer-events-none', 'select-none');
+      btnCreate.setAttribute('disabled', 'true');
+      btnCreate.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i> VÔ HIỆU HÓA TẠO MỚI`;
+    }
+    // Also disable action buttons inside the table if not permitted to edit
+    if (!perms.includes('c-p-edit')) {
+      setTimeout(() => {
+        const tableActions = document.querySelectorAll('button[onclick*="inspectPartner"], button[onclick*="toggleDrawer"]');
+        tableActions.forEach(btn => {
+          btn.classList.add('opacity-30', 'pointer-events-none');
+          btn.setAttribute('disabled', 'true');
+        });
+      }, 50);
+    }
+  }
+
+  // Disable assign API button
+  if (currentPath.includes('apis.html') && !perms.includes('c-api-assign')) {
+    const btnAssign = document.querySelector('button[onclick*="toggleDrawer(true)"]');
+    if (btnAssign) {
+      btnAssign.classList.add('opacity-40', 'pointer-events-none', 'select-none');
+      btnAssign.setAttribute('disabled', 'true');
+      btnAssign.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i> KHÔNG CÓ QUYỀN GÁN API`;
+    }
+  }
+
+  // Disable create service/package button
+  if (currentPath.includes('services.html') && (!perms.includes('c-srv-add') && !perms.includes('c-srv-add-pkg'))) {
+    const btnAddService = document.querySelector('button[onclick*="toggleDrawer(true)"]');
+    if (btnAddService) {
+      btnAddService.classList.add('opacity-40', 'pointer-events-none', 'select-none');
+      btnAddService.setAttribute('disabled', 'true');
+      btnAddService.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i> KHÔNG CHO PHÉP SỬA ĐỔI`;
+    }
+  }
+
+  // Disable user management invitations and permissions toggles
+  if (currentPath.includes('users.html')) {
+    const btnCreateUser = document.querySelector('button[onclick*="toggleDrawer(true)"]');
+    if (btnCreateUser && !perms.includes('c-usr-invite')) {
+      btnCreateUser.classList.add('opacity-40', 'pointer-events-none');
+      btnCreateUser.setAttribute('disabled', 'true');
+      btnCreateUser.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i> VÔ HIỆU HÓA MỜI THÀNH VIÊN`;
+    }
+
+    if (!perms.includes('c-usr-perm')) {
+      const btnSaveRole = document.querySelector('button[onclick*="saveRoleConfig()"]');
+      if (btnSaveRole) {
+        btnSaveRole.classList.add('opacity-40', 'pointer-events-none');
+        btnSaveRole.setAttribute('disabled', 'true');
+        btnSaveRole.innerHTML = `<i data-lucide="lock" class="w-3.5 h-3.5"></i> MA TRẬN ĐÃ KHÓA (READ ONLY)`;
+      }
+
+      // Automatically lock all interactive controls in users.html
+      setTimeout(() => {
+        const matrixCheckboxes = document.querySelectorAll('.tab-p-chk, .matrix-chk');
+        matrixCheckboxes.forEach(box => {
+          box.setAttribute('disabled', 'true');
+          box.classList.add('cursor-not-allowed', 'opacity-60');
+          box.style.pointerEvents = 'none';
+        });
+
+        // Hide delete actions or detail modification capability
+        const tableActionButtons = document.querySelectorAll('button[onclick*="showDeleteModal"], button[onclick*="toggleDrawer"]');
+        tableActionButtons.forEach(btn => {
+          if (btn.textContent.includes("Xóa")) {
+            btn.classList.add('hidden');
+          } else {
+            btn.innerHTML = `<i data-lucide="eye" class="w-3.5 h-3.5"></i> Chỉ Xem chi tiết`;
+          }
+        });
+      }, 100);
+    }
+  }
+}
+
 // Auto kick-off when the DOM resources are fully mounted
 document.addEventListener("DOMContentLoaded", () => {
   autoConfigurePortalUI();
+  enforceBusinessPermissions();
   
   // Re-run lucide icons rendering for newly injected html nodes
   if (window.lucide) {
